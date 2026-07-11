@@ -1,10 +1,10 @@
 import { useMemo, useState } from "react";
-import { Search, EyeOff, Eye, CalendarClock, RotateCcw } from "lucide-react";
+import { EyeOff, Eye, CalendarClock, RotateCcw } from "lucide-react";
 import {
   Card,
   CardContent,
   Select,
-  TextInput,
+  SearchInput,
   Button,
   Badge,
   ColorDot,
@@ -87,16 +87,12 @@ export function EventCatalog({ onCreateCampaign }: EventCatalogProps) {
       {/* Filters */}
       <Card>
         <CardContent className="flex flex-col gap-3">
-          <div className="relative">
-            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-            <TextInput
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              placeholder="Search events…"
-              className="pl-9"
-              aria-label="Search events"
-            />
-          </div>
+          <SearchInput
+            value={query}
+            onValueChange={setQuery}
+            placeholder="Search events…"
+            aria-label="Search events"
+          />
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
             <Select
               value={country}

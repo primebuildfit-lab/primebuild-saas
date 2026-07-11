@@ -97,7 +97,6 @@ export default function SearchRoute() {
       <div className="relative mb-5">
         <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
         <TextInput
-          autoFocus
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Search everything…"

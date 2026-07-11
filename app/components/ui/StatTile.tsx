@@ -30,7 +30,7 @@ export function StatTile({
       <p className="mt-2 text-2xl font-semibold tracking-tight text-gray-900">
         {value}
       </p>
-      {hint ? <p className="mt-1 text-xs text-gray-400">{hint}</p> : null}
+      {hint ? <p className="mt-1 text-xs text-gray-500">{hint}</p> : null}
     </div>
   );
 }

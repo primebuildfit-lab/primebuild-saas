@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router";
-import { Plus, EyeOff, ExternalLink, Tag } from "lucide-react";
+import { Plus, EyeOff, ExternalLink, Tag, CalendarPlus } from "lucide-react";
 import { Drawer, Button, Badge, ColorDot, StatusPill, EmptyState } from "~/components/ui";
-import { CalendarPlus } from "lucide-react";
 import { useData } from "~/context/DataContext";
 import type { GlobalEvent } from "~/types/domain";
 import { entriesForYear, entriesOnDay } from "~/lib/planning";
@@ -33,7 +32,13 @@ export function DayDetail({
     hideEvent,
   } = useData();
 
-  if (!date) return <Drawer open={open} onClose={onClose} title="Day" children={null} />;
+  if (!date) {
+    return (
+      <Drawer open={open} onClose={onClose} title="Day">
+        {null}
+      </Drawer>
+    );
+  }
 
   const year = date.getFullYear();
   const entries = entriesOnDay(

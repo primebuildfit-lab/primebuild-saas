@@ -38,7 +38,7 @@ export function AdminConsole() {
         <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
         <p>
           Platform admin — the country and official-event catalog is shared by
-          every store. Merchants can hide events for themselves but can't edit
+          every store. Merchants can hide events for themselves but can’t edit
           this catalog.
         </p>
       </div>

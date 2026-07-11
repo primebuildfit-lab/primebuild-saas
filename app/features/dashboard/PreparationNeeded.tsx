@@ -24,7 +24,7 @@ export function PreparationNeeded({ items, onPrepare }: PreparationNeededProps) 
         {items.length === 0 ? (
           <div className="flex items-center gap-2 py-4 text-sm text-gray-500">
             <CheckCircle2 className="h-4 w-4 text-emerald-500" />
-            You're on track — nothing needs prep right now.
+            You’re on track — nothing needs prep right now.
           </div>
         ) : (
           <ul className="space-y-3">

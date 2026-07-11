@@ -33,6 +33,8 @@ export function CardTitle({
   ...props
 }: HTMLAttributes<HTMLHeadingElement>) {
   return (
+    // Passthrough heading wrapper; content is always provided by callers.
+    // eslint-disable-next-line jsx-a11y/heading-has-content
     <h3
       className={cn("text-sm font-semibold text-gray-900", className)}
       {...props}

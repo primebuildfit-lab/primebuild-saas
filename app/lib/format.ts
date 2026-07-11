@@ -17,8 +17,3 @@ export function humanizeCategory(category: string): string {
     .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
     .join(" ");
 }
-
-/** Compact possessive-free label for a country list, e.g. "US, CA". */
-export function joinCodes(codes: string[]): string {
-  return codes.join(", ");
-}

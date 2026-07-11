@@ -24,5 +24,6 @@ export type { TabItem } from "./Tabs";
 export { PageHeader } from "./PageHeader";
 export { Field } from "./Field";
 export { TextInput, Textarea, Select } from "./FormControls";
+export { SearchInput } from "./SearchInput";
 export { SegmentedControl } from "./SegmentedControl";
 export { Spinner, Skeleton, LoadingState, ErrorState } from "./States";

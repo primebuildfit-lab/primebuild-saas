@@ -77,8 +77,8 @@ export default function CampaignsRoute() {
         <div className="mb-4 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
           <p className="flex-1">
-            You've reached your plan's saved-campaign limit. Existing campaigns
-            stay editable, but you'll need to upgrade to save more.
+            You’ve reached your plan’s saved-campaign limit. Existing campaigns
+            stay editable, but you’ll need to upgrade to save more.
           </p>
           <LinkButton to="/app/billing" size="sm">
             Upgrade

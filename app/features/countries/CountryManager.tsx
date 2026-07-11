@@ -62,7 +62,7 @@ export function CountryManager() {
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
           <p>
             You have more countries enabled than your current plan allows.
-            Existing countries stay active, but you can't add more until you{" "}
+            Existing countries stay active, but you can’t add more until you{" "}
             <Link to="/app/billing" className="font-medium underline">
               upgrade
             </Link>{" "}

@@ -17,11 +17,6 @@ export function canAddCountry(plan: Plan, currentCount: number): boolean {
   return !countryLimitReached(plan, currentCount);
 }
 
-/** Human-readable limit ("Unlimited" for null). */
-export function formatLimit(limit: number | null): string {
-  return limit === null ? "Unlimited" : String(limit);
-}
-
 /** True when the store has reached its saved-campaign limit for the plan. */
 export function savedCampaignLimitReached(
   plan: Plan,

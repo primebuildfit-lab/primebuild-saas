@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
-import { Menu, ChevronDown, Search } from "lucide-react";
+import { Menu, Search } from "lucide-react";
 import { useCurrentStore } from "~/context/StoreContext";
 import { usePlan } from "~/context/PlanContext";
 import { Badge } from "~/components/ui/Badge";
@@ -49,7 +49,8 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
           <Search className="h-5 w-5" />
         </button>
         <Badge tone="brand">{plan.name}</Badge>
-        {/* Store identity. Phase 5: becomes a real store switcher from Shopify sessions. */}
+        {/* Store identity (read-only). Phase 5: becomes a real store switcher from
+            Shopify sessions — no dropdown affordance until it actually switches. */}
         <div className="flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-2.5 py-1.5">
           <div className="flex h-6 w-6 items-center justify-center rounded-md bg-gray-900 text-[11px] font-semibold text-white">
             {store.name.slice(0, 1)}
@@ -57,7 +58,6 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
           <span className="hidden text-sm font-medium text-gray-700 sm:block">
             {store.name}
           </span>
-          <ChevronDown className="h-4 w-4 text-gray-400" />
         </div>
       </div>
     </header>

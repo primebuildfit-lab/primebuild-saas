@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { Package, Layers, Search, Check } from "lucide-react";
-import { Modal, TextInput, Button, Badge } from "~/components/ui";
+import { Package, Layers, Check } from "lucide-react";
+import { Modal, SearchInput, Button, Badge } from "~/components/ui";
 import { catalogRefs, getCatalogRef, type CatalogRef } from "~/data";
 import { cn } from "~/lib/cn";
 
@@ -71,16 +71,13 @@ export function ProductPicker({
         </Button>
       }
     >
-      <div className="relative mb-3">
-        <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-        <TextInput
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Search catalog…"
-          className="pl-9"
-          aria-label="Search catalog"
-        />
-      </div>
+      <SearchInput
+        className="mb-3"
+        value={query}
+        onValueChange={setQuery}
+        placeholder="Search catalog…"
+        aria-label="Search catalog"
+      />
 
       <div className="max-h-80 space-y-1 overflow-y-auto">
         {results.map((ref) => {

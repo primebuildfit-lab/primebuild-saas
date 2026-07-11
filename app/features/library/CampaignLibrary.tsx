@@ -1,12 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router";
-import {
-  Library,
-  CalendarPlus,
-  ExternalLink,
-  GitBranch,
-  Search,
-} from "lucide-react";
+import { Library, CalendarPlus, ExternalLink, GitBranch } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -16,7 +10,7 @@ import {
   Badge,
   StatusPill,
   EmptyState,
-  TextInput,
+  SearchInput,
   SegmentedControl,
 } from "~/components/ui";
 import { useData } from "~/context/DataContext";
@@ -98,16 +92,13 @@ export function CampaignLibrary() {
   return (
     <div className="space-y-4">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div className="relative w-full sm:max-w-xs">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-          <TextInput
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search memory…"
-            className="pl-9"
-            aria-label="Search campaign memory"
-          />
-        </div>
+        <SearchInput
+          className="w-full sm:max-w-xs"
+          value={query}
+          onValueChange={setQuery}
+          placeholder="Search memory…"
+          aria-label="Search campaign memory"
+        />
         <SegmentedControl<Scope>
           aria-label="Library scope"
           segments={[

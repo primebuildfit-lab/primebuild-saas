@@ -18,7 +18,6 @@ import {
   ConfirmDialog,
 } from "~/components/ui";
 import { useData } from "~/context/DataContext";
-import type { Campaign } from "~/types/domain";
 import { getCountry } from "~/data";
 import { formatDate, formatDateRange } from "~/lib/dates";
 import { differenceInCalendarDays, parseISO } from "date-fns";
@@ -58,7 +57,11 @@ export function CampaignDetail({
 
   const open = Boolean(campaign);
   if (!campaign) {
-    return <Drawer open={open} onClose={onClose} children={null} />;
+    return (
+      <Drawer open={open} onClose={onClose}>
+        {null}
+      </Drawer>
+    );
   }
 
   const event = campaign.globalEventId

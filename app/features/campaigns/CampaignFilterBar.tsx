@@ -1,5 +1,4 @@
-import { Search } from "lucide-react";
-import { Card, CardContent, Select, TextInput } from "~/components/ui";
+import { Card, CardContent, Select, SearchInput } from "~/components/ui";
 import { useData } from "~/context/DataContext";
 import { getCountry } from "~/data";
 import type { CampaignStatus } from "~/types/domain";
@@ -32,16 +31,12 @@ export function CampaignFilterBar({ filters, onChange }: CampaignFilterBarProps)
   return (
     <Card>
       <CardContent className="flex flex-col gap-3">
-        <div className="relative">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
-          <TextInput
-            value={filters.query}
-            onChange={(e) => set({ query: e.target.value })}
-            placeholder="Search campaigns…"
-            className="pl-9"
-            aria-label="Search campaigns"
-          />
-        </div>
+        <SearchInput
+          value={filters.query}
+          onValueChange={(query) => set({ query })}
+          placeholder="Search campaigns…"
+          aria-label="Search campaigns"
+        />
         <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
           <Select
             value={filters.status}

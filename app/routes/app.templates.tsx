@@ -28,7 +28,7 @@ export default function TemplatesRoute() {
   const [createOpen, setCreateOpen] = useState(false);
   const [confirmId, setConfirmId] = useState<string | null>(null);
 
-  const useTemplate = (templateId: string) => {
+  const applyTemplate = (templateId: string) => {
     const template = templates.find((t) => t.id === templateId);
     if (!template) return;
     const campaign = createCampaign(templateToCampaignInput(template));
@@ -83,7 +83,7 @@ export default function TemplatesRoute() {
                   <p className="mt-2 line-clamp-2 text-xs text-gray-500">{t.notes}</p>
                 ) : null}
                 <div className="mt-4 flex items-center gap-2 border-t border-gray-100 pt-3">
-                  <Button size="sm" onClick={() => useTemplate(t.id)}>
+                  <Button size="sm" onClick={() => applyTemplate(t.id)}>
                     <Sparkles className="h-4 w-4" />
                     Use template
                   </Button>
