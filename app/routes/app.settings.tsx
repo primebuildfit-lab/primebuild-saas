@@ -1,14 +1,40 @@
-import { Settings } from "lucide-react";
-import { Placeholder } from "~/components/Placeholder";
+import { useState } from "react";
+import { PageHeader, Tabs } from "~/components/ui";
+import {
+  AccountSettings,
+  CalendarSettings,
+  AppearanceSettings,
+} from "~/features/settings/SettingsPanels";
+import { BillingSummary } from "~/features/billing/BillingSummary";
 
 export default function SettingsRoute() {
+  const [tab, setTab] = useState("account");
+
   return (
-    <Placeholder
-      title="Settings"
-      description="Account, calendar, appearance, and billing preferences."
-      icon={Settings}
-      gate={4}
-      note="Account, calendar, appearance, and billing settings arrive in Phase 4 — Platform Surfaces."
-    />
+    <div>
+      <PageHeader
+        title="Settings"
+        description="Manage your account, calendar preferences, and appearance."
+      />
+
+      <Tabs
+        className="mb-4"
+        value={tab}
+        onValueChange={setTab}
+        tabs={[
+          { value: "account", label: "Account" },
+          { value: "calendar", label: "Calendar" },
+          { value: "appearance", label: "Appearance" },
+          { value: "billing", label: "Billing" },
+        ]}
+      />
+
+      {tab === "account" ? <AccountSettings /> : null}
+      {tab === "calendar" ? <CalendarSettings /> : null}
+      {tab === "appearance" ? <AppearanceSettings /> : null}
+      {tab === "billing" ? <BillingSummary /> : null}
+    </div>
   );
 }
+
+export { RouteBoundary as ErrorBoundary } from "~/components/RouteBoundary";

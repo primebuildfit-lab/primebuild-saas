@@ -1,14 +1,16 @@
-import { ShieldCheck } from "lucide-react";
-import { Placeholder } from "~/components/Placeholder";
+import { PageHeader } from "~/components/ui";
+import { AdminConsole } from "~/features/admin/AdminConsole";
 
 export default function AdminRoute() {
   return (
-    <Placeholder
-      title="Admin"
-      description="Platform management of countries and official events."
-      icon={ShieldCheck}
-      gate={4}
-      note="Admin management of the country catalog and official events arrives in Phase 4 — Platform Surfaces."
-    />
+    <div>
+      <PageHeader
+        title="Admin"
+        description="Manage the shared country and official-event catalog."
+      />
+      <AdminConsole />
+    </div>
   );
 }
+
+export { RouteBoundary as ErrorBoundary } from "~/components/RouteBoundary";

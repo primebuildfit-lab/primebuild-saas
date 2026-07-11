@@ -82,3 +82,5 @@ export default function EventsRoute() {
     </div>
   );
 }
+
+export { RouteBoundary as ErrorBoundary } from "~/components/RouteBoundary";

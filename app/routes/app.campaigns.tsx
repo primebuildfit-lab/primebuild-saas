@@ -134,3 +134,5 @@ export default function CampaignsRoute() {
     </div>
   );
 }
+
+export { RouteBoundary as ErrorBoundary } from "~/components/RouteBoundary";

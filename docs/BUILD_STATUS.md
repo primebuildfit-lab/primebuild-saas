@@ -12,6 +12,15 @@ approval still pending from the user)._
 
 ## Current phase
 
+**Phases 2–4 — complete mock-driven product: 🟦 Ready for Review (built, typechecked, built, SSR-verified).**
+
+The full mock-data-driven Eventra interface is functional and cohesive: dashboard, calendar
+(year/month drag-to-move/day), countries, events + Event Creator, campaigns CRUD + memory,
+templates, library, search, plans/billing, settings/appearance, light analytics, and admin — all
+wired to one mutable client state layer (`app/context/DataContext.tsx`) seeded from typed mock data.
+No Supabase/Shopify production is connected; actions remain visual-only (D7). See
+"Phases 2–4 deliverables" below. **Phase 5 not started.**
+
 **Phase 1 — Foundation: 🟦 Ready for Review (corrected & verified; awaiting approval).**
 
 Honest status of what exists:
@@ -52,32 +61,63 @@ Honest status of what exists:
 | **Phase 1 — Foundation** | Shopify React Router scaffold, shell + nav, design system + UI primitives, TS domain types, mock-data layer | 🟦 Ready for Review (build pending) |
 | **Phase 2 — Core Planning** | Dashboard, Calendar (year/month dnd-kit/day), Countries (`StoreCountry`), Events catalog + Event Creator, Event Actions (visual) | 🟦 Ready for Review (mock-driven, verified) |
 | **Phase 3 — Campaign Memory** | Campaigns CRUD + status, Campaign Library, memory/reuse (versioned), Templates (duplication), Search | 🟦 Ready for Review (mock-driven, verified) |
-| **Phase 4 — Platform Surfaces** | Subscription/pricing UI, Settings, Admin (countries/events), in-app notifications/reminders | 🟨 In progress |
+| **Phase 4 — Platform Surfaces** | Search, Subscription/pricing UI, Settings, Appearance, Billing view, light Analytics, Admin (countries/events), states/a11y/polish | 🟦 Ready for Review (mock-driven, verified) |
 | **Phase 5 — Real Shopify & Supabase Infrastructure** | OAuth/install, App Bridge session tokens, Supabase tables + live RLS, server-side membership validation, replace mock data with real API, Shopify Billing, tenant-isolation tests | ⬜ |
 
-## Application sections (all not started)
+## Application sections
 
 | Section | Gate | Status |
 |---------|------|--------|
 | App shell + navigation | 1 | 🟦 |
 | Design system / UI primitives | 1 | 🟦 |
 | TS domain types + mock-data layer | 1 | 🟦 |
-| Supabase project + RLS design | 1 | ⬜ (provision at Phase 5 / when repo connected) |
-| Dashboard | 2 | ⬜ |
-| Year / Month (dnd-kit) / Day calendar | 2 | ⬜ |
-| Countries (`StoreCountry`) | 2 | ⬜ |
-| Events catalog + Event Creator + Actions (visual) | 2 | ⬜ |
-| Campaigns (CRUD + status) | 3 | ⬜ |
-| Campaign Library + Memory (versioned) | 3 | ⬜ |
-| Templates (duplication) | 3 | ⬜ |
-| Search | 3 | ⬜ |
-| Subscription/pricing UI | 4 | ⬜ |
-| Settings | 4 | ⬜ |
-| Admin (countries/events) | 4 | ⬜ |
-| Notifications/reminders (in-app) | 4 | ⬜ |
+| Supabase project + RLS design | 1 | ⬜ (provision at Phase 5) |
+| Dashboard | 2 | 🟦 |
+| Year / Month (dnd-kit) / Day calendar | 2 | 🟦 |
+| Countries (`StoreCountry`) | 2 | 🟦 |
+| Events catalog + Event Creator + Actions (visual) | 2 | 🟦 |
+| Campaigns (CRUD + status) | 3 | 🟦 |
+| Campaign Library + Memory (versioned) | 3 | 🟦 |
+| Templates (duplication) | 3 | 🟦 |
+| Search | 4 | 🟦 |
+| Subscription/pricing UI + country/campaign limits | 4 | 🟦 |
+| Settings + Appearance | 4 | 🟦 |
+| Billing view | 4 | 🟦 |
+| Light analytics | 4 | 🟦 |
+| Admin (countries/events) | 4 | 🟦 |
+| Notifications/reminders (in-app reminder settings) | 4 | 🟦 (settings; surfacing is light in V1) |
+| Empty / error / loading states + a11y | 4 | 🟦 |
 | Auth + Shopify install | 5 | ⬜ |
 | Supabase tables + RLS live + membership | 5 | ⬜ |
 | Shopify Billing | 5 | ⬜ |
+
+## Phases 2–4 deliverables (mock-driven)
+
+**State layer:** `app/context/DataContext.tsx` (single mutable tenant store; back-compat
+`useCurrentStore`/`usePlan`). Domain libs: `lib/events.ts` (date-rule resolution + prep status),
+`lib/planning.ts` (opportunities/prep-needed/calendar entries), `lib/campaigns.ts` (duplication,
+next-year reuse, template↔campaign), `lib/calendar.ts`, `lib/search.ts`, `lib/accents.ts`,
+`lib/id.ts`, `lib/format.ts`. Mock data added: `mockCustomEvents.ts`, `mockCatalog.ts`
+(products/collections). Dependency added: `@dnd-kit/core` + `@dnd-kit/utilities`.
+
+**Routes (all real now):** `app._index` (dashboard), `app.calendar`, `app.events`, `app.countries`,
+`app.campaigns`, `app.campaign-library`, `app.templates`, `app.billing`, `app.settings`,
+`app.analytics`, `app.admin`, `app.search`. Each has an in-shell `ErrorBoundary`.
+
+**Feature components:** `features/dashboard/*`, `features/calendar/*` (Year/Month dnd-kit/Day +
+toolbar/chips), `features/events/*` (catalog, filters, hide-restore, Event Creator),
+`features/countries/*`, `features/campaigns/*` (form/modal/detail/status/filters/product-picker/card),
+`features/library/*`, `features/templates/*`, `features/billing/*`, `features/settings/*`,
+`features/analytics/*`, `features/admin/*`. New UI primitives: `Drawer`, `FormControls`
+(TextInput/Textarea/Select), `Field`, `SegmentedControl`, `ConfirmDialog`, `LinkButton`, `States`
+(Spinner/Skeleton/LoadingState/ErrorState).
+
+**Business rules honored:** importance colors vs category indicators kept separate (D11/D12);
+per-store hide/restore never deletes globally (D13); repeat-next-year defaults ON (D14); reuse
+always creates a new record and never overwrites history (D15); plan limits (countries + saved
+campaigns) enforced in the UI with non-destructive over-limit messaging (D16); exact plan
+names/prices from a single config (D9/D10); actions are visual-only (D7). Server-side enforcement
+of limits remains Phase 5 (UI checks are convenience only, as designed).
 
 ## Files created (Phase 1)
 
@@ -130,20 +170,34 @@ Added for Eventra: `framer-motion`, `lucide-react`, `date-fns`, `clsx`, `tailwin
 - **Real Shopify auth** requires Partner-org credentials (a `client_id` in `shopify.app.toml`, plus
   `SHOPIFY_API_KEY`/`SHOPIFY_API_SECRET`). Not present — the app builds and boots with mock UI; live OAuth
   is Phase 5. `npm run dev` (Shopify CLI tunnel) needs a Partner login and was intentionally not run.
-- Black Friday / Cyber Monday date rules are `nth_weekday` approximations in mock data — resolved precisely in Phase 2.
-- See the commit/push status recorded at the bottom of this file after the Phase-1 correction commit.
+- Black Friday / Cyber Monday dates are now resolved precisely by `lib/events.ts` (nth-weekday /
+  last-weekday), correct for 2026 and forward.
+- **Loading states:** loaders are synchronous mock reads in V1, so there is little async to show; the
+  Search surface demonstrates a debounced skeleton, and `Skeleton`/`LoadingState`/`Spinner` primitives
+  exist for the Phase-5 real async loaders.
+- **Notifications:** reminder *milestones* are configurable in Settings; proactive in-app notification
+  surfacing is intentionally light in V1 (no email/push automation).
+- Country catalog stays US + CA (D22 / quality-over-quantity). The country-limit UX is exercised by
+  switching plans (Free = 1 … VIP = ∞) in Plans & billing, which also demonstrates the downgrade
+  read-only rule (D16).
+- See the commit/push record at the bottom of this file.
 
 ## Next task
 
-1. **User review + Phase-1 approval** of the corrected foundation.
-2. Provision the new, separate Eventra Supabase project (Phase 5 wiring), and — for a live embedded
-   preview — create the app on a Shopify Partner org (`shopify app config link`) to populate `client_id`.
-3. On approval, begin **Phase 2 — Core Planning**; stop at the Phase 2 gate.
+**Phase 5 — Real Shopify & Supabase Infrastructure (not started; needs approval + credentials):**
+1. Create the Eventra app on a Shopify Partner org (`shopify app config link` → `client_id`) and set
+   `SHOPIFY_API_KEY`/`SHOPIFY_API_SECRET`/`SHOPIFY_APP_URL` to run the embedded app live (`npm run dev`).
+2. Provision the new, separate Eventra Supabase project; apply `docs/SUPABASE_SCHEMA.md` migrations + RLS.
+3. Replace `DataContext` mock reads/writes with server loaders/actions (App Bridge session → server-side
+   Membership validation → Supabase with RLS). Enforce plan limits server-side. Wire Shopify Billing.
+4. Add tenant-isolation + plan-limit + install/responsive tests.
 
-## Commit / push record (Phase 1 correction)
+## Commit / push record
 
 - **Repo:** `primebuildfit-lab/primebuild-saas` · **branch:** `main`
-- **Foundation commit:** `df1cb16` — _Phase 1: Eventra foundation on official Shopify React Router template_
-- **Pushed:** ✅ 2026-07-11 to `origin/main` (repo was previously empty; this is the initial commit).
-- Verification prior to push: `npm run typecheck` ✅ · `npm run build` ✅ · `react-router-serve` smoke test ✅.
-- A follow-up docs commit records this status.
+- `df1cb16` — Phase 1: Eventra foundation on official Shopify React Router template (initial commit)
+- `0aae3a2` — Phase 2: Core Planning (dashboard, calendar, countries, events)
+- `b8ae3f6` — Phase 3: Campaign Memory (CRUD, statuses, duplication, library, templates)
+- Phase 4: Platform Surfaces (search, billing, settings, analytics, admin, states) — this milestone.
+- Every milestone verified before push: `npm run typecheck` ✅ · `npm run build` ✅ · SSR smoke test of
+  the surfaces ✅. Pushed to `origin/main`.

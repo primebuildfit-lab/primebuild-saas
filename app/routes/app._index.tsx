@@ -99,3 +99,5 @@ export default function DashboardRoute() {
     </div>
   );
 }
+
+export { RouteBoundary as ErrorBoundary } from "~/components/RouteBoundary";

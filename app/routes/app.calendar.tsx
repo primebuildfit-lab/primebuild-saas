@@ -190,3 +190,5 @@ export default function CalendarRoute() {
     </div>
   );
 }
+
+export { RouteBoundary as ErrorBoundary } from "~/components/RouteBoundary";

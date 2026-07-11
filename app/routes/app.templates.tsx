@@ -115,3 +115,5 @@ export default function TemplatesRoute() {
     </div>
   );
 }
+
+export { RouteBoundary as ErrorBoundary } from "~/components/RouteBoundary";

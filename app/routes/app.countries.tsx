@@ -12,3 +12,5 @@ export default function CountriesRoute() {
     </div>
   );
 }
+
+export { RouteBoundary as ErrorBoundary } from "~/components/RouteBoundary";

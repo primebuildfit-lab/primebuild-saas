@@ -12,3 +12,5 @@ export default function CampaignLibraryRoute() {
     </div>
   );
 }
+
+export { RouteBoundary as ErrorBoundary } from "~/components/RouteBoundary";

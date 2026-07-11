@@ -77,6 +77,10 @@ _Last updated: 2026-07-11 — **Architecture Review approved with amendments.** 
 | D29 | Session storage | Keep the template default **Prisma (SQLite dev)** for Shopify session storage in Phase 1; revisit Supabase/Postgres session storage in Phase 5. | ✅ |
 | D30 | Lockfile | `package-lock.json` is **committed** (removed from `.gitignore`) — required Phase-1 deliverable. | ✅ |
 | D31 | App Bridge nav | `/app` uses App Bridge `AppProvider` + Eventra's own Tailwind `AppShell`/`Sidebar` for navigation (dropped the template's `<s-app-nav>` demo links). | ✅ |
+| D32 | Phase 2–4 state | One mutable client store (`app/context/DataContext.tsx`) seeded from typed mock data holds all tenant state; components read/write it so the whole product is interactive with no backend. Swapped for Supabase reads/writes in Phase 5 with no component rewrites. | ✅ |
+| D33 | Country-limit demo | Country catalog stays **US + CA** (respects D22 + quality-over-quantity). The country-limit & downgrade-read-only UX is exercised by **switching plans** in Plans & billing, not by padding the catalog. | ✅ |
+| D34 | Appearance accent | Appearance settings expose an accent (indigo/blue/emerald/violet) applied at runtime via CSS variables that Tailwind v4 `brand-*` utilities resolve — instant re-tint, no rebuild. Design stays light per the design system. | ✅ |
+| D35 | Search placement | Global deterministic search lives at `/app/search` with a Topbar entry point (not a sidebar item). Searches events/campaigns/templates/countries/custom events by substring — no AI. | ✅ |
 
 ### Status
 Architecture Review **approved with amendments (2026-07-11)**. All previously-open items (D1, D2, D5,
