@@ -1,5 +1,6 @@
 {
   "include": ["env.d.ts", "**/*.ts", "**/*.tsx", ".react-router/types/**/*"],
+  "exclude": ["node_modules", "build", "vitest.config.ts"],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "strict": true,
@@ -19,7 +20,12 @@
     "paths": {
       "~/*": ["./app/*"]
     },
-    "types": ["@react-router/node", "vite/client", "@shopify/polaris-types"],
+    "types": [
+      "@react-router/node",
+      "vite/client",
+      "@shopify/polaris-types",
+      "vitest/globals"
+    ],
     "rootDirs": [".", "./.react-router/types"]
   }
 }

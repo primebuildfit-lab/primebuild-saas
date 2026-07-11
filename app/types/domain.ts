@@ -34,7 +34,17 @@ export type EventPrepStatus = "unprepared" | "planning" | "ready" | "passed";
 
 export type SubscriptionStatus = "active" | "past_due" | "canceled";
 
-/** A date or recurrence rule. Phase 2 resolves these to concrete dates per year. */
+/**
+ * A date or recurrence rule, resolved to a concrete date per year by
+ * `lib/events.ts#resolveDateRule`.
+ *
+ * `offsetDays` shifts the resolved date by a fixed number of days and is the
+ * mechanism for holidays defined *relative* to another weekday anchor — e.g.
+ * Black Friday = "day after the 4th Thursday of November" (nth_weekday Thu #4,
+ * offsetDays 1) and Cyber Monday = "Monday after" (offsetDays 4). Encoding these
+ * as an offset from Thanksgiving keeps them correct in every year, unlike a bare
+ * "4th Friday" / "last Monday" approximation (see docs/RECURRENCE.md).
+ */
 export interface DateRule {
   kind: "fixed" | "nth_weekday";
   /** 1–12 */
@@ -45,6 +55,8 @@ export interface DateRule {
   weekday?: number;
   /** for kind="nth_weekday": 1–5, or -1 for "last" */
   nth?: number;
+  /** optional fixed shift applied after resolving (e.g. +1 day after an anchor) */
+  offsetDays?: number;
 }
 
 // ---------- Platform-owned (no storeId) ----------

@@ -67,8 +67,9 @@ export const globalEvents: GlobalEvent[] = [
     id: "ge_us_blackfriday",
     name: "Black Friday",
     countryCodes: ["US", "CA"],
-    // 4th Friday of November (approximation; resolved precisely in Phase 2)
-    startRule: { kind: "nth_weekday", month: 11, weekday: 5, nth: 4 },
+    // Day after US Thanksgiving = 4th Thursday of November + 1 day.
+    // Correct in every year (see docs/RECURRENCE.md).
+    startRule: { kind: "nth_weekday", month: 11, weekday: 4, nth: 4, offsetDays: 1 },
     category: "major_sales",
     importance: "high",
     description: "The single biggest sales day of the year.",
@@ -79,8 +80,8 @@ export const globalEvents: GlobalEvent[] = [
     id: "ge_us_cybermonday",
     name: "Cyber Monday",
     countryCodes: ["US", "CA"],
-    // Monday after Black Friday (approx: 4th Monday+ ; refined in Phase 2)
-    startRule: { kind: "nth_weekday", month: 11, weekday: 1, nth: -1 },
+    // Monday after Thanksgiving = 4th Thursday of November + 4 days.
+    startRule: { kind: "nth_weekday", month: 11, weekday: 4, nth: 4, offsetDays: 4 },
     category: "major_sales",
     importance: "high",
     description: "Online-focused follow-up to Black Friday.",

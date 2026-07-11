@@ -14,10 +14,11 @@ import { toISODate } from "~/lib/dates";
  * This is the precise Phase-2 resolution promised for Black Friday / Cyber Monday.
  */
 export function resolveDateRule(rule: DateRule, year: number): Date {
-  if (rule.kind === "fixed") {
-    return new Date(year, rule.month - 1, rule.day ?? 1);
-  }
-  return resolveNthWeekday(year, rule.month, rule.weekday ?? 0, rule.nth ?? 1);
+  const base =
+    rule.kind === "fixed"
+      ? new Date(year, rule.month - 1, rule.day ?? 1)
+      : resolveNthWeekday(year, rule.month, rule.weekday ?? 0, rule.nth ?? 1);
+  return rule.offsetDays ? addDays(base, rule.offsetDays) : base;
 }
 
 /** nth occurrence of `weekday` (0=Sun) in `month1` (1–12); nth=-1 means last. */
