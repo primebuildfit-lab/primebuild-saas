@@ -10,9 +10,33 @@ approval still pending from the user)._
 
 ---
 
+## Pre‑Phase‑5 Hardening Sprint — ✅ complete (2026‑07‑11)
+
+Ran against `docs/PROJECT_AUDIT.md` as the backlog. **No Phase 5 / Shopify / Supabase / paid services.**
+
+- **P1 Tests:** Vitest + React Testing Library + user‑event + jsdom. **77 tests, all passing** across 9
+  files — date resolution, Black Friday/Cyber Monday 2023–2030, prep‑status, campaign duplication +
+  next‑year, history‑never‑overwritten (lib + stateful context), plan country/saved‑campaign limits,
+  downgrade retention, hide/restore, single current store + tenant keying, template→campaign,
+  deterministic search, and dialog a11y. Scripts: `npm run test`, `npm run test:watch`.
+- **P2 Dates:** `DateRule.offsetDays`; Black Friday = 4th Thu + 1, Cyber Monday = 4th Thu + 4 (correct
+  every year). All other rule‑based events audited. `docs/RECURRENCE.md`.
+- **P3 Accessibility:** `useDialog` — focus trap, focus return, Escape, scroll lock, aria‑labelledby —
+  applied to Modal, Drawer, mobile nav; a11y contrast fixes.
+- **P4 State/perf:** `DataContext` split into Plan/Catalog/Campaigns; shell no longer re‑renders on
+  campaign changes; stable action identities. `docs/STATE_ARCHITECTURE.md`.
+- **P5 Routing:** invalid‑id "not found" panels, `/app/*` catch‑all 404. `docs/ROUTING.md`.
+- **P6 Plan limits:** `planLimits.ts` retention + read‑only‑on‑downgrade UI. `docs/PLAN_ENFORCEMENT.md`.
+- **P7 Security plan:** `docs/SECURITY_PLAN.md` + 9‑point Phase‑5 test plan (no real security claimed yet).
+
+**Gates:** `npm run lint` → 0 errors (6 advisory warnings), `npm run typecheck` clean, `npm run test`
+→ 77 passing, `npm run build` green. Finding‑by‑finding disposition in `docs/PROJECT_AUDIT.md`.
+
+---
+
 ## Current phase
 
-**Phases 2–4 — complete mock-driven product: 🟦 Ready for Review (built, typechecked, built, SSR-verified).**
+**Phases 2–4 — complete mock-driven product: 🟦 Ready for Review (built, typechecked, tested, SSR-verified).**
 
 The full mock-data-driven Eventra interface is functional and cohesive: dashboard, calendar
 (year/month drag-to-move/day), countries, events + Event Creator, campaigns CRUD + memory,

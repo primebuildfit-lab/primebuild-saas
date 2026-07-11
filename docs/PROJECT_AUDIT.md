@@ -50,6 +50,44 @@ Phase‑5 by design, so the app is *not* releasable to real merchants today.
 
 ---
 
+## Hardening Sprint Disposition (2026‑07‑11)
+
+Status of every finding after the pre‑Phase‑5 hardening sprint. **Fixed** = resolved & tested;
+**Mitigated** = materially improved, remainder deferred; **Deferred to Phase 5** = needs real
+infrastructure; **Requires business decision** = needs product sign‑off.
+
+| # | Finding | Disposition | Evidence |
+|---|---------|-------------|----------|
+| C‑1 | No automated tests | **Fixed** | Vitest + RTL; 77 tests across 9 files |
+| H‑1 | Ephemeral client state | **Deferred to Phase 5** | `docs/STATE_ARCHITECTURE.md` migration map |
+| H‑2 | BF/CM date drift | **Fixed** | `offsetDays` rule; 2023–2030 regression tests; `docs/RECURRENCE.md` |
+| H‑3 | Plan enforcement / downgrade retention | **Mitigated** | mock read‑only campaigns + `planLimits.ts` + tests; server enforcement → Phase 5 (`docs/PLAN_ENFORCEMENT.md`) |
+| H‑4 | Mega‑context re‑renders | **Fixed** | split into Plan/Catalog/Campaigns; shell isolated; stable actions |
+| H‑5 | Tenant security unimplemented | **Deferred to Phase 5** | `docs/SECURITY_PLAN.md` + 9‑point test plan |
+| M‑1 | Query‑param vs nested routes | **Mitigated** | invalid‑id + 404 handling; nested‑route plan in `docs/ROUTING.md` (decision pending) |
+| M‑2 | Modal/Drawer focus management | **Fixed** | `useDialog` (trap/return/scroll‑lock); 5 a11y tests |
+| M‑3 | `text-gray-400` contrast | **Mitigated** | shared Field/StatTile fixed; systemic sweep remaining |
+| M‑4 | Duplicated dashboard computation | **Deferred** | documented; low value at mock scale |
+| M‑5 | framer‑motion bundle weight | **Deferred** | documented; revisit at perf pass |
+| M‑6 | DataContext shared chunk | **Deferred to Phase 5** | folds into loader migration |
+| M‑7 | No route loaders/actions | **Deferred to Phase 5** | mapped in `docs/STATE_ARCHITECTURE.md` |
+| M‑8 | `as` casts on `<select>` | **Deferred** | documented; options are constrained |
+| L‑1 | Dead code | **Fixed** | removed in audit commit |
+| L‑2 | `tenant.ts` unused params | **Fixed** | eslint `argsIgnorePattern: "^_"` |
+| L‑3 | setState‑in‑effect (search) | **Mitigated** | intentional; rule → warning, documented |
+| L‑4 | React Compiler memo skip | **Mitigated** | advisory; rule → warning, documented |
+| L‑5 | No 404 / root ErrorBoundary | **Mitigated** | `app.$.tsx` catch‑all added; root boundary still open |
+| L‑6 | `templateFromCampaign` category | **Deferred** | documented; low |
+| L‑7 | Module‑level `now` in calendar | **Deferred** | documented; low |
+| L‑8 | RR v8 future‑flag warnings | **Deferred** | upgrade housekeeping |
+| L‑9 | Search discoverability | **Deferred** | UX follow‑up |
+| L‑10 | `.env.example` vs toml scopes | **Deferred to Phase 5** | reconcile before OAuth (`docs/SECURITY_PLAN.md §6`) |
+
+**Requires business decision:** none newly raised — the country‑catalog scope (US+CA per D22) and all
+prices/plan names remain as approved; nothing in this sprint changed a business rule.
+
+---
+
 ## CRITICAL
 
 ### C‑1 — No automated tests of any kind
