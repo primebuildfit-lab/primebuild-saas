@@ -21,3 +21,18 @@ export function canAddCountry(plan: Plan, currentCount: number): boolean {
 export function formatLimit(limit: number | null): string {
   return limit === null ? "Unlimited" : String(limit);
 }
+
+/** True when the store has reached its saved-campaign limit for the plan. */
+export function savedCampaignLimitReached(
+  plan: Plan,
+  currentCount: number,
+): boolean {
+  return (
+    plan.savedCampaignLimit !== null && currentCount >= plan.savedCampaignLimit
+  );
+}
+
+/** True when another campaign may be saved under the plan. */
+export function canSaveCampaign(plan: Plan, currentCount: number): boolean {
+  return !savedCampaignLimitReached(plan, currentCount);
+}

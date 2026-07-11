@@ -1,9 +1,4 @@
-import type {
-  Campaign,
-  CampaignStatus,
-  StoreId,
-  Template,
-} from "~/types/domain";
+import type { Campaign, CampaignStatus, Template } from "~/types/domain";
 import { createId } from "~/lib/id";
 import { shiftISO } from "~/lib/calendar";
 
@@ -67,20 +62,19 @@ function nextYearLabel(iso: string): number {
   return new Date(`${iso}T00:00:00`).getFullYear() + 1;
 }
 
-/** Build a new campaign scaffold from a template (create → draft). */
-export function campaignFromTemplate(
+/**
+ * Build the create-input for a new draft campaign from a template. Dates are
+ * anchored to today + the template's default lead/duration.
+ */
+export function templateToCampaignInput(
   template: Template,
-  storeId: StoreId,
-): Campaign {
-  const now = new Date().toISOString();
+): Omit<Campaign, "id" | "storeId" | "createdAt" | "updatedAt"> {
   const start = new Date();
   start.setDate(start.getDate() + template.defaultLeadDays);
   const startISO = isoFrom(start);
-  const endISO = shiftISO(startISO, template.defaultDurationDays);
+  const endISO = shiftISO(startISO, Math.max(0, template.defaultDurationDays - 1));
   const prepISO = shiftISO(startISO, -template.defaultLeadDays);
   return {
-    id: createId("cmp"),
-    storeId,
     name: template.name,
     objective: template.notes,
     description: template.notes,
@@ -91,8 +85,6 @@ export function campaignFromTemplate(
     productRefs: [],
     status: "draft",
     actions: [],
-    createdAt: now,
-    updatedAt: now,
   };
 }
 

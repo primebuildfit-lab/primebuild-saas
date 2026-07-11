@@ -1,14 +1,14 @@
-import { Library } from "lucide-react";
-import { Placeholder } from "~/components/Placeholder";
+import { PageHeader } from "~/components/ui";
+import { CampaignLibrary } from "~/features/library/CampaignLibrary";
 
 export default function CampaignLibraryRoute() {
   return (
-    <Placeholder
-      title="Campaign Library"
-      description="Reuse what worked — your marketing memory."
-      icon={Library}
-      gate={3}
-      note="Saved campaigns and non-destructive reuse (Campaign Memory) arrive in Phase 3 — Campaign Memory."
-    />
+    <div>
+      <PageHeader
+        title="Campaign Library"
+        description="Your marketing memory — every campaign you've run, grouped by opportunity and ready to reuse."
+      />
+      <CampaignLibrary />
+    </div>
   );
 }
