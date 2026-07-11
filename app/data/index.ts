@@ -8,5 +8,13 @@ export { plans } from "./mockPlans";
 export { countries, getCountry } from "./mockCountries";
 export { globalEvents } from "./mockGlobalEvents";
 export { campaigns } from "./mockCampaigns";
+export { customEvents } from "./mockCustomEvents";
 export { templates } from "./mockTemplates";
 export { storeEventPreferences } from "./mockStoreEventPreferences";
+export {
+  mockProducts,
+  mockCollections,
+  catalogRefs,
+  getCatalogRef,
+} from "./mockCatalog";
+export type { MockProduct, MockCollection, CatalogRef } from "./mockCatalog";

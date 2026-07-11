@@ -1,14 +1,14 @@
-import { Globe } from "lucide-react";
-import { Placeholder } from "~/components/Placeholder";
+import { PageHeader } from "~/components/ui";
+import { CountryManager } from "~/features/countries/CountryManager";
 
 export default function CountriesRoute() {
   return (
-    <Placeholder
-      title="Countries"
-      description="Enable the markets you operate in."
-      icon={Globe}
-      gate={2}
-      note="Per-store country enablement (StoreCountry) with plan limits arrives in Phase 2 — Core Planning."
-    />
+    <div>
+      <PageHeader
+        title="Countries"
+        description="Choose the markets you plan for. Each country unlocks its official events and opportunities."
+      />
+      <CountryManager />
+    </div>
   );
 }

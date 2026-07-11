@@ -168,12 +168,21 @@ export interface Template {
   notes?: string;
 }
 
+/** Accent palette choices for Appearance settings (D31 shell uses brand tokens). */
+export type AccentColor = "indigo" | "blue" | "emerald" | "violet";
+
+export type Density = "comfortable" | "compact";
+
 export interface StorePreference {
   storeId: StoreId;
   weekStartsOn: 0 | 1;
   calendarFormat: "month" | "year";
   /** days-before reminder milestones */
   reminderDefaults: number[];
+  /** Appearance: accent tint applied to brand utilities (default "indigo"). */
+  accent?: AccentColor;
+  /** Appearance: calendar cell density. */
+  density?: Density;
 }
 
 export interface Subscription {

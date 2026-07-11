@@ -50,8 +50,8 @@ Honest status of what exists:
 | Gate | Scope | Status |
 |------|-------|--------|
 | **Phase 1 — Foundation** | Shopify React Router scaffold, shell + nav, design system + UI primitives, TS domain types, mock-data layer | 🟦 Ready for Review (build pending) |
-| **Phase 2 — Core Planning** | Dashboard, Calendar (year/month dnd-kit/day), Countries (`StoreCountry`), Events catalog + Event Creator, Event Actions (visual) | ⬜ |
-| **Phase 3 — Campaign Memory** | Campaigns CRUD + status, Campaign Library, memory/reuse (versioned), Templates (duplication), Search | ⬜ |
+| **Phase 2 — Core Planning** | Dashboard, Calendar (year/month dnd-kit/day), Countries (`StoreCountry`), Events catalog + Event Creator, Event Actions (visual) | 🟦 Ready for Review (mock-driven, verified) |
+| **Phase 3 — Campaign Memory** | Campaigns CRUD + status, Campaign Library, memory/reuse (versioned), Templates (duplication), Search | 🟨 In progress |
 | **Phase 4 — Platform Surfaces** | Subscription/pricing UI, Settings, Admin (countries/events), in-app notifications/reminders | ⬜ |
 | **Phase 5 — Real Shopify & Supabase Infrastructure** | OAuth/install, App Bridge session tokens, Supabase tables + live RLS, server-side membership validation, replace mock data with real API, Shopify Billing, tenant-isolation tests | ⬜ |
 

@@ -1,13 +1,20 @@
-import { useState, type ReactNode } from "react";
+import { useState, type CSSProperties, type ReactNode } from "react";
+import { useData } from "~/context/DataContext";
+import { accentVars } from "~/lib/accents";
 import { Sidebar } from "./Sidebar";
 import { Topbar } from "./Topbar";
 import { MobileNav } from "./MobileNav";
 
 export function AppShell({ children }: { children: ReactNode }) {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { preferences } = useData();
+
+  // Accent is applied as CSS variables here; Tailwind v4 `brand-*` utilities
+  // resolve to these vars at runtime, so the whole app re-tints instantly.
+  const style = accentVars(preferences.accent) as CSSProperties;
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50" style={style}>
       <Sidebar />
 
       <div className="lg:pl-64">

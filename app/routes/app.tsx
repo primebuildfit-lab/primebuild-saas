@@ -4,8 +4,7 @@ import { boundary } from "@shopify/shopify-app-react-router/server";
 import { AppProvider } from "@shopify/shopify-app-react-router/react";
 
 import { authenticate } from "../shopify.server";
-import { StoreProvider } from "~/context/StoreContext";
-import { PlanProvider } from "~/context/PlanContext";
+import { DataProvider } from "~/context/DataContext";
 import { AppShell } from "~/components/shell/AppShell";
 
 /**
@@ -30,13 +29,11 @@ export default function App() {
 
   return (
     <AppProvider embedded apiKey={apiKey}>
-      <StoreProvider>
-        <PlanProvider>
-          <AppShell>
-            <Outlet />
-          </AppShell>
-        </PlanProvider>
-      </StoreProvider>
+      <DataProvider>
+        <AppShell>
+          <Outlet />
+        </AppShell>
+      </DataProvider>
     </AppProvider>
   );
 }
