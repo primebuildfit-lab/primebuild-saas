@@ -43,83 +43,90 @@ import { createId } from "~/lib/id";
 import { duplicateCampaign } from "~/lib/campaigns";
 
 /**
- * The single mutable tenant store for Phases 2–4. Seeded from the typed mock
- * data; every merchant action mutates local React state so the whole product is
- * interactive without a backend. Shapes mirror app/types/domain.ts, so Phase 5
- * swaps this provider for real Supabase reads/writes without touching components.
+ * Mutable tenant store for Phases 2–4, seeded from typed mock data.
+ *
+ * State is split into three domain contexts — Identity/Plan, Catalog, and
+ * Campaigns — so a mutation in one domain does not re-render consumers of
+ * another (e.g. editing a campaign no longer re-renders the app shell, which
+ * only reads identity/plan/countries). `useData()` composes all three for
+ * backward compatibility. In Phase 5 each context is replaced by React Router
+ * route loaders/actions backed by Supabase (see docs/STATE_ARCHITECTURE.md);
+ * the split mirrors the natural loader boundaries.
  */
-interface DataContextValue {
-  // identity
+
+// ─────────────────────────── Identity + Plan ───────────────────────────
+interface PlanContextValue {
   user: User;
   store: Store;
   membership: Membership;
-
-  // plan / subscription (plan is switchable locally for the pricing UI)
   plans: Plan[];
   planId: PlanId;
   plan: Plan;
   subscription: Subscription;
   setPlanId: (id: PlanId) => void;
   canAddCountry: (currentCount: number) => boolean;
+}
+const PlanCtx = createContext<PlanContextValue | null>(null);
 
-  // countries
+function PlanProviderInner({ children }: { children: ReactNode }) {
+  const [planId, setPlanId] = useState<PlanId>(demoSubscription.planId);
+
+  const plan = useMemo(() => getPlan(planId), [planId]);
+  const subscription = useMemo<Subscription>(
+    () => ({ storeId: demoStore.id, planId, status: "active" }),
+    [planId],
+  );
+  const canAddCountry = useCallback(
+    (currentCount: number) => canAddCountryFor(plan, currentCount),
+    [plan],
+  );
+
+  const value = useMemo<PlanContextValue>(
+    () => ({
+      user: demoUser,
+      store: demoStore,
+      membership: demoMembership,
+      plans,
+      planId,
+      plan,
+      subscription,
+      setPlanId,
+      canAddCountry,
+    }),
+    [planId, plan, subscription, canAddCountry],
+  );
+  return <PlanCtx.Provider value={value}>{children}</PlanCtx.Provider>;
+}
+
+// ─────────────────────────── Catalog (countries, events, prefs) ───────────────────────────
+interface CatalogContextValue {
   countries: Country[];
   storeCountries: StoreCountry[];
   enabledCountryCodes: string[];
   setCountryEnabled: (code: string, enabled: boolean) => void;
-
-  // global events + per-store hide/restore
   globalEvents: GlobalEvent[];
   eventPreferences: StoreEventPreference[];
   isEventHidden: (globalEventId: string) => boolean;
   hideEvent: (globalEventId: string) => void;
   restoreEvent: (globalEventId: string) => void;
-
-  // custom (merchant) events
   customEvents: CustomEvent[];
   addCustomEvent: (input: Omit<CustomEvent, "id" | "storeId">) => CustomEvent;
   updateCustomEvent: (id: string, patch: Partial<CustomEvent>) => void;
   deleteCustomEvent: (id: string) => void;
-
-  // campaigns
-  campaigns: Campaign[];
-  createCampaign: (
-    input: Omit<Campaign, "id" | "storeId" | "createdAt" | "updatedAt">,
-  ) => Campaign;
-  updateCampaign: (id: string, patch: Partial<Campaign>) => void;
-  deleteCampaign: (id: string) => void;
-  duplicateCampaign: (id: string, overrides?: Partial<Campaign>) => Campaign | undefined;
-  setCampaignStatus: (id: string, status: CampaignStatus) => void;
-  moveCampaign: (id: string, startDate: string, endDate: string) => void;
-
-  // templates
-  templates: Template[];
-  addTemplate: (template: Template) => void;
-  deleteTemplate: (id: string) => void;
-
-  // preferences
   preferences: StorePreference;
   updatePreferences: (patch: Partial<StorePreference>) => void;
 }
+const CatalogCtx = createContext<CatalogContextValue | null>(null);
 
-const DataContext = createContext<DataContextValue | null>(null);
-
-export function DataProvider({ children }: { children: ReactNode }) {
-  const [planId, setPlanId] = useState<PlanId>(demoSubscription.planId);
-  const [storeCountries, setStoreCountries] = useState<StoreCountry[]>(
-    () => demoStoreCountries.map((c) => ({ ...c })),
+function CatalogProviderInner({ children }: { children: ReactNode }) {
+  const [storeCountries, setStoreCountries] = useState<StoreCountry[]>(() =>
+    demoStoreCountries.map((c) => ({ ...c })),
   );
-  const [eventPreferences, setEventPreferences] = useState<
-    StoreEventPreference[]
-  >(() => seedEventPrefs.map((p) => ({ ...p })));
+  const [eventPreferences, setEventPreferences] = useState<StoreEventPreference[]>(
+    () => seedEventPrefs.map((p) => ({ ...p })),
+  );
   const [customEvents, setCustomEvents] = useState<CustomEvent[]>(() =>
     seedCustomEvents.map((e) => ({ ...e })),
-  );
-  const [campaigns, setCampaigns] = useState<Campaign[]>(() =>
-    seedCampaigns.map((c) => ({ ...c })),
-  );
-  const [templates, setTemplates] = useState<Template[]>(() =>
-    seedTemplates.map((t) => ({ ...t })),
   );
   const [preferences, setPreferences] = useState<StorePreference>(() => ({
     ...demoStorePreference,
@@ -127,36 +134,24 @@ export function DataProvider({ children }: { children: ReactNode }) {
     density: "comfortable",
   }));
 
-  const plan = useMemo(() => getPlan(planId), [planId]);
-  const subscription = useMemo<Subscription>(
-    () => ({ storeId: demoStore.id, planId, status: "active" }),
-    [planId],
-  );
-
   const enabledCountryCodes = useMemo(
     () => storeCountries.filter((c) => c.enabled).map((c) => c.countryCode),
     [storeCountries],
   );
 
-  // ---- countries ----
   const setCountryEnabled = useCallback((code: string, enabled: boolean) => {
     setStoreCountries((prev) => {
       const existing = prev.find((c) => c.countryCode === code);
       if (existing) {
-        return prev.map((c) =>
-          c.countryCode === code ? { ...c, enabled } : c,
-        );
+        return prev.map((c) => (c.countryCode === code ? { ...c, enabled } : c));
       }
       return [...prev, { storeId: demoStore.id, countryCode: code, enabled }];
     });
   }, []);
 
-  // ---- event hide / restore (per-store, never a global delete: D13) ----
   const isEventHidden = useCallback(
     (globalEventId: string) =>
-      eventPreferences.some(
-        (p) => p.globalEventId === globalEventId && p.hidden,
-      ),
+      eventPreferences.some((p) => p.globalEventId === globalEventId && p.hidden),
     [eventPreferences],
   );
 
@@ -180,34 +175,89 @@ export function DataProvider({ children }: { children: ReactNode }) {
     );
   }, []);
 
-  // ---- custom events ----
-  const addCustomEvent = useCallback(
-    (input: Omit<CustomEvent, "id" | "storeId">) => {
-      const event: CustomEvent = {
-        ...input,
-        id: createId("cev"),
-        storeId: demoStore.id,
-      };
-      setCustomEvents((prev) => [...prev, event]);
-      return event;
-    },
-    [],
-  );
+  const addCustomEvent = useCallback((input: Omit<CustomEvent, "id" | "storeId">) => {
+    const event: CustomEvent = { ...input, id: createId("cev"), storeId: demoStore.id };
+    setCustomEvents((prev) => [...prev, event]);
+    return event;
+  }, []);
 
-  const updateCustomEvent = useCallback(
-    (id: string, patch: Partial<CustomEvent>) => {
-      setCustomEvents((prev) =>
-        prev.map((e) => (e.id === id ? { ...e, ...patch } : e)),
-      );
-    },
-    [],
-  );
+  const updateCustomEvent = useCallback((id: string, patch: Partial<CustomEvent>) => {
+    setCustomEvents((prev) => prev.map((e) => (e.id === id ? { ...e, ...patch } : e)));
+  }, []);
 
   const deleteCustomEvent = useCallback((id: string) => {
     setCustomEvents((prev) => prev.filter((e) => e.id !== id));
   }, []);
 
-  // ---- campaigns ----
+  const updatePreferences = useCallback((patch: Partial<StorePreference>) => {
+    setPreferences((prev) => ({ ...prev, ...patch }));
+  }, []);
+
+  const value = useMemo<CatalogContextValue>(
+    () => ({
+      countries: catalog,
+      storeCountries,
+      enabledCountryCodes,
+      setCountryEnabled,
+      globalEvents: seedGlobalEvents,
+      eventPreferences,
+      isEventHidden,
+      hideEvent,
+      restoreEvent,
+      customEvents,
+      addCustomEvent,
+      updateCustomEvent,
+      deleteCustomEvent,
+      preferences,
+      updatePreferences,
+    }),
+    [
+      storeCountries,
+      enabledCountryCodes,
+      setCountryEnabled,
+      eventPreferences,
+      isEventHidden,
+      hideEvent,
+      restoreEvent,
+      customEvents,
+      addCustomEvent,
+      updateCustomEvent,
+      deleteCustomEvent,
+      preferences,
+      updatePreferences,
+    ],
+  );
+  return <CatalogCtx.Provider value={value}>{children}</CatalogCtx.Provider>;
+}
+
+// ─────────────────────────── Campaigns + templates ───────────────────────────
+interface CampaignsContextValue {
+  campaigns: Campaign[];
+  createCampaign: (
+    input: Omit<Campaign, "id" | "storeId" | "createdAt" | "updatedAt">,
+  ) => Campaign;
+  updateCampaign: (id: string, patch: Partial<Campaign>) => void;
+  deleteCampaign: (id: string) => void;
+  duplicateCampaign: (
+    id: string,
+    overrides?: Partial<Campaign>,
+  ) => Campaign | undefined;
+  setCampaignStatus: (id: string, status: CampaignStatus) => void;
+  moveCampaign: (id: string, startDate: string, endDate: string) => void;
+  templates: Template[];
+  addTemplate: (template: Template) => void;
+  deleteTemplate: (id: string) => void;
+}
+const CampaignsCtx = createContext<CampaignsContextValue | null>(null);
+
+function CampaignsProviderInner({ children }: { children: ReactNode }) {
+  const [campaigns, setCampaigns] = useState<Campaign[]>(() =>
+    seedCampaigns.map((c) => ({ ...c })),
+  );
+  const [templates, setTemplates] = useState<Template[]>(() =>
+    seedTemplates.map((t) => ({ ...t })),
+  );
+
   const createCampaign = useCallback(
     (input: Omit<Campaign, "id" | "storeId" | "createdAt" | "updatedAt">) => {
       const now = new Date().toISOString();
@@ -227,9 +277,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
   const updateCampaign = useCallback((id: string, patch: Partial<Campaign>) => {
     setCampaigns((prev) =>
       prev.map((c) =>
-        c.id === id
-          ? { ...c, ...patch, updatedAt: new Date().toISOString() }
-          : c,
+        c.id === id ? { ...c, ...patch, updatedAt: new Date().toISOString() } : c,
       ),
     );
   }, []);
@@ -238,32 +286,30 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setCampaigns((prev) => prev.filter((c) => c.id !== id));
   }, []);
 
-  const duplicate = useCallback(
-    (id: string, overrides?: Partial<Campaign>) => {
-      const source = campaigns.find((c) => c.id === id);
-      if (!source) return undefined;
-      const copy = duplicateCampaign(source, overrides);
-      setCampaigns((prev) => [copy, ...prev]);
-      return copy;
-    },
-    [campaigns],
-  );
+  // Functional update keeps this action referentially stable (no `campaigns` dep),
+  // so consumers memoized on it don't re-render on every campaign change.
+  const duplicate = useCallback((id: string, overrides?: Partial<Campaign>) => {
+    let copy: Campaign | undefined;
+    setCampaigns((prev) => {
+      const source = prev.find((c) => c.id === id);
+      if (!source) return prev;
+      copy = duplicateCampaign(source, overrides);
+      return [copy, ...prev];
+    });
+    return copy;
+  }, []);
 
   const setCampaignStatus = useCallback(
-    (id: string, status: CampaignStatus) => {
-      updateCampaign(id, { status });
-    },
+    (id: string, status: CampaignStatus) => updateCampaign(id, { status }),
     [updateCampaign],
   );
 
   const moveCampaign = useCallback(
-    (id: string, startDate: string, endDate: string) => {
-      updateCampaign(id, { startDate, endDate });
-    },
+    (id: string, startDate: string, endDate: string) =>
+      updateCampaign(id, { startDate, endDate }),
     [updateCampaign],
   );
 
-  // ---- templates ----
   const addTemplate = useCallback((template: Template) => {
     setTemplates((prev) => [template, ...prev]);
   }, []);
@@ -272,36 +318,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
     setTemplates((prev) => prev.filter((t) => t.id !== id));
   }, []);
 
-  // ---- preferences ----
-  const updatePreferences = useCallback((patch: Partial<StorePreference>) => {
-    setPreferences((prev) => ({ ...prev, ...patch }));
-  }, []);
-
-  const value = useMemo<DataContextValue>(
+  const value = useMemo<CampaignsContextValue>(
     () => ({
-      user: demoUser,
-      store: demoStore,
-      membership: demoMembership,
-      plans,
-      planId,
-      plan,
-      subscription,
-      setPlanId,
-      canAddCountry: (currentCount: number) =>
-        canAddCountryFor(plan, currentCount),
-      countries: catalog,
-      storeCountries,
-      enabledCountryCodes,
-      setCountryEnabled,
-      globalEvents: seedGlobalEvents,
-      eventPreferences,
-      isEventHidden,
-      hideEvent,
-      restoreEvent,
-      customEvents,
-      addCustomEvent,
-      updateCustomEvent,
-      deleteCustomEvent,
       campaigns,
       createCampaign,
       updateCampaign,
@@ -312,24 +330,8 @@ export function DataProvider({ children }: { children: ReactNode }) {
       templates,
       addTemplate,
       deleteTemplate,
-      preferences,
-      updatePreferences,
     }),
     [
-      planId,
-      plan,
-      subscription,
-      storeCountries,
-      enabledCountryCodes,
-      setCountryEnabled,
-      eventPreferences,
-      isEventHidden,
-      hideEvent,
-      restoreEvent,
-      customEvents,
-      addCustomEvent,
-      updateCustomEvent,
-      deleteCustomEvent,
       campaigns,
       createCampaign,
       updateCampaign,
@@ -340,30 +342,60 @@ export function DataProvider({ children }: { children: ReactNode }) {
       templates,
       addTemplate,
       deleteTemplate,
-      preferences,
-      updatePreferences,
     ],
   );
-
-  return <DataContext.Provider value={value}>{children}</DataContext.Provider>;
+  return <CampaignsCtx.Provider value={value}>{children}</CampaignsCtx.Provider>;
 }
+
+// ─────────────────────────── Composed provider ───────────────────────────
+export function DataProvider({ children }: { children: ReactNode }) {
+  return (
+    <PlanProviderInner>
+      <CatalogProviderInner>
+        <CampaignsProviderInner>{children}</CampaignsProviderInner>
+      </CatalogProviderInner>
+    </PlanProviderInner>
+  );
+}
+
+// ─────────────────────────── Focused hooks ───────────────────────────
+export function usePlanData(): PlanContextValue {
+  const v = useContext(PlanCtx);
+  if (!v) throw new Error("usePlanData must be used within <DataProvider>");
+  return v;
+}
+export function useCatalog(): CatalogContextValue {
+  const v = useContext(CatalogCtx);
+  if (!v) throw new Error("useCatalog must be used within <DataProvider>");
+  return v;
+}
+export function useCampaignData(): CampaignsContextValue {
+  const v = useContext(CampaignsCtx);
+  if (!v) throw new Error("useCampaignData must be used within <DataProvider>");
+  return v;
+}
+
+/** Composite of all three domains — backward-compatible with existing consumers. */
+export type DataContextValue = PlanContextValue &
+  CatalogContextValue &
+  CampaignsContextValue;
 
 export function useData(): DataContextValue {
-  const value = useContext(DataContext);
-  if (!value) {
-    throw new Error("useData must be used within <DataProvider>");
-  }
-  return value;
+  return { ...usePlanData(), ...useCatalog(), ...useCampaignData() };
 }
 
-/** Back-compat tenant selector used by the shell. */
+/**
+ * Shell tenant selector — reads identity + countries only (NOT campaigns), so the
+ * persistent shell does not re-render when campaigns/templates change.
+ */
 export function useCurrentStore() {
-  const { store, membership, storeCountries, enabledCountryCodes } = useData();
+  const { store, membership } = usePlanData();
+  const { storeCountries, enabledCountryCodes } = useCatalog();
   return { store, membership, storeCountries, enabledCountryCodes };
 }
 
-/** Back-compat plan selector used by the shell. */
+/** Shell plan selector — reads the plan domain only. */
 export function usePlan() {
-  const { subscription, plan, canAddCountry } = useData();
+  const { subscription, plan, canAddCountry } = usePlanData();
   return { subscription, plan, canAddCountry };
 }
