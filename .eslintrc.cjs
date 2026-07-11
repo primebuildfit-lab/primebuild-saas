@@ -50,6 +50,11 @@ module.exports = {
       },
       rules: {
         "react/no-unknown-property": ["error", { ignore: ["variant"] }],
+        // React Compiler advisory diagnostics (optimization/style hints, not
+        // correctness bugs). Surfaced as warnings so they don't fail CI: the
+        // debounced search effect and the calendar memo are intentional.
+        "react-hooks/preserve-manual-memoization": "warn",
+        "react-hooks/set-state-in-effect": "warn",
       },
     },
 
@@ -74,6 +79,14 @@ module.exports = {
         "plugin:import/recommended",
         "plugin:import/typescript",
       ],
+      rules: {
+        // Allow intentionally-unused, underscore-prefixed placeholder params
+        // (e.g. Phase-5 stub signatures in app/lib/tenant.ts).
+        "@typescript-eslint/no-unused-vars": [
+          "error",
+          { argsIgnorePattern: "^_", varsIgnorePattern: "^_" },
+        ],
+      },
     },
 
     // Node

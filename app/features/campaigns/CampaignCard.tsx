@@ -1,4 +1,4 @@
-import { CalendarRange, Tag } from "lucide-react";
+import { CalendarRange, Tag, Lock } from "lucide-react";
 import type { Campaign } from "~/types/domain";
 import { StatusPill, Badge } from "~/components/ui";
 import { getCountry } from "~/data";
@@ -8,11 +8,18 @@ import { cn } from "~/lib/cn";
 interface CampaignCardProps {
   campaign: Campaign;
   onOpen?: (campaign: Campaign) => void;
+  /** over the plan's saved-campaign limit — retained but not editable (D16) */
+  readOnly?: boolean;
   className?: string;
 }
 
 /** Compact, clickable campaign summary used across dashboard, list, and library. */
-export function CampaignCard({ campaign, onOpen, className }: CampaignCardProps) {
+export function CampaignCard({
+  campaign,
+  onOpen,
+  readOnly,
+  className,
+}: CampaignCardProps) {
   const country = campaign.country ? getCountry(campaign.country) : undefined;
   const interactive = Boolean(onOpen);
 
@@ -42,7 +49,15 @@ export function CampaignCard({ campaign, onOpen, className }: CampaignCardProps)
         <h3 className="min-w-0 truncate text-sm font-semibold text-gray-900">
           {campaign.name}
         </h3>
-        <StatusPill status={campaign.status} />
+        <div className="flex shrink-0 items-center gap-1.5">
+          {readOnly ? (
+            <Badge tone="amber">
+              <Lock className="h-3 w-3" />
+              Read-only
+            </Badge>
+          ) : null}
+          <StatusPill status={campaign.status} />
+        </div>
       </div>
 
       <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">

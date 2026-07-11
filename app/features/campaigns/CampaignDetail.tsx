@@ -18,7 +18,10 @@ import {
   StatusPill,
   ConfirmDialog,
   EmptyState,
+  LinkButton,
 } from "~/components/ui";
+import { isCampaignReadOnly } from "~/lib/planLimits";
+import { savedCampaignLimitReached } from "~/lib/planEntitlements";
 import { useData } from "~/context/DataContext";
 import { getCountry } from "~/data";
 import { formatDate, formatDateRange } from "~/lib/dates";
@@ -44,6 +47,7 @@ export function CampaignDetail({
   const {
     campaigns,
     globalEvents,
+    plan,
     updateCampaign,
     deleteCampaign,
     duplicateCampaign,
@@ -85,6 +89,9 @@ export function CampaignDetail({
     );
   }
 
+  const readOnly = isCampaignReadOnly(campaign, campaigns, plan);
+  const atCreateLimit = savedCampaignLimitReached(plan, campaigns.length);
+
   const event = campaign.globalEventId
     ? globalEvents.find((e) => e.id === campaign.globalEventId)
     : undefined;
@@ -100,6 +107,7 @@ export function CampaignDetail({
   };
 
   const toggleAction = (actionId: string) => {
+    if (readOnly) return;
     updateCampaign(campaign.id, {
       actions: campaign.actions?.map((a) =>
         a.id === actionId ? { ...a, done: !a.done } : a,
@@ -156,11 +164,28 @@ export function CampaignDetail({
         description={formatDateRange(campaign.startDate, campaign.endDate)}
         footer={
           <>
-            <Button variant="secondary" onClick={() => onEdit(campaign.id)}>
+            <Button
+              variant="secondary"
+              onClick={() => onEdit(campaign.id)}
+              disabled={readOnly}
+              title={
+                readOnly
+                  ? "Read-only on your current plan — upgrade to edit"
+                  : undefined
+              }
+            >
               <Pencil className="h-4 w-4" />
               Edit
             </Button>
-            <Button onClick={handleDuplicate}>
+            <Button
+              onClick={handleDuplicate}
+              disabled={atCreateLimit}
+              title={
+                atCreateLimit
+                  ? "You’ve reached your plan’s saved-campaign limit"
+                  : undefined
+              }
+            >
               <Copy className="h-4 w-4" />
               Duplicate
             </Button>
@@ -168,6 +193,19 @@ export function CampaignDetail({
         }
       >
         <div className="space-y-5">
+          {readOnly ? (
+            <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm text-amber-800">
+              <p className="flex-1">
+                This campaign is <strong>read-only</strong> because it’s over your{" "}
+                {plan.name} plan’s saved-campaign limit. Your data is kept safe —
+                upgrade to edit it again.
+              </p>
+              <LinkButton to="/app/billing" size="sm" variant="secondary">
+                Upgrade
+              </LinkButton>
+            </div>
+          ) : null}
+
           {flash ? (
             <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
               {flash}
@@ -184,10 +222,16 @@ export function CampaignDetail({
                 </span>
               ) : null}
             </div>
-            <CampaignStatusMenu
-              campaign={campaign}
-              onChange={(status) => setCampaignStatus(campaign.id, status)}
-            />
+            {readOnly ? (
+              <p className="text-xs text-gray-500">
+                Status changes are disabled while this campaign is read-only.
+              </p>
+            ) : (
+              <CampaignStatusMenu
+                campaign={campaign}
+                onChange={(status) => setCampaignStatus(campaign.id, status)}
+              />
+            )}
           </section>
 
           {/* Key facts */}
@@ -231,7 +275,8 @@ export function CampaignDetail({
                     <button
                       type="button"
                       onClick={() => toggleAction(action.id)}
-                      className="flex items-center gap-2 text-sm text-gray-700"
+                      disabled={readOnly}
+                      className="flex items-center gap-2 text-sm text-gray-700 disabled:cursor-not-allowed"
                     >
                       {action.done ? (
                         <CheckCircle2 className="h-4 w-4 text-emerald-500" />

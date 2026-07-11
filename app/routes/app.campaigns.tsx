@@ -4,6 +4,7 @@ import { Plus, Megaphone, AlertTriangle } from "lucide-react";
 import { PageHeader, Button, EmptyState, LinkButton } from "~/components/ui";
 import { useData } from "~/context/DataContext";
 import { savedCampaignLimitReached } from "~/lib/planEntitlements";
+import { readOnlyCampaignIds } from "~/lib/planLimits";
 import { formatLimitValue } from "~/lib/format";
 import { CampaignCard } from "~/features/campaigns/CampaignCard";
 import {
@@ -40,6 +41,10 @@ export default function CampaignsRoute() {
   };
 
   const atLimit = savedCampaignLimitReached(plan, campaigns.length);
+  const readOnlyIds = useMemo(
+    () => readOnlyCampaignIds(campaigns, plan),
+    [campaigns, plan],
+  );
 
   const filtered = useMemo(() => {
     const q = filters.query.trim().toLowerCase();
@@ -107,7 +112,12 @@ export default function CampaignsRoute() {
         ) : (
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {filtered.map((c) => (
-              <CampaignCard key={c.id} campaign={c} onOpen={(camp) => openDetail(camp.id)} />
+              <CampaignCard
+                key={c.id}
+                campaign={c}
+                readOnly={readOnlyIds.has(c.id)}
+                onOpen={(camp) => openDetail(camp.id)}
+              />
             ))}
           </div>
         )}
