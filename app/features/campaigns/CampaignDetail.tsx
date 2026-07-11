@@ -9,6 +9,7 @@ import {
   GitBranch,
   CheckCircle2,
   Circle,
+  SearchX,
 } from "lucide-react";
 import {
   Drawer,
@@ -16,6 +17,7 @@ import {
   Badge,
   StatusPill,
   ConfirmDialog,
+  EmptyState,
 } from "~/components/ui";
 import { useData } from "~/context/DataContext";
 import { getCountry } from "~/data";
@@ -55,10 +57,29 @@ export function CampaignDetail({
     ? campaigns.find((c) => c.id === campaignId)
     : undefined;
 
-  const open = Boolean(campaign);
+  // A campaignId in the URL that resolves to nothing (stale/shared deep link, or
+  // a record that no longer exists) gets an explicit "not found" state rather
+  // than a silently-empty panel.
+  if (campaignId && !campaign) {
+    return (
+      <Drawer open onClose={onClose} title="Campaign not found">
+        <EmptyState
+          icon={SearchX}
+          title="This campaign doesn’t exist"
+          description="It may have been deleted, or the link is out of date."
+          action={
+            <Button variant="secondary" onClick={onClose}>
+              Back to campaigns
+            </Button>
+          }
+        />
+      </Drawer>
+    );
+  }
+
   if (!campaign) {
     return (
-      <Drawer open={open} onClose={onClose}>
+      <Drawer open={false} onClose={onClose}>
         {null}
       </Drawer>
     );
@@ -129,7 +150,7 @@ export function CampaignDetail({
   return (
     <>
       <Drawer
-        open={open}
+        open
         onClose={onClose}
         title={campaign.name}
         description={formatDateRange(campaign.startDate, campaign.endDate)}
