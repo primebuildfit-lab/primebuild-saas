@@ -139,3 +139,11 @@ Added for Eventra: `framer-motion`, `lucide-react`, `date-fns`, `clsx`, `tailwin
 2. Provision the new, separate Eventra Supabase project (Phase 5 wiring), and — for a live embedded
    preview — create the app on a Shopify Partner org (`shopify app config link`) to populate `client_id`.
 3. On approval, begin **Phase 2 — Core Planning**; stop at the Phase 2 gate.
+
+## Commit / push record (Phase 1 correction)
+
+- **Repo:** `primebuildfit-lab/primebuild-saas` · **branch:** `main`
+- **Foundation commit:** `df1cb16` — _Phase 1: Eventra foundation on official Shopify React Router template_
+- **Pushed:** ✅ 2026-07-11 to `origin/main` (repo was previously empty; this is the initial commit).
+- Verification prior to push: `npm run typecheck` ✅ · `npm run build` ✅ · `react-router-serve` smoke test ✅.
+- A follow-up docs commit records this status.
