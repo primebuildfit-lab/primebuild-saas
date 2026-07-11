@@ -1,6 +1,7 @@
-import { useEffect, type ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 import { X } from "lucide-react";
 import { cn } from "~/lib/cn";
+import { useDialog } from "~/hooks/useDialog";
 
 interface ModalProps {
   open: boolean;
@@ -19,14 +20,8 @@ export function Modal({
   footer,
   className,
 }: ModalProps) {
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  const dialogRef = useDialog<HTMLDivElement>(open, onClose);
+  const titleId = useId();
 
   if (!open) return null;
 
@@ -38,17 +33,22 @@ export function Modal({
         aria-hidden
       />
       <div
+        ref={dialogRef}
+        tabIndex={-1}
         role="dialog"
         aria-modal="true"
-        aria-label={title}
+        aria-labelledby={title ? titleId : undefined}
+        aria-label={title ? undefined : "Dialog"}
         className={cn(
-          "relative z-10 w-full max-w-lg rounded-xl border border-gray-200 bg-white shadow-xl",
+          "relative z-10 w-full max-w-lg rounded-xl border border-gray-200 bg-white shadow-xl focus:outline-none",
           className,
         )}
       >
         {title ? (
           <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-            <h2 className="text-sm font-semibold text-gray-900">{title}</h2>
+            <h2 id={titleId} className="text-sm font-semibold text-gray-900">
+              {title}
+            </h2>
             <button
               type="button"
               onClick={onClose}

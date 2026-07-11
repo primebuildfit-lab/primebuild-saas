@@ -1,7 +1,8 @@
-import { useEffect, type ReactNode } from "react";
+import { useId, type ReactNode } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { cn } from "~/lib/cn";
+import { useDialog } from "~/hooks/useDialog";
 
 interface DrawerProps {
   open: boolean;
@@ -24,14 +25,9 @@ export function Drawer({
   footer,
   widthClassName = "max-w-xl",
 }: DrawerProps) {
-  useEffect(() => {
-    if (!open) return;
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
-    document.addEventListener("keydown", onKey);
-    return () => document.removeEventListener("keydown", onKey);
-  }, [open, onClose]);
+  const dialogRef = useDialog<HTMLElement>(open, onClose);
+  const titleId = useId();
+  const descId = useId();
 
   return (
     <AnimatePresence>
@@ -46,11 +42,15 @@ export function Drawer({
             aria-hidden
           />
           <motion.aside
+            ref={dialogRef}
+            tabIndex={-1}
             role="dialog"
             aria-modal="true"
-            aria-label={title}
+            aria-labelledby={title ? titleId : undefined}
+            aria-label={title ? undefined : "Dialog"}
+            aria-describedby={description ? descId : undefined}
             className={cn(
-              "absolute inset-y-0 right-0 flex w-full flex-col bg-white shadow-xl",
+              "absolute inset-y-0 right-0 flex w-full flex-col bg-white shadow-xl focus:outline-none",
               widthClassName,
             )}
             initial={{ x: "100%" }}
@@ -61,12 +61,18 @@ export function Drawer({
             <div className="flex items-start justify-between gap-3 border-b border-gray-100 px-5 py-4">
               <div className="min-w-0">
                 {title ? (
-                  <h2 className="truncate text-base font-semibold text-gray-900">
+                  <h2
+                    id={titleId}
+                    className="truncate text-base font-semibold text-gray-900"
+                  >
                     {title}
                   </h2>
                 ) : null}
                 {description ? (
-                  <p className="mt-0.5 truncate text-sm text-gray-500">
+                  <p
+                    id={descId}
+                    className="mt-0.5 truncate text-sm text-gray-500"
+                  >
                     {description}
                   </p>
                 ) : null}

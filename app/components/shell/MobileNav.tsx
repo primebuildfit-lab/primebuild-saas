@@ -2,6 +2,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { X } from "lucide-react";
 import { Brand } from "./Brand";
 import { NavLinks } from "./NavLinks";
+import { useDialog } from "~/hooks/useDialog";
 
 interface MobileNavProps {
   open: boolean;
@@ -9,6 +10,7 @@ interface MobileNavProps {
 }
 
 export function MobileNav({ open, onClose }: MobileNavProps) {
+  const dialogRef = useDialog<HTMLElement>(open, onClose);
   return (
     <AnimatePresence>
       {open ? (
@@ -22,7 +24,9 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
             aria-hidden
           />
           <motion.aside
-            className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-white shadow-xl"
+            ref={dialogRef}
+            tabIndex={-1}
+            className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-white shadow-xl focus:outline-none"
             initial={{ x: "-100%" }}
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
