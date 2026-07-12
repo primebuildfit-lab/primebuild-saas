@@ -10,6 +10,20 @@ approval still pending from the user)._
 
 ---
 
+## INSTALLATION PHASE — Local install ready (2026-07-12) ✅
+
+Eventra Business is **installed and usable locally** with no external services (preview + file
+persistence). One-command / double-click start; data persists across restarts. Verified end-to-end:
+startup, shutdown, first-run seeding, persistence (write→disk), restart recovery (survives), reset, and the
+update guard. See **`docs/LOCAL_USAGE.md`**.
+
+- **Launcher:** `Eventra-Local.cmd` (double-click) or `npm run start:local` → `http://localhost:3000/app`.
+- **Helpers:** `npm run reset:local` (fresh demo), `npm run update:local` (safe fast-forward + install).
+- **Stops at the gate:** no Shopify, no Supabase, no publish/deploy. Installing into real Shopify Admin
+  remains Brian-gated (`docs/SHOPIFY_DEV_INSTALL_RUNBOOK.md`).
+
+---
+
 ## MEGA MODULE 5 — Pre-Install Readiness implemented in code (2026-07-12) 🟦
 
 Business is **installation-ready** — certified **READY FOR SHOPIFY AUTHORIZATION**
