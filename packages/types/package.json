@@ -1,0 +1,21 @@
+{
+  "name": "@eventra/types",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Platform-wide shared domain types (type-only; no runtime).",
+  "exports": {
+    ".": "./src/index.ts",
+    "./identity": "./src/identity.ts",
+    "./catalog": "./src/catalog.ts",
+    "./plan": "./src/plan.ts",
+    "./billing": "./src/billing.ts",
+    "./notifications": "./src/notifications.ts",
+    "./system": "./src/system.ts"
+  },
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  }
+}

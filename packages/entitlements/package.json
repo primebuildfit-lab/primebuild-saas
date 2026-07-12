@@ -1,0 +1,19 @@
+{
+  "name": "@eventra/entitlements",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Pure, provider-independent entitlement resolver. No billing/db/UI deps.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@eventra/types": "*",
+    "@eventra/config": "*"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  }
+}
