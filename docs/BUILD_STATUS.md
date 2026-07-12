@@ -10,6 +10,30 @@ approval still pending from the user)._
 
 ---
 
+## Phase 5 — Private Pilot: 🟨 in progress (blocked on Brian's gates)
+
+**No Shopify app linked and no Supabase project connected yet** — both require Brian's interactive
+login / authorization (external cost), which are the sprint's designated stop gates. Honest status:
+
+- ✅ **DB contract (in-repo):** `supabase/migrations/0001_schema.sql` (all tables), `0002_rls.sql`
+  (RLS + policies, `WITH CHECK` blocks cross-tenant writes), `0003_reference_data.sql` (countries,
+  plans, 11 events — matches `app/data`), `supabase/seed.sql` (dev-only Demo Store).
+- ✅ **Server persistence foundation (env-gated, unit-tested):** `app/db/` — `supabase.server.ts`
+  (admin + RLS-JWT user client), `tenant.server.ts` (resolve/provision store + membership from the
+  Shopify session; storeId never from client), `ids.server.ts` (deterministic tenant ids),
+  `mappers.ts` (row↔domain), `repositories.server.ts` (all merchant reads/writes, RLS-scoped),
+  `env.server.ts` (`EVENTRA_PERSISTENCE` gate). 10 new tests (uuidv5 RFC vector, JWT claims, gate,
+  mapper round-trips). Mock mode remains the default so all 87 tests + build stay green.
+- ✅ **Config:** minimal Shopify scope (`read_products`, no write), `.env.example` pilot vars,
+  `docs/PHASE5_PILOT_RUNBOOK.md` with exact steps for Brian.
+- ⛔ **Blocked (needs Brian):** (1) `shopify app config link` + install on the dev store — interactive
+  Partner login; (2) create the separate Eventra Supabase project — external cost/authorization;
+  (3) secrets in `.env`. **Not yet done:** wiring the loaders/actions into routes + DataContext and
+  end-to-end persistence/tenant-isolation verification against the live DB (the next step once the
+  gates clear).
+
+---
+
 ## Pre‑Phase‑5 Hardening Sprint — ✅ complete (2026‑07‑11)
 
 Ran against `docs/PROJECT_AUDIT.md` as the backlog. **No Phase 5 / Shopify / Supabase / paid services.**
