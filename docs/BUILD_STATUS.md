@@ -10,7 +10,33 @@ approval still pending from the user)._
 
 ---
 
-## Phase 5 — Private Pilot: 🟨 in progress (blocked on Brian's gates)
+## Platform Expansion (v3) — 🟦 architecture review pending (2026-07-11)
+
+Eventra is being expanded from a single B2B Shopify app into **one platform, three products**: Eventra
+Consumer (Android/Play + web), Eventra Business (the existing product, now multi-platform — Shopify is
+one integration), and the Eventra Admin Console (web). **Phase-5 database implementation is PAUSED**
+until this architecture is reviewed and approved.
+
+- Checkpoint tag `pre-platform-expansion` (commit `0e7bb7b`) preserves all prior work.
+- Architecture package delivered (docs only, no code): `docs/PLATFORM_VISION.md`,
+  `CONSUMER_PRODUCT.md`, `BUSINESS_PRODUCT.md`, `ADMIN_CONSOLE.md`, `MONETIZATION.md`,
+  `PLATFORM_ARCHITECTURE.md`; `DECISIONS.md` updated (old Shopify-first items rescoped/superseded, new
+  D36–D46 proposed).
+- New pricing (approved): Consumer Free $0 / Ad-Free $15 / Verified Deals $30; Business Starter $15 /
+  Growth $30 / Business Pro $45 + a 45-day full-Pro trial (old business plans superseded). Exact
+  entitlements are **proposed, pending sign-off**.
+- **Not done (by design):** no code, no Supabase, no billing, no Android publish, no ad networks, no
+  PrimeBuild changes. Awaiting approval of the package + the open business decisions in `DECISIONS.md`.
+
+---
+
+## Phase 5 — Private Pilot: ⏸ PAUSED (architecture expansion under review)
+
+_The Business persistence work below is preserved and unchanged, but paused. When resumed it is
+**rescoped** to "Business slice on the platform schema" (org-based, principal-aware) per
+`PLATFORM_ARCHITECTURE.md §19`. Original status retained for reference:_
+
+### Phase 5 — Private Pilot (as of the pause): 🟨 blocked on Brian's gates
 
 **No Shopify app linked and no Supabase project connected yet** — both require Brian's interactive
 login / authorization (external cost), which are the sprint's designated stop gates. Honest status:

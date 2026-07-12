@@ -3,7 +3,9 @@
 Record of approved product decisions. Do not silently change an approved rule —
 amend here and flag it. Status: ✅ approved · 🟡 proposed (awaiting user) · 🔴 open.
 
-_Last updated: 2026-07-11 — **Architecture Review approved with amendments.** Open items resolved._
+_Last updated: 2026-07-11 — **Platform expansion proposed** (three products: Consumer / Business /
+Admin). See the "Platform Expansion (v3)" section below; several earlier Shopify-first decisions are
+now **rescoped to Eventra Business** or **superseded**. Nothing is deleted — history preserved._
 
 ---
 
@@ -82,8 +84,52 @@ _Last updated: 2026-07-11 — **Architecture Review approved with amendments.** 
 | D34 | Appearance accent | Appearance settings expose an accent (indigo/blue/emerald/violet) applied at runtime via CSS variables that Tailwind v4 `brand-*` utilities resolve — instant re-tint, no rebuild. Design stays light per the design system. | ✅ |
 | D35 | Search placement | Global deterministic search lives at `/app/search` with a Topbar entry point (not a sidebar item). Searches events/campaigns/templates/countries/custom events by substring — no AI. | ✅ |
 
+---
+
+## Platform Expansion (v3) — proposed 2026-07-11 (awaiting approval)
+
+Eventra becomes **one platform, three products** (Consumer / Business / Admin). See
+`docs/PLATFORM_VISION.md`, `CONSUMER_PRODUCT.md`, `BUSINESS_PRODUCT.md`, `ADMIN_CONSOLE.md`,
+`MONETIZATION.md`, `PLATFORM_ARCHITECTURE.md`. Status: 🟡 proposed unless noted. Nothing deleted.
+
+### Rescoped / superseded earlier decisions
+| Old | Was | Now |
+|-----|-----|-----|
+| D5 | Shopify app first; standalone deferred | 🔁 **Rescoped:** Shopify is **one integration of Eventra Business**, not the whole product (also Woo/Wix/Squarespace/custom/physical/none). |
+| D6, D7, D8 | V1 planning + memory, visual actions, mock-first | ✅ **Still apply — scoped to Eventra Business.** |
+| D9 (business plans) | Free $0 / Starter $10 / Growth $20 / VIP $50 | 🔴 **Superseded** by **Starter $15 / Growth $30 / Business Pro $45** + a **45-day full-Pro trial** (no free business tier). |
+| D10 | "Pro"/"Advanced" deprecated | ⚠️ **Amended:** "Business **Pro**" is the approved top business tier; the old deprecation referred to the earlier draft only. |
+| D16 | Downgrade retention (read-only excess) | ✅ **Kept + extended** to the trial-grace state. |
+| D19 | Shopify official RR template from the start | 🔁 **Rescoped:** the template powers the **Business web/embedded surface**; Consumer (web/PWA→Android) and Admin (web) are new surfaces on the shared backend. |
+| D22 | Initial countries US + Canada | ✅ **Kept** for the curated catalog. |
+| D17/D24 | `Store`-based multi-tenant model | 🔁 **Generalized:** `Store` → **`Org`**; add **Consumer account** and **Admin** principal types. |
+
+### New decisions (proposed) — numbered from D36 (D28–D35 are build-execution notes above)
+| # | Decision | Value | Status |
+|---|----------|-------|--------|
+| D36 | Product structure | One platform, three surfaces: Consumer, Business, Admin Console | 🟡 |
+| D37 | PrimeBuild role | Only a business customer and possible **advertiser**; never hardcoded | ✅ |
+| D38 | Consumer prices | Free $0 · Ad-Free $15 · Verified Deals $30 (incl. ad removal) | ✅ prices / 🟡 entitlements |
+| D39 | Business prices | Starter $15 · Growth $30 · Business Pro $45; no free tier | ✅ prices / 🟡 entitlements |
+| D40 | Business trial | 45 days full Business Pro; then choose a plan; expiry → read-only grace, never delete | ✅ |
+| D41 | Consumer target | Android (Google Play) first + responsive web PWA (proposed TWA packaging) | 🟡 |
+| D42 | Integrations as adapters | Common `CommerceConnection` interface; core works with no integration | 🟡 |
+| D43 | Advertising | First-party/house ads only at launch; Consumer Free only; no third-party network yet | 🟡 |
+| D44 | Verified deals | Business submits → Admin verifies vs sources → publish → Verified-tier consumer alerts | 🟡 |
+| D45 | Tenancy/security | Three principal types (consumer/org/admin); RLS per principal; never trust client ids | 🟡 |
+| D46 | Phase 5 rescope | DB work paused; becomes "Business slice on the platform schema" once approved | ✅ |
+
+### Open business decisions (need Brian)
+Exact entitlements per consumer/business tier; consumer follow limits; whether Starter can submit
+verified deals; team-member counts; annual pricing; consumer trial?; **Google Play Billing vs web
+billing**; ad consent/privacy model; PSP choice; monorepo vs single-app repo shape.
+
+---
+
 ### Status
-Architecture Review **approved with amendments (2026-07-11)**. All previously-open items (D1, D2, D5,
-D8, D19, D20, D22) are now resolved. **Phase 1 foundation correction executed and verified (2026-07-11)** —
-migrated onto the official Shopify React Router template; typecheck + build pass; see `BUILD_STATUS.md`.
-Phase 1 is **Ready for Review**; awaiting user approval before Phase 2.
+Business Architecture Review **approved with amendments (2026-07-11)** (D1–D27) and **Phase 1 foundation
+correction executed and verified** — migrated onto the official Shopify React Router template; typecheck +
+build pass. Phases 2–4 built, hardened, and tested (87 tests). **Platform expansion (D36–D46) is PROPOSED
+and awaiting approval.** Phase-5 database implementation is **paused** until the expanded architecture +
+open decisions are approved. **No application code / no Supabase / no billing until the Platform
+Architecture Lock is approved.**
