@@ -344,10 +344,12 @@ Added for Eventra: `framer-motion`, `lucide-react`, `date-fns`, `clsx`, `tailwin
 - **Real Shopify auth** requires Partner-org credentials (a `client_id` in `shopify.app.toml`, plus
   `SHOPIFY_API_KEY`/`SHOPIFY_API_SECRET`). Not present — the app builds and boots with mock UI; live OAuth
   is Phase 5. `npm run dev` (Shopify CLI tunnel) needs a Partner login and was intentionally not run.
-- Black Friday / Cyber Monday are encoded as nth-weekday rules (BF = 4th Friday, CM = last Monday of
-  November). `lib/events.ts` resolves those rules correctly, and they match the true US dates for 2026.
-  ⚠️ The **encoding** can drift from the real definitions (BF = day after the 4th Thursday) in years
-  where Nov 1 is a Friday — see `docs/PROJECT_AUDIT.md` (H-2). Fix the catalog rule before real use.
+- Black Friday / Cyber Monday are encoded (in `@eventra/calendar`, consumed via `lib/events.ts`) as
+  Thanksgiving-relative rules: `{ kind: "nth_weekday", month: 11, weekday: 4, nth: 4, offsetDays }`
+  — i.e. **BF = 4th Thursday + 1 day**, **CM = 4th Thursday + 4 days**. This is the correct definition
+  in every year (no Nov-1-is-a-Friday drift); verified by `packages/calendar/test/calendar.test.ts`
+  across 2023–2030. The earlier "4th Friday / last Monday" encoding (H-2 in `docs/PROJECT_AUDIT.md`)
+  has been fixed — this note is retained only to record that the drift risk no longer applies.
 - **Loading states:** loaders are synchronous mock reads in V1, so there is little async to show; the
   Search surface demonstrates a debounced skeleton, and `Skeleton`/`LoadingState`/`Spinner` primitives
   exist for the Phase-5 real async loaders.
