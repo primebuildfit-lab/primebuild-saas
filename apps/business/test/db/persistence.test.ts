@@ -143,6 +143,7 @@ describe("templates / countries / events / preferences / plan / notes", () => {
   });
 
   it("enables/disables countries idempotently", async () => {
+    await repo.setPlan(A, "growth"); // unlimited countries (enforcement covered in enforcement.test)
     await repo.setCountryEnabled(A, "US", true);
     await repo.setCountryEnabled(A, "US", false);
     await repo.setCountryEnabled(A, "CA", true);

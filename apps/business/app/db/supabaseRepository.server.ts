@@ -10,6 +10,7 @@ import type {
 import { duplicateCampaign as buildDuplicate } from "~/lib/campaigns";
 import { toLockedPlanId } from "~/lib/planModel";
 import { plans as facadePlans } from "~/data";
+import { assertCanEnableCountry } from "./enforcement";
 import type { BusinessRepository, Catalog, StoreBundle } from "./repository";
 import {
   campaignToRow,
@@ -123,6 +124,21 @@ export function createSupabaseRepository(client: SupabaseClient): BusinessReposi
     },
 
     async setCountryEnabled(scope, countryCode, enabled) {
+      if (enabled) {
+        // Server-side plan enforcement (Part 6): read the org plan + current
+        // enabled countries, then guard against exceeding the locked limit.
+        const [sub, countries] = await Promise.all([
+          client.from("subscriptions").select("plan_id").eq("organization_id", scope.organizationId).maybeSingle(),
+          client.from("workspace_countries").select("country_code, enabled").eq("workspace_id", ws(scope)),
+        ]);
+        const planId = sub.data
+          ? rowToSubscription(sub.data as Row, ws(scope)).planId
+          : ("free" as const);
+        const currentEnabled = ((countries.data as Row[] | null) ?? []).filter(
+          (c) => c.enabled && c.country_code !== countryCode,
+        ).length;
+        assertCanEnableCountry(planId, currentEnabled);
+      }
       unwrap(
         await client
           .from("workspace_countries")

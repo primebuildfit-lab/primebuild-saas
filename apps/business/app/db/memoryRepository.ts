@@ -35,6 +35,7 @@ import { createId } from "~/lib/id";
 import { duplicateCampaign as buildDuplicate } from "~/lib/campaigns";
 import type { BusinessRepository, Catalog, StoreBundle } from "./repository";
 import { RepositoryError } from "./repository";
+import { assertCanEnableCountry } from "./enforcement";
 import {
   assertNoDuplicateCustomEvent,
   assertNoDuplicateTemplateName,
@@ -184,9 +185,16 @@ export function createMemoryRepository(
       return bundle;
     },
 
-    // ── countries ──
+    // ── countries (server-side plan enforcement — Part 6) ──
     async setCountryEnabled(scope, countryCode, enabled) {
       const s = stateFor(scope);
+      if (enabled) {
+        const planId = s.subscription?.planId ?? "free";
+        const currentEnabled = s.storeCountries.filter(
+          (c) => c.enabled && c.countryCode !== countryCode,
+        ).length;
+        assertCanEnableCountry(planId, currentEnabled);
+      }
       const existing = s.storeCountries.find((c) => c.countryCode === countryCode);
       if (existing) existing.enabled = enabled;
       else s.storeCountries.push({ storeId: scope.workspaceId, countryCode, enabled });
