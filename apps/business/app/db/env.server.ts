@@ -19,3 +19,24 @@ export function persistenceEnabled(): boolean {
     Boolean(process.env.SUPABASE_JWT_SECRET)
   );
 }
+
+/**
+ * Persistence mode selector (MM4, Part 10). Precedence:
+ *  1. `supabase`  — real Postgres + RLS, only when {@link persistenceEnabled}.
+ *  2. `file`      — local snapshot-on-disk dev persistence (survives restarts)
+ *                   when `EVENTRA_PERSISTENCE_MODE=file`.
+ *  3. `mock`      — in-memory demo data (default; ephemeral per process).
+ * `mock` and `file` require NO secrets, so the app always runs out of the box.
+ */
+export type PersistenceMode = "mock" | "file" | "supabase";
+
+export function persistenceMode(): PersistenceMode {
+  if (persistenceEnabled()) return "supabase";
+  if (process.env.EVENTRA_PERSISTENCE_MODE === "file") return "file";
+  return "mock";
+}
+
+/** Absolute path for the `file` mode snapshot (dev only). */
+export function fileSnapshotPath(): string {
+  return process.env.EVENTRA_PERSISTENCE_FILE || ".eventra/dev-store.json";
+}

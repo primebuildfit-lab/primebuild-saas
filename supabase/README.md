@@ -14,14 +14,14 @@ supabase/
   tests/        RLS / tenant-isolation tests (pgTAP or SQL) — pending
 ```
 
-## File index & classification
+## File index & classification (MM4 — reconciled to the org model)
 | File | Classification | Notes |
 |------|----------------|-------|
-| `migrations/0001_schema.sql` | **requires organization/workspace rename** + **platform expansion** | Business-slice tables; `store_*` → `org/workspace`; add consumer/deals/ads/billing/notifications/admin tables (`docs/PLATFORM_SCHEMA.md`). |
-| `migrations/0003_reference_data.sql` | **reusable** | Countries/plans/global events; matches `apps/business/app/data/*` incl. corrected Black Friday/Cyber Monday rules. |
-| `policies/0002_rls.sql` | **requires platform expansion** | `is_store_member` → add `is_org_member`/`is_self`/advertiser/admin/service policies (`docs/RLS_SECURITY_MODEL.md`). |
-| `seeds/seed.sql` | **reusable (dev-only)** | Demo tenant; rename `store`→`org/workspace` when the schema does. |
-| `tests/` | **pending** | Add the 16-row isolation matrix from `docs/RLS_SECURITY_MODEL.md §7`. |
+| `migrations/0001_schema.sql` | **reconciled (org/workspace + locked plans)** | Business-slice tables now `organization`+`workspace`-keyed; plans use the LOCKED model (`business.*`, workspace limits, YEAR horizons); audit + soft-delete + campaign versioning added. Store-based original is in git history. |
+| `migrations/0003_reference_data.sql` | **reconciled** | Countries/global events unchanged; plans updated to `business.*` / prices 0/15/30/45 / year horizons to match `@eventra/config`. |
+| `policies/0002_rls.sql` | **reconciled** | `is_store_member` → `is_org_member` + `is_workspace_member`; principal-ready (`is_self` reserved for consumer tables in a later module). |
+| `seeds/seed.sql` | **reconciled (dev-only)** | Demo org + workspace; valid UUIDs; `business.growth`. |
+| `tests/` | **pending (SQL)** | The org-isolation matrix (`docs/RLS_SECURITY_MODEL.md §7`). App-level isolation is covered by `apps/business/test/db/*` in MM4. |
 
 ## Future execution order (when provisioning is approved)
 1. `migrations/0001_schema.sql` (after org/workspace + platform expansion)

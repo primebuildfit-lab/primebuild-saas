@@ -165,6 +165,8 @@ export interface Campaign {
   actions?: EventAction[];
   /** memory link — reuse creates a new record; never overwrites the source (D15) */
   createdFromId?: string;
+  /** memory version — increments along a reuse chain (MM4 Part 7). Optional in the façade. */
+  version?: number;
   createdAt: string; // ISO
   updatedAt: string; // ISO
 }
@@ -201,4 +203,33 @@ export interface Subscription {
   storeId: StoreId;
   planId: PlanId;
   status: SubscriptionStatus;
+}
+
+/**
+ * Free-form planning note attached to a store/workspace (MM4 persistence). Prepared
+ * entity — minimal surface in V1; persisted, audited, and soft-deletable like other
+ * merchant records. See docs/MM4_PERSISTENCE.md Part 4.
+ */
+export interface WorkspaceNote {
+  id: string;
+  storeId: StoreId;
+  body: string;
+  createdAt: string; // ISO
+  updatedAt: string; // ISO
+}
+
+/**
+ * Server-resolved tenant scope (MM4). The Business façade `storeId` maps to a
+ * persistent `workspaceId` inside an `organizationId`. Resolved from verified
+ * identity server-side — NEVER from client-supplied ids (D23). The legacy
+ * `assertMembership`/RLS gate applies on top.
+ */
+export interface TenantScope {
+  userId: UserId;
+  organizationId: string;
+  organizationName: string;
+  /** the façade store id === the persistent workspace id */
+  workspaceId: StoreId;
+  /** locked-model role (owner|admin|editor|viewer) */
+  role: "owner" | "admin" | "editor" | "viewer";
 }

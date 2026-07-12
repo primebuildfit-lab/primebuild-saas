@@ -9,20 +9,23 @@ insert into countries (code, name, flag) values
 on conflict (code) do update
   set name = excluded.name, flag = excluded.flag;
 
--- ---------- Plans (D9 — single source of truth) ----------
-insert into plans (id, name, price_monthly, country_limit, planning_horizon_months, saved_campaign_limit, features) values
-  ('free',    'Free',    0,  1,    2,  5,
-     '["Core calendar","Main events","Manual campaigns","Basic reminders","1 country"]'),
-  ('starter', 'Starter', 10, 2,    4,  20,
-     '["Everything in Free","More categories & capacity","Basic campaign history","Campaign duplication","2 countries"]'),
-  ('growth',  'Growth',  20, 3,    8,  100,
-     '["Everything in Starter","Longer history","Plan up to 8 months ahead","Better filters & organization","3 countries"]'),
-  ('vip',     'VIP',     50, null, 12, null,
-     '["Everything in Growth","All countries","Plan 12+ months ahead","Recurring yearly workflows","Advanced templates"]')
+-- ---------- Plans (LOCKED model D49/D50 — must match @eventra/config BUSINESS_PLANS) ----------
+-- workspace_limit: null = unlimited (fair-use). country_limit: 0 = manual only; null = unlimited.
+-- planning_horizon_years replaces the old months. Prices 0/15/30/45.
+insert into plans (id, name, price_monthly, workspace_limit, country_limit, planning_horizon_years, saved_campaign_limit, features) values
+  ('business.free',    'Free',         0,  1,    0,    0,  5,
+     '["Core calendar","Main events","Manual campaigns","Basic reminders","1 workspace"]'),
+  ('business.starter', 'Starter',      15, 2,    1,    1,  20,
+     '["Everything in Free","2 workspaces","1 country","~1 year horizon","Campaign duplication"]'),
+  ('business.growth',  'Growth',       30, 3,    null, 4,  100,
+     '["Everything in Starter","3 workspaces","All countries","4 year horizon","Advanced memory & templates"]'),
+  ('business.pro',     'Business Pro', 45, null, null, 10, null,
+     '["Everything in Growth","Unlimited workspaces","10 year horizon","Consumer promo & storefront widgets"]')
 on conflict (id) do update set
   name = excluded.name, price_monthly = excluded.price_monthly,
+  workspace_limit = excluded.workspace_limit,
   country_limit = excluded.country_limit,
-  planning_horizon_months = excluded.planning_horizon_months,
+  planning_horizon_years = excluded.planning_horizon_years,
   saved_campaign_limit = excluded.saved_campaign_limit,
   features = excluded.features;
 

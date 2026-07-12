@@ -32,3 +32,13 @@ export function uuidv5(name: string, namespace = EVENTRA_NS): string {
 export function ownerUserId(shopDomain: string): string {
   return uuidv5(`owner:${shopDomain.toLowerCase()}`);
 }
+
+/** Stable organization id for a shop (one org per shop in V1 — A3). */
+export function orgIdForShop(shopDomain: string): string {
+  return uuidv5(`org:${shopDomain.toLowerCase()}`);
+}
+
+/** Stable workspace id for a shop's default workspace. */
+export function workspaceIdForShop(shopDomain: string): string {
+  return uuidv5(`workspace:${shopDomain.toLowerCase()}`);
+}

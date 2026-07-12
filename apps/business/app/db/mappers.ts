@@ -4,17 +4,22 @@ import type {
   CustomEvent,
   EventAction,
   GlobalEvent,
-  Plan,
   StoreCountry,
   StoreEventPreference,
   StorePreference,
   Subscription,
   Template,
+  WorkspaceNote,
 } from "~/types/domain";
+import { toFacadePlanId, isBusinessPlanId } from "~/lib/planModel";
 
 /**
  * Pure row <-> domain mappers (snake_case DB <-> camelCase domain). Kept free of
  * any DB/secret imports so they are fully unit-testable (test/db/mappers.test.ts).
+ *
+ * MM4: merchant tables are keyed by `workspace_id` (the façade `storeId`). Plans
+ * are the locked `business.*` model in the DB; catalog plan display comes from the
+ * static façade `~/data` plans, so there is no row→façade Plan mapper here.
  */
 type Row = Record<string, unknown>;
 
@@ -23,16 +28,6 @@ export const rowToCountry = (r: Row): Country => ({
   code: r.code as string,
   name: r.name as string,
   flag: r.flag as string,
-});
-
-export const rowToPlan = (r: Row): Plan => ({
-  id: r.id as Plan["id"],
-  name: r.name as string,
-  priceMonthly: r.price_monthly as number,
-  countryLimit: (r.country_limit as number | null) ?? null,
-  planningHorizonMonths: r.planning_horizon_months as number,
-  savedCampaignLimit: (r.saved_campaign_limit as number | null) ?? null,
-  features: (r.features as string[]) ?? [],
 });
 
 export const rowToGlobalEvent = (r: Row): GlobalEvent => ({
@@ -48,22 +43,22 @@ export const rowToGlobalEvent = (r: Row): GlobalEvent => ({
   recurring: Boolean(r.recurring),
 });
 
-// ---------- merchant ----------
+// ---------- merchant (workspace-keyed; façade storeId === workspace_id) ----------
 export const rowToStoreCountry = (r: Row): StoreCountry => ({
-  storeId: r.store_id as string,
+  storeId: r.workspace_id as string,
   countryCode: r.country_code as string,
   enabled: Boolean(r.enabled),
 });
 
 export const rowToEventPref = (r: Row): StoreEventPreference => ({
-  storeId: r.store_id as string,
+  storeId: r.workspace_id as string,
   globalEventId: r.global_event_id as string,
   hidden: Boolean(r.hidden),
 });
 
 export const rowToCustomEvent = (r: Row): CustomEvent => ({
   id: r.id as string,
-  storeId: r.store_id as string,
+  storeId: r.workspace_id as string,
   name: r.name as string,
   startDate: r.start_date as string,
   endDate: (r.end_date as string | null) ?? undefined,
@@ -77,7 +72,7 @@ export const customEventToRow = (
   e: Omit<CustomEvent, "id"> & { id?: string },
 ): Row => ({
   ...(e.id ? { id: e.id } : {}),
-  store_id: e.storeId,
+  workspace_id: e.storeId,
   name: e.name,
   start_date: e.startDate,
   end_date: e.endDate ?? null,
@@ -89,7 +84,7 @@ export const customEventToRow = (
 
 export const rowToCampaign = (r: Row): Campaign => ({
   id: r.id as string,
-  storeId: r.store_id as string,
+  storeId: r.workspace_id as string,
   name: r.name as string,
   globalEventId: (r.global_event_id as string | null) ?? undefined,
   country: (r.country as string | null) ?? undefined,
@@ -104,6 +99,7 @@ export const rowToCampaign = (r: Row): Campaign => ({
   status: r.status as Campaign["status"],
   actions: (r.actions as EventAction[]) ?? [],
   createdFromId: (r.created_from_id as string | null) ?? undefined,
+  version: (r.version as number | null) ?? 1,
   createdAt: r.created_at as string,
   updatedAt: r.updated_at as string,
 });
@@ -114,7 +110,7 @@ export const campaignToRow = (c: Partial<Campaign>): Row => {
   const set = (k: string, v: unknown) => {
     if (v !== undefined) row[k] = v;
   };
-  set("store_id", c.storeId);
+  set("workspace_id", c.storeId);
   set("name", c.name);
   set("global_event_id", c.globalEventId ?? null);
   set("country", c.country ?? null);
@@ -129,12 +125,13 @@ export const campaignToRow = (c: Partial<Campaign>): Row => {
   set("status", c.status);
   set("actions", c.actions);
   set("created_from_id", c.createdFromId ?? null);
+  set("version", c.version);
   return row;
 };
 
 export const rowToTemplate = (r: Row): Template => ({
   id: r.id as string,
-  storeId: r.store_id as string,
+  storeId: r.workspace_id as string,
   name: r.name as string,
   category: r.category as Template["category"],
   defaultDurationDays: r.default_duration_days as number,
@@ -145,7 +142,7 @@ export const rowToTemplate = (r: Row): Template => ({
 
 export const templateToRow = (t: Template): Row => ({
   id: t.id,
-  store_id: t.storeId,
+  workspace_id: t.storeId,
   name: t.name,
   category: t.category,
   default_duration_days: t.defaultDurationDays,
@@ -154,8 +151,16 @@ export const templateToRow = (t: Template): Row => ({
   notes: t.notes ?? null,
 });
 
+export const rowToWorkspaceNote = (r: Row): WorkspaceNote => ({
+  id: r.id as string,
+  storeId: r.workspace_id as string,
+  body: r.body as string,
+  createdAt: r.created_at as string,
+  updatedAt: r.updated_at as string,
+});
+
 export const rowToStorePreference = (r: Row): StorePreference => ({
-  storeId: r.store_id as string,
+  storeId: r.workspace_id as string,
   weekStartsOn: (r.week_starts_on as 0 | 1) ?? 0,
   calendarFormat: r.calendar_format as StorePreference["calendarFormat"],
   reminderDefaults: (r.reminder_defaults as number[]) ?? [30, 14, 7, 1],
@@ -163,8 +168,16 @@ export const rowToStorePreference = (r: Row): StorePreference => ({
   density: (r.density as StorePreference["density"]) ?? "comfortable",
 });
 
-export const rowToSubscription = (r: Row): Subscription => ({
-  storeId: r.store_id as string,
-  planId: r.plan_id as Subscription["planId"],
-  status: r.status as Subscription["status"],
-});
+/**
+ * Subscription row is ORG-scoped in the DB (organization_id + locked plan_id).
+ * The façade wants a workspace `storeId` + façade plan id, so the workspace id is
+ * supplied by the caller (server-resolved), never read from the client.
+ */
+export const rowToSubscription = (r: Row, workspaceId: string): Subscription => {
+  const planId = r.plan_id as string;
+  return {
+    storeId: workspaceId,
+    planId: isBusinessPlanId(planId) ? toFacadePlanId(planId) : (planId as Subscription["planId"]),
+    status: r.status as Subscription["status"],
+  };
+};
