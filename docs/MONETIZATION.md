@@ -16,21 +16,34 @@
 | Affiliate | future | Referral revenue on outbound deals (with disclosure) |
 | API monetization | future | Paid access to platform data/APIs for partners |
 
-## 2. Consumer plans (approved prices)
-| Plan | Price | Ads | Highlights |
-|------|-------|-----|-----------|
-| Free | $0/mo | Yes | General calendar, basic notifications |
-| Ad-Free | $15/mo | No | Everything in Free, no ads |
-| Verified Deals | $30/mo | No | Ad-free + verified alerts + company/category selection + priority alerts + unlimited follows |
-Entitlement detail + open decisions: `CONSUMER_PRODUCT.md §5`.
+> ⚠️ **ARCHITECTURE LOCK (D47–D49):** the authoritative plan/entitlement model is now in
+> **`CONSUMER_PLANS.md`**, **`BUSINESS_PLANS.md`**, and **`ENTITLEMENTS.md`**. Key corrections to the MM1
+> tables below: **Ad-Free is an independent $15 add-on** (not a tier); the **$30 "Deal Intelligence"**
+> tier **keeps ads** unless Ad-Free is also bought; **Business Free $0 exists**; business horizons are
+> **years** (1/4/10), not months.
 
-## 3. Business plans (approved prices; supersede old Free/Starter$10/Growth$20/VIP$50)
-| Plan | Price | Highlights (proposed) |
-|------|-------|-----------------------|
-| Starter | $15/mo | 2 markets, 25 saved campaigns, 4-mo horizon, 1 integration |
-| Growth | $30/mo | 3 markets, 150 saved, 8-mo horizon, up to 3 integrations, verified-deal submission |
-| Business Pro | $45/mo | Unlimited markets/campaigns, 12+-mo horizon, unlimited integrations, advanced templates/reports |
-No free business tier — entry is the **45-day full-Pro trial**. Detail: `BUSINESS_PRODUCT.md §3, §18`.
+## 2. Consumer — two independent axes (locked; see `CONSUMER_PLANS.md`)
+Intelligence: **Consumer Core ($0)** → **Deal Intelligence ($30)**. Ad-Free: an **independent $15
+add-on** that only removes ads. The four (and only) states:
+| State | Intelligence | Ad-Free | Ads | Price |
+|-------|--------------|:------:|:---:|-------|
+| A | Core | off | shown | $0 |
+| B | Core | on | hidden | $15 |
+| C | Deal Intelligence | off | **shown** | $30 |
+| D | Deal Intelligence | on | hidden | $45 |
+Consumer trial = **30 days Deal Intelligence** (ads remain unless Ad-Free bought). Detail:
+`CONSUMER_PLANS.md`.
+
+## 3. Business plans (locked; see `BUSINESS_PLANS.md`)
+| Plan | Price | Workspaces | Countries | Horizon | Highlights |
+|------|-------|:----------:|:---------:|:-------:|-----------|
+| Free | $0/mo | 1 | manual | manual | manual planning calendar |
+| Starter | $15/mo | 2 | 1 primary | **~1 year** | main dates, suggestions, basic memory, repeat-next-year |
+| Growth | $30/mo | 3 | Unlimited | **4 years** | broad catalog, custom dates, advanced memory, templates, supplier/competitor intel |
+| Business Pro | $45/mo | Unlimited | Unlimited | **10 years** | + consumer-app promo (no extra ad fee), storefront widgets, multi-strategy, richer analytics |
+"Limit" = **workspaces / store connections**. New orgs get a **45-day full-Pro trial**; expiry defaults
+to Business Free with excess **read-only** (never deleted). Detail: `BUSINESS_PLANS.md`,
+`TRIALS_AND_DOWNGRADES.md`.
 
 ## 4. Trials
 - **Business:** 45 days full Business Pro, no plan pre-selected; countdown; at end → choose a plan or

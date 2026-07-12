@@ -65,7 +65,7 @@ matching verified deals even without following the specific company. Category al
 relevance and Discover.
 
 ## 8. How notifications are sent
-On `published`, a fan-out job selects **Verified-Deals-tier** consumers who (a) follow the company or a
+On `published`, a fan-out job selects **Deal Intelligence** consumers who (a) follow the company or a
 matching category, (b) are in the deal's country scope, and (c) pass alert preferences (lead time, quiet
 hours, per-follow toggle, confidence policy). Delivery via the shared notification service
 (`PLATFORM_ARCHITECTURE.md §8`), idempotent per (deal, user). Non-paid tiers may see it in the feed

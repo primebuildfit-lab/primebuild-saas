@@ -1,7 +1,8 @@
-# Eventra — Documentation Impact & Self-Audit (MEGA MODULE 1)
+# Eventra — Documentation Impact & Self-Audit (MEGA MODULE 1 + 2)
 
-> Part 11 (project impact) + Part 13 (self-audit). Classifies every existing doc and records
-> contradictions found and fixed. **No prior decision is deleted — only marked.**
+> Project impact + self-audit. Classifies every existing doc and records contradictions found and fixed.
+> **No prior decision is deleted — only marked.** §1–§6 are from MM1; §7 is the MM2 architecture-lock
+> self-audit. MM2 added 13 implementation-ready docs (see `DECISIONS.md` D47–D59).
 
 ## 1. Impact matrix — every document
 Legend: ✅ Still valid · ✏️ Modified (valid but updated/rescoped) · 🔻 Deprecated (kept for history) ·
@@ -41,13 +42,13 @@ Legend: ✅ Still valid · ✏️ Modified (valid but updated/rescoped) · 🔻 
 `PLATFORM_VISION`, `PLATFORM_ARCHITECTURE`, `CONSUMER_PRODUCT`, `BUSINESS_PRODUCT`, `ADMIN_CONSOLE`,
 `MONETIZATION`, `VERIFIED_DEALS`, `ADVERTISING`, `USER_FLOWS`, `PLATFORM_ROADMAP`, `DOC_IMPACT`.
 
-## 3. New documentation still needed (future modules)
-- `PLATFORM_SCHEMA.md` — the full multi-principal DB schema + RLS (expands `SUPABASE_SCHEMA.md`).
-- `NOTIFICATIONS.md` — detailed notification service spec (channels, scheduling, templates).
-- `INTEGRATIONS.md` — per-adapter contracts (Shopify/Woo/Wix/Squarespace/custom).
-- `DESIGN_SYSTEM.md` — cross-surface UI/brand variants (Consumer vs Business vs Admin).
-- `API_CONTRACTS.md` — shared backend API/RPC contracts.
-- `PRIVACY_COMPLIANCE.md` — consent, data export/delete, store data-safety, ads.
+## 3. New documentation status
+**Delivered in MM2:** `ENTITLEMENTS`, `CONSUMER_PLANS`, `BUSINESS_PLANS`, `PLATFORM_SCHEMA`,
+`RLS_SECURITY_MODEL`, `BILLING_ARCHITECTURE`, `TRIALS_AND_DOWNGRADES`, `COMPANY_MONITORING`,
+`NOTIFICATIONS`, `AD_PRIVACY`, `ADMIN_CONFIGURATION`, `REPOSITORY_ARCHITECTURE`, `MIGRATION_PLAN`.
+**Still needed (future modules):** `INTEGRATIONS.md` (per-adapter contracts), `DESIGN_SYSTEM.md`
+(cross-surface brand variants), `API_CONTRACTS.md` (shared API/RPC). `AD_PRIVACY.md` covers the privacy/
+compliance framework.
 
 ## 4. Self-audit — issues found & fixed
 | Issue | Where | Resolution |
@@ -72,3 +73,37 @@ Legend: ✅ Still valid · ✏️ Modified (valid but updated/rescoped) · 🔻 
 - **Store/App billing** economics for consumer mobile.
 - **Verified-deal trust** depends on real sources + moderation.
 - **Scope** — 3–4× expansion; mitigate by landing Business persistence (P2) before new surfaces.
+
+---
+
+## 7. MEGA MODULE 2 — Architecture-Lock Self-Audit (risk register)
+Every risk the lock must withstand, with its mitigation and where it's specified.
+
+| Risk | Mitigation | Where |
+|------|-----------|-------|
+| Contradictory entitlements | Single entitlement engine + one config source; superseded items marked | `ENTITLEMENTS.md`, `DECISIONS.md` |
+| Impossible plan combinations | Consumer = two orthogonal axes (only 4 states A–D); resolver enumerated | `ENTITLEMENTS.md §3`, `CONSUMER_PLANS.md §1` |
+| Ad-Free wrongly bundled into $30 | Locked as independent add-on; ads gated by `addon.ad_free` only; docs corrected | `CONSUMER_PLANS.md`, `ADVERTISING.md`, `ENTITLEMENTS.md` |
+| Hidden billing edge cases | Orchestration layer: dup-sub protection, restore, grace, reconciliation, idempotent webhooks | `BILLING_ARCHITECTURE.md §6` |
+| Cross-product data leaks | Per-principal RLS + server checks; consumers see only published data; isolation-test matrix | `RLS_SECURITY_MODEL.md §6–7` |
+| Privacy problems | Contextual-first, explicit consent, minimal data, dashboard; every item ⚖️ legal review | `AD_PRIVACY.md` |
+| Misleading verified-deal claims | 5 classes; uncertainty visually distinct; never "guaranteed"; human verify for push | `COMPANY_MONITORING.md §5`, `VERIFIED_DEALS.md` |
+| Ad vs verification conflict | Paid placement always labeled + separate; must not affect ranking/confidence | `AD_PRIVACY.md §3`, `COMPANY_MONITORING.md §12` |
+| Unbounded free-ad inventory | Frequency caps + global per-user daily cap + pacing; no interstitial spam | `ADVERTISING.md §5` |
+| Abuse of unlimited Pro workspaces | "Unlimited" = fair-use with technical protection threshold | `BUSINESS_PLANS.md §7`, `ENTITLEMENTS.md` |
+| Notification spam | Dedupe keys, per-type + global caps, quiet hours, opt-out, job rate limits | `NOTIFICATIONS.md §6` |
+| AI hallucination | Source-required promotions; classify + confidence-gate; human verify; never fabricate a source | `COMPANY_MONITORING.md §11` |
+| Illegal/restricted monitoring | Legal/approved public sources only; no auth bypass/hidden-data extraction | `COMPANY_MONITORING.md §2`, `RLS_SECURITY_MODEL.md §8` |
+| Storefront widget abuse | Merchant-approved, frequency controls, easy disable, accessibility, no user-trapping | `BUSINESS_PLANS.md §3` |
+| Mobile billing conflicts | Store-billing mandate flagged as open decision; orchestration supports either | `BILLING_ARCHITECTURE.md §7` |
+| Restore-purchase problems | Re-verify receipts → idempotent re-resolve → clear read-only | `BILLING_ARCHITECTURE.md §6` |
+| Trial exploitation | One trial per identity (permanent record); dup-account signals; no silent conversion | `TRIALS_AND_DOWNGRADES.md §5` |
+| Duplicate accounts | Anti-abuse signals; unique constraints; flagged (residual risk — needs product policy) | `RLS_SECURITY_MODEL.md`, open decision |
+| Business downgrade data loss | Never delete; excess → read-only; customer chooses active workspaces; restore on upgrade | `TRIALS_AND_DOWNGRADES.md §3` |
+| Admin over-permission | RBAC + audit on every write; sensitive actions need confirmation/2nd admin | `RLS_SECURITY_MODEL.md`, `ADMIN_CONSOLE.md §1` |
+| Repository coupling | Package boundaries + dependency direction rules + lint enforcement | `REPOSITORY_ARCHITECTURE.md §2` |
+| Future migration risk | Incremental migration, green tests each step, isolation-test gates | `MIGRATION_PLAN.md §6–7` |
+
+**Approved rules NOT changed** (flagged if they were a concern, but preserved): the four consumer prices
+and independence, the four business plans + workspace limits + year-horizons, the 45-day/30-day trials,
+and PrimeBuild's non-privileged status. No approved price or core feature was altered.

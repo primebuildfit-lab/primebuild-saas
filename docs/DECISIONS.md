@@ -126,10 +126,49 @@ billing**; ad consent/privacy model; PSP choice; monorepo vs single-app repo sha
 
 ---
 
+---
+
+## Architecture Lock (MEGA MODULE 2) — approved in direction 2026-07-11
+
+Precise, approved rules that **override earlier conflicting assumptions**. See `ENTITLEMENTS.md`,
+`CONSUMER_PLANS.md`, `BUSINESS_PLANS.md`, `PLATFORM_SCHEMA.md`, `RLS_SECURITY_MODEL.md`,
+`BILLING_ARCHITECTURE.md`, `TRIALS_AND_DOWNGRADES.md`, `COMPANY_MONITORING.md`, `NOTIFICATIONS.md`,
+`AD_PRIVACY.md`, `ADMIN_CONFIGURATION.md`, `REPOSITORY_ARCHITECTURE.md`, `MIGRATION_PLAN.md`.
+
+### Corrections to prior decisions
+| Old | Correction |
+|-----|-----------|
+| **D38** (Consumer: "Verified Deals $30 **incl. ad removal**") | 🔴 **Superseded.** Ad-Free is an **independent $15 add-on**. Intelligence tier renamed **Deal Intelligence ($30)** and **does NOT remove ads**. Four states: $0 / $15 / $30 / $45 (see D47). |
+| **D39** ("Business… **no free tier**") | 🔴 **Superseded.** There **is** a **Business Free $0** tier (1 workspace) **and** the 45-day Pro trial (D40 kept). |
+| MM1 business horizons (4/8/12 **months**) | 🔴 **Superseded** by **years**: Starter ~1yr, Growth 4yr, Pro 10yr (D49). |
+| "Verified Deals" tier name | ✏️ Renamed **Deal Intelligence** (consumer). "Verified deals" now = the deal *classification/pipeline*. |
+
+### New locked decisions
+| # | Decision | Value | Status |
+|---|----------|-------|--------|
+| D47 | Consumer model | Two **independent** axes: Deal Intelligence ($30) × Ad-Free add-on ($15). States: $0/$15/$30/$45. **$30 alone keeps ads.** Non-negotiable unless Brian changes it. | ✅ |
+| D48 | Consumer trial | **30 days Deal Intelligence**; ads remain unless Ad-Free bought separately; no silent conversion; prefs kept read-only on expiry | ✅ |
+| D49 | Business plans | **Free $0 (1 ws)** · Starter $15 (2 ws, ~1yr) · Growth $30 (3 ws, ∞ countries, 4yr) · Business Pro $45 (∞ ws, 10yr, consumer-promo + storefront widgets) | ✅ prices / 🟡 caps |
+| D50 | Business "limit" = **workspaces** (store/business connections); Free1/Starter2/Growth3/Pro∞ (fair-use) | ✅ |
+| D51 | Downgrade | Never delete; excess workspaces/countries/horizon-data/premium features → **read-only**; restore on upgrade | ✅ |
+| D52 | Billing | Provider-independent **orchestration layer** (BillingProvider/Resolver/Verifier/TrialManager/WebhookProcessor); licensed providers/app-store billing only; **no card storage**; no provider selected | ✅ |
+| D53 | Entitlement engine | Single engine + one config source resolves all plan/add-on/trial/grant/grace states; enforced server-side | ✅ |
+| D54 | Tenancy | `Store` → **Organization/Workspace**; principals: consumer/org-member/advertiser/admin/service | ✅ |
+| D55 | Deal classification | Confirmed Official · Publicly Published · Strongly Supported Likely · Historical Pattern · Unverified Possibility; uncertainty never marketed as guaranteed | ✅ |
+| D56 | Company monitoring | Legal/approved public sources only; no auth bypass/restricted extraction | ✅ |
+| D57 | Storefront tools naming | "promotional widgets / engagement tools / campaign overlays / gamified promotions" (never "spam"); merchant-approved, guarded | ✅ |
+| D58 | Privacy posture | Contextual ads before personalized; minimal data; explicit consent; ads ≠ verified deals; items need legal review | ✅ direction / ⚖️ legal |
+| D59 | Repository | Monorepo `apps/{consumer,business,admin}` + `packages/*` + `services/*`; project-owned, no lock-in; migrate per `MIGRATION_PLAN.md` | ✅ |
+
+### Open decisions (updated)
+Fair-use follow limit; DI multi-country count; exact business saved-campaign/history caps; card-on-start
+for business trial; **store vs web billing on mobile**; PSP choice; personalized-ads (legal); minors
+policy; workspace-tool choice; effective-date scheduling for price changes.
+
+---
+
 ### Status
-Business Architecture Review **approved with amendments (2026-07-11)** (D1–D27) and **Phase 1 foundation
-correction executed and verified** — migrated onto the official Shopify React Router template; typecheck +
-build pass. Phases 2–4 built, hardened, and tested (87 tests). **Platform expansion (D36–D46) is PROPOSED
-and awaiting approval.** Phase-5 database implementation is **paused** until the expanded architecture +
-open decisions are approved. **No application code / no Supabase / no billing until the Platform
-Architecture Lock is approved.**
+D1–D27 approved (Business). Phases 1–4 built, hardened, tested (**87 tests green**). Platform expansion
+(D36–D46) **approved in direction**; **MEGA MODULE 2 architecture lock (D47–D59)** documented and
+awaiting final review. **Phase-5 DB implementation remains PAUSED.** No application code / no Supabase /
+no billing / no ads / no PrimeBuild changes until the Architecture Lock is approved for implementation.

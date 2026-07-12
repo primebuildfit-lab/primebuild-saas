@@ -28,8 +28,15 @@ until this architecture is reviewed and approved.
 - New pricing (approved): Consumer Free $0 / Ad-Free $15 / Verified Deals $30; Business Starter $15 /
   Growth $30 / Business Pro $45 + a 45-day full-Pro trial (old business plans superseded). Exact
   entitlements are **proposed, pending sign-off**.
+- **MEGA MODULE 2 — Architecture Lock (2026-07-11):** implementation-ready specs added —
+  `ENTITLEMENTS`, `CONSUMER_PLANS`, `BUSINESS_PLANS`, `PLATFORM_SCHEMA`, `RLS_SECURITY_MODEL`,
+  `BILLING_ARCHITECTURE`, `TRIALS_AND_DOWNGRADES`, `COMPANY_MONITORING`, `NOTIFICATIONS`, `AD_PRIVACY`,
+  `ADMIN_CONFIGURATION`, `REPOSITORY_ARCHITECTURE`, `MIGRATION_PLAN`. Locked rules (D47–D59): **Ad-Free is
+  an independent $15 add-on ($30 keeps ads)**; **Business Free $0** exists; business horizons in **years**
+  (1/4/10); "limit" = **workspaces**; provider-independent **billing orchestration**; single **entitlement
+  engine**; `Store→Org/Workspace`. Prior conflicting items (D38/D39, month-horizons) marked superseded.
 - **Not done (by design):** no code, no Supabase, no billing, no Android publish, no ad networks, no
-  PrimeBuild changes. Awaiting approval of the package + the open business decisions in `DECISIONS.md`.
+  PrimeBuild changes. Awaiting approval of the lock + the open decisions in `DECISIONS.md`.
 
 ---
 

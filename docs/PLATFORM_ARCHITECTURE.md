@@ -77,7 +77,7 @@ deals ever reach consumers. Reviewer role + audit log in the Admin Console.
 ## 8. Notification architecture
 A shared **notification service** with: triggers → a queue → channel senders → `notification_deliveries`
 (+ status). Triggers: scheduled **calendar reminders** (all consumers/business prep), **verified-deal
-published** events (Verified-tier followers), **trial lifecycle** (day-30/40/44/expiry), **business prep**
+published** events (Deal Intelligence followers), **trial lifecycle** (day-30/40/44/expiry), **business prep**
 reminders (30/14/7/1). Channels: **push** (web push + Android FCM), **in-app inbox**, **email** (later).
 Per-principal `alert_preferences` (lead time, quiet hours, per-follow toggles) gate delivery; tiering
 enforced server-side. Idempotent delivery keys prevent duplicates.

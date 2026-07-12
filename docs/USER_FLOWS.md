@@ -12,9 +12,10 @@ Activation
   └─ Follow a company/category → prompted to SIGN UP (email/OAuth) → Free account
 Engagement (Free)
   └─ Daily: check calendar + upcoming; basic reminders; sees ads
-  └─ Tries to enable a verified-deal alert → UPSELL to Verified Deals ($30)
+  └─ Tries to enable a deal alert → UPSELL to Deal Intelligence ($30)
 Conversion
-  └─ Upgrade: Ad-Free ($15, remove ads) or Verified Deals ($30, alerts + unlimited follows)
+  └─ Two independent purchases: Deal Intelligence ($30, follows + alerts) and/or the Ad-Free ($15)
+     add-on. $30 alone keeps ads; $30 + $15 = $45 ad-free (states $0/$15/$30/$45)
   └─ Billing via store (Play/App Store) or web PSP → tier active immediately
 Long-term
   └─ Verified-deal alerts on followed companies/categories; manage follows; adjust alert prefs;

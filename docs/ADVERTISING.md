@@ -23,7 +23,7 @@
 ## 3. Placements (surfaces & slots)
 Consumer Free only: `calendar` inline slot, `discover` card slot, `company page` banner, `day detail`
 footer. Slots are **clearly labeled "Ad/Sponsored"**, sized to the design system, never interstitial-
-spammy. Ad-Free/Verified users get the space back (no blank slot).
+spammy. Users with the Ad-Free add-on get the space back (no blank slot).
 
 ## 4. Rotation & selection
 On each eligible render, the **ad-selection service** returns one creative by:
@@ -43,8 +43,10 @@ Deterministic + fair; no real-time bidding.
 - **Quiet placements**: no ads on sensitive flows (auth, billing, settings).
 
 ## 6. Premium users without ads
-Ad-Free ($15) and Verified Deals ($30) users are excluded at selection time (server-checked by tier).
-No client-side hiding only — the server does not return ads for paid tiers (prevents leakage/flicker).
+Only users with the **Ad-Free add-on ($15)** are excluded at selection time (server-checked via
+`ads.suppressed` = `addon.ad_free`). **Deal Intelligence ($30) alone does NOT exclude ads** — the axes
+are independent (`ENTITLEMENTS.md`). No client-side hiding only — the server does not return ads to
+Ad-Free users (prevents leakage/flicker).
 
 ## 7. Campaign scheduling
 Ads managers schedule campaigns with start/end, budget or flat booking, targeting, priority, and caps in

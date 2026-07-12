@@ -1,5 +1,12 @@
 # Eventra Business — Complete Product Design (PROPOSED, platform-first)
 
+> ⚠️ **ARCHITECTURE LOCK (D49–D51):** the authoritative business plan/entitlement model is
+> **`BUSINESS_PLANS.md`** + **`ENTITLEMENTS.md`**. Corrections to the tables in this doc: **a Business
+> Free $0 tier exists** (1 workspace, manual calendar); the "limit" is **workspaces/store connections**
+> (Free1/Starter2/Growth3/Pro∞); horizons are **years** — Starter ~1yr, Growth 4yr, Pro 10yr (not
+> months); Growth/Pro have **unlimited countries**; Business Pro adds **consumer-app promo exposure +
+> storefront widgets**. The onboarding/workflows/widget guardrails below remain valid.
+
 > The campaign-planning + campaign-memory product, generalized beyond Shopify. Shopify is **one
 > integration**, not the product. Shares the platform backend. **Proposed — awaiting approval. No
 > implementation.** Supersedes the shorter v3 draft (MEGA MODULE 1 expansion). The current mock UI is

@@ -1,5 +1,12 @@
 # Eventra Consumer — Complete Product Design (PROPOSED)
 
+> ⚠️ **ARCHITECTURE LOCK (D47/D48):** the authoritative consumer plan/entitlement model is
+> **`CONSUMER_PLANS.md`** + **`ENTITLEMENTS.md`**. Corrections to the tables in this doc: **Ad-Free is an
+> independent $15 add-on** (not a tier); the **$30 tier is "Deal Intelligence" and KEEPS ads** unless
+> Ad-Free is also active (states $0/$15/$30/$45); the intelligence tier is named **Deal Intelligence**
+> (not "Verified Deals"); trial = **30 days Deal Intelligence** (ads remain unless Ad-Free bought). The
+> screens/flows/features below remain valid.
+
 > Consumer app: Web + Google Play (Android) + App Store (iOS). Shares the platform backend
 > (`PLATFORM_ARCHITECTURE.md`). **Proposed — awaiting approval. No implementation.**
 > Supersedes the shorter v3 draft of this file (MEGA MODULE 1 expansion).
@@ -40,18 +47,21 @@ Bottom tab bar (mobile) / left rail (web), 5 primary destinations + account:
 | Following | `/following` | Managed follows (companies + categories); reorder; per-follow alert toggle. |
 | Alerts inbox | `/alerts` | Chronological notifications: calendar reminders + verified-deal alerts; read/unread. |
 | Account | `/account` | Profile, region/country, connected sign-in, subscription status, settings entry. |
-| Upgrade / paywall | `/upgrade` | Plan comparison (Free / Ad-Free / Verified Deals); contextual triggers. |
+| Upgrade / paywall | `/upgrade` | Deal Intelligence ($30) + the independent Ad-Free ($15) add-on; contextual triggers. |
 
-## 5. Premium pages / gated features
-| Feature | Free | Ad-Free ($15) | Verified Deals ($30) |
-|---------|:----:|:-------------:|:--------------------:|
-| Ads shown | yes | **no** | **no** |
-| Verified-deal **feed** (`/deals`) | preview + upsell | preview + upsell | **full feed + filters** |
-| Verified-deal **alerts** | — | — | **yes** |
-| Follow companies / categories | limited (proposed 3 each) | extended (proposed 20) | **unlimited** |
-| Priority / configurable alerts (lead time, quiet hours, per-follow) | basic | basic | **full** |
-| Multiple regions | 1 | multiple | multiple |
-| Future wishlist (see §11) | basic | basic | **price/deal-linked** |
+## 5. Premium pages / gated features (locked model — `CONSUMER_PLANS.md`)
+Two independent axes: the **Deal Intelligence** subscription and the **Ad-Free** add-on. Intelligence
+features come only from Deal Intelligence; **ads are removed only by the Ad-Free add-on** — so a $30
+Deal-Intelligence user **still sees ads** unless they also buy Ad-Free (states $0/$15/$30/$45).
+| Feature | Consumer Core | Deal Intelligence ($30) |
+|---------|:-------------:|:-----------------------:|
+| Ads shown | yes — hidden **only** with the independent Ad-Free ($15) add-on | yes — hidden **only** with Ad-Free ($15) |
+| Deal **feed** (`/deals`) | preview + upsell | **full feed + filters** |
+| Deal **alerts** | — | **yes** |
+| Follow companies / categories | — (following is a Deal-Intelligence feature) | **up to the fair-use limit** |
+| Priority / configurable alerts (lead time, quiet hours, per-follow) | basic | **full** |
+| Multiple regions | 1 | multiple (proposed cap) |
+| Future wishlist (see §11) | basic | **price/deal-linked** |
 `/deals` and alert configuration render gated states with clear upsell for lower tiers (no fake buttons).
 
 ## 6. Settings
