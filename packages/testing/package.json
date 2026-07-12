@@ -1,0 +1,19 @@
+{
+  "name": "@eventra/testing",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared test factories & fixtures (principals, orgs, workspaces, entitlement inputs, date/event fixtures).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@eventra/types": "*",
+    "@eventra/entitlements": "*"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  }
+}

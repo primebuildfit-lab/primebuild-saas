@@ -39,18 +39,22 @@ first — split into packages only where genuinely shared. Docs stay in `docs/`.
 4. Migrate Business data `store_id → workspace_id/org_id` (data-preserving).
 5. Retire `store` naming after all references move. No data loss.
 
-## 6. Sequenced steps (each ends green: lint + typecheck + test + build)
-| Step | Action | Risk |
-|------|--------|------|
-| M0 | Approve this plan + `REPOSITORY_ARCHITECTURE.md` (P0) | — |
-| M1 | Introduce workspace tooling (pnpm/Turborepo); wrap current app as `apps/business` (no code logic change) | low |
-| M2 | Extract `packages/{types,config,ui,calendar}` from `app/*`; update imports | med |
-| M3 | `store → org/workspace` rename in types/config/state (mechanical) + tests updated | med |
-| M4 | Generalize `app/db` → `packages/identity` (principal-aware RLS-JWT) | med |
-| M5 | Expand `supabase/*` to the platform schema + RLS + isolation tests | high |
-| M6 | Wire Business persistence (rescoped Phase 5 / P2) on the platform schema | high |
-| M7 | Scaffold `apps/consumer` + `apps/admin` (empty shells) reusing packages | low |
-| M8+ | Build Consumer/Admin surfaces per `PLATFORM_ROADMAP.md` | staged |
+## 6. Sequenced steps (each ends green: typecheck + test + build)
+Status: ✅ done in MM3 · 🟡 partial · ⬜ pending.
+| Step | Action | Status |
+|------|--------|--------|
+| M0 | Approve plan + `REPOSITORY_ARCHITECTURE.md` | ✅ |
+| M1 | npm workspaces; wrap current app as `apps/business` (no logic change) | ✅ |
+| M2 | Extract `packages/{types,config,calendar}` (+ `entitlements`,`identity`,`ui`,`testing`) | ✅ (ui adoption by Business 🟡) |
+| M3 | `store → org/workspace` rename inside Business | 🟡 platform types model Org/Workspace; Business rename staged for MM4 (protects 87 tests) |
+| M4 | Generalize `app/db` → `packages/identity` (principal-aware RLS-JWT) | 🟡 identity contracts done; Business `app/db` rewire pending |
+| M5 | Expand `supabase/*` to platform schema + RLS + isolation tests | ⬜ (structure/classification done) |
+| M6 | Wire Business persistence on the platform schema | ⬜ |
+| M7 | Scaffold `apps/consumer` + `apps/admin` shells reusing packages | ✅ |
+| M8+ | Build Consumer/Admin surfaces per `PLATFORM_ROADMAP.md` | ⬜ |
+
+**MM3 delivered M0–M2, M7 fully + M3/M4 partially. Remaining (M3 rename, M4 db rewire, M5–M6, M8+) is
+MM4+.** Details: `docs/TECHNICAL_HANDOFF.md`.
 
 ## 7. Guardrails during migration
 - Keep the app runnable + tests green after **every** step (no big-bang).

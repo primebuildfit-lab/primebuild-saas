@@ -1,7 +1,10 @@
-# Eventra — Repository Architecture (recommendation)
+# Eventra — Repository Architecture
 
-> Target monorepo for the three-surface platform. **Do not reorganize yet** — the exact steps are in
-> `MIGRATION_PLAN.md`. Goal: editable, modular, project-owned code; **no no-code/proprietary lock-in**.
+> ✅ **AS-BUILT (MM3, 2026-07-11):** the monorepo below is now **implemented** with **npm workspaces**.
+> Business app moved to `apps/business`; shared packages `types/config/entitlements/identity/calendar/
+> ui/testing` created; `apps/consumer` + `apps/admin` shells + `services/{api,workers}` + `supabase/`
+> structure in place. Run/verify commands + what's deferred: `docs/TECHNICAL_HANDOFF.md`. The section
+> below is the target/spec (largely realized).
 
 ## 1. Target structure
 ```

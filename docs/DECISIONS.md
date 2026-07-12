@@ -167,8 +167,16 @@ policy; workspace-tool choice; effective-date scheduling for price changes.
 
 ---
 
+### MEGA MODULE 3 — foundation implemented (2026-07-11)
+| # | Decision | Value | Status |
+|---|----------|-------|--------|
+| D60 | Monorepo tool | **npm workspaces** (simplest reliable; one root lockfile; no Nx/Turborepo/pnpm) | ✅ |
+| D61 | Migration safety | Business app moved intact + kept green each step; `store→org/workspace` rename inside Business **staged to MM4** to protect the 87 tests; platform types already model `Organization/Workspace` | ✅ |
+| D62 | Shared single-source | `@eventra/config` + `@eventra/entitlements` (prices/limits) and `@eventra/calendar` (date engine, Business re-exports it); Business rewire onto config/ui deferred to MM4 | ✅ |
+
 ### Status
-D1–D27 approved (Business). Phases 1–4 built, hardened, tested (**87 tests green**). Platform expansion
-(D36–D46) **approved in direction**; **MEGA MODULE 2 architecture lock (D47–D59)** documented and
-awaiting final review. **Phase-5 DB implementation remains PAUSED.** No application code / no Supabase /
-no billing / no ads / no PrimeBuild changes until the Architecture Lock is approved for implementation.
+D1–D27 approved (Business). Phases 1–4 built, hardened, tested. Platform expansion (D36–D46) **approved
+in direction**; **MM2 architecture lock (D47–D59)** documented; **MM3 platform foundation (D60–D62)
+implemented** — npm-workspaces monorepo, 7 shared packages, Consumer/Admin shells, Business green
+(**138 tests across 9 workspaces**). **Phase-5 DB implementation remains PAUSED.** No Supabase / billing /
+ads / PrimeBuild changes.

@@ -1,0 +1,11 @@
+{
+  "name": "@eventra/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared backend API contracts (foundation only — no server, no external calls).",
+  "exports": { ".": "./src/contracts.ts" },
+  "types": "./src/contracts.ts",
+  "dependencies": { "@eventra/types": "*" },
+  "scripts": { "typecheck": "tsc --noEmit" }
+}

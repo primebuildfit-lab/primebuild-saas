@@ -1,0 +1,11 @@
+{
+  "name": "@eventra/workers",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Background worker contracts (foundation only — no queues, no external calls).",
+  "exports": { ".": "./src/contracts.ts" },
+  "types": "./src/contracts.ts",
+  "dependencies": { "@eventra/types": "*" },
+  "scripts": { "typecheck": "tsc --noEmit" }
+}

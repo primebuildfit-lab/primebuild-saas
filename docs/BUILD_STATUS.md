@@ -10,6 +10,21 @@ approval still pending from the user)._
 
 ---
 
+## MEGA MODULE 3 — Platform Foundation implemented (2026-07-11) 🟩
+
+The repo is now an **npm-workspaces monorepo**; the Business app is fully functional (87 tests) in
+`apps/business`. Delivered: shared packages `@eventra/{types,config,entitlements,identity,calendar,ui,
+testing}` (all tested); Business consumes `@eventra/calendar` as a single source (no duplication);
+`apps/consumer` + `apps/admin` foundation shells (build + smoke tests); `services/{api,workers}` +
+`supabase/` structure; env templates; `scripts/check-boundaries.mjs` (dependency-boundary + circular
+validation); docs (`TECHNICAL_HANDOFF`, `ENVIRONMENTS`, updated `REPOSITORY_ARCHITECTURE`/`MIGRATION_PLAN`).
+Checkpoint tag `pre-monorepo-foundation` preserves the pre-move state.
+**Deferred to MM4 (to keep Business green):** `store→org/workspace` rename inside Business, Business
+rewire onto shared `config/entitlements/ui`, and the Business `app/db` → identity generalization.
+**Not touched:** Supabase, auth, billing, ads, PrimeBuild. See `docs/TECHNICAL_HANDOFF.md`.
+
+---
+
 ## Platform Expansion (v3) — 🟦 architecture review pending (2026-07-11)
 
 Eventra is being expanded from a single B2B Shopify app into **one platform, three products**: Eventra
