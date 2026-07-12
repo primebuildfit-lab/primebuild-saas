@@ -5,8 +5,10 @@ name = "eventra"
 client_id = ""
 
 [access_scopes]
-# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
-scopes = "write_products"
+# Minimal footprint for the private pilot: Eventra reads products/collections only
+# when a merchant attaches them to a campaign. It never writes to the store
+# (V1 actions are visual-only, D7), so no write scopes are requested.
+scopes = "read_products"
 
 [webhooks]
 api_version = "2025-10"
