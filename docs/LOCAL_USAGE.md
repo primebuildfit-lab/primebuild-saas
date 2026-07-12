@@ -13,8 +13,16 @@
    If it warns about blocked scripts (Prisma/esbuild), run `npm approve-scripts` once, then `npm install`
    again.
 
+## Windows shortcuts (one-time, optional)
+To get a **Desktop icon** and a **Start Menu** entry (launch it like any app):
+```
+npm run shortcuts:install
+```
+Then launch **Eventra Business** from the Desktop or Start Menu. Remove with `npm run shortcuts:uninstall`.
+Full Windows details: `docs/WINDOWS_INSTALL.md`.
+
 ## Start it (daily)
-**Easiest (Windows):** double-click **`Eventra-Local.cmd`** in the project folder.
+**Easiest (Windows):** double-click the **Eventra Business** Desktop icon (or `Eventra-Local.cmd`).
 
 **Or from a terminal:**
 ```

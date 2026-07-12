@@ -10,17 +10,24 @@ approval still pending from the user)._
 
 ---
 
-## INSTALLATION PHASE — Local install ready (2026-07-12) ✅
+## INSTALLATION PHASE — Local install + Windows desktop integration ready (2026-07-12) ✅
 
 Eventra Business is **installed and usable locally** with no external services (preview + file
-persistence). One-command / double-click start; data persists across restarts. Verified end-to-end:
-startup, shutdown, first-run seeding, persistence (write→disk), restart recovery (survives), reset, and the
-update guard. See **`docs/LOCAL_USAGE.md`**.
+persistence), and **integrated into Windows** so Brian launches it like any desktop app. Verified live
+end-to-end: startup, shutdown, restart recovery, first-run seeding, persistence, multiple-launch guard,
+and idempotent shortcut install. See **`docs/WINDOWS_INSTALL.md`** + **`docs/LOCAL_USAGE.md`**.
 
-- **Launcher:** `Eventra-Local.cmd` (double-click) or `npm run start:local` → `http://localhost:3000/app`.
-- **Helpers:** `npm run reset:local` (fresh demo), `npm run update:local` (safe fast-forward + install).
-- **Stops at the gate:** no Shopify, no Supabase, no publish/deploy. Installing into real Shopify Admin
-  remains Brian-gated (`docs/SHOPIFY_DEV_INSTALL_RUNBOOK.md`).
+- **Windows integration:** `npm run shortcuts:install` creates a **Desktop icon** + **Start Menu ▸ Eventra
+  ▸ Eventra Business** (branded `assets/eventra.ico`, working dir = repo root, no temp paths). Both shortcut
+  launches verified → HTTP 200 on `/app`, window title `Eventra Business`, preview banner. Remove with
+  `shortcuts:uninstall`.
+- **Launchers (hardened, Windows 11):** `Eventra-Local.cmd` (UTF-8 codepage, title, exit codes),
+  `scripts/eventra-local.ps1` (UTF-8 output), `scripts/eventra-local.mjs` (ASCII output, HTTP-based
+  already-running guard, auto-open browser, friendly errors). `npm run start:local` → `localhost:3000/app`.
+- **Helpers:** `reset:local` (fresh demo), `update:local` (safe ff + install), `icon:make`.
+- **Desktop quality:** app `<title>Eventra Business</title>` + favicon (`favicon.svg`/`.ico`) added to root.
+- **Stops at the gate:** no Shopify, no Supabase, no publish/deploy. Real Shopify Admin install remains
+  Brian-gated (`docs/SHOPIFY_DEV_INSTALL_RUNBOOK.md`).
 
 ---
 

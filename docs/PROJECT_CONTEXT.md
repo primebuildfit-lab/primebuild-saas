@@ -16,9 +16,11 @@
   possible advertiser — never a special case in code, never its branding/DB/logic/colors.
 - **Maturity:** Pre-production. Business product is a complete, tested **mock-driven** app; Consumer/Admin
   are foundation shells; no backend/billing/ads are connected anywhere.
-- **Current phase:** **MM5 (Pre-Install Readiness) implemented in code** — Business is **installation-ready**
-  (certified READY FOR SHOPIFY AUTHORIZATION). UI is wired to the persistence layer; a labeled local
-  preview renders every screen without Shopify. Awaiting only Brian's Shopify auth + dev-store + install.
+- **Current phase:** **Installed locally + Windows desktop integration** (on top of MM5 Pre-Install
+  Readiness). Business is **installation-ready** (certified READY FOR SHOPIFY AUTHORIZATION), the UI is
+  wired to the persistence layer, and it now launches like a normal Windows app (Desktop + Start Menu
+  shortcuts, `npm run start:local`) in local preview + file mode — verified live. Awaiting only Brian's
+  Shopify auth + dev-store + install for the cloud path. See `docs/WINDOWS_INSTALL.md`.
 - **Status:** All tests green (**Business 134**, **185** total across 9 workspaces); typecheck / lint
   (0 errors) / build / boundary / SQL-readiness / preinstall gate all pass. Nothing live (no cloud infra,
   no install).

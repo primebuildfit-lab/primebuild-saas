@@ -3,6 +3,25 @@
 All notable milestones. Dates are absolute. This file summarizes; `docs/DECISIONS.md` is authoritative for
 decisions and `docs/BUILD_STATUS.md` for per-module status.
 
+## Installation phase — Local install + Windows desktop integration — 2026-07-12
+
+Eventra Business is launchable like a normal Windows app, entirely locally (no Shopify/Supabase/deploy).
+
+### Added
+- **Windows shortcuts:** `scripts/windows/{install,uninstall}-shortcuts.ps1` + `make-icon.ps1` →
+  Desktop + Start Menu (`Eventra ▸ Eventra Business`), branded `assets/eventra.ico`. npm:
+  `shortcuts:install` / `shortcuts:uninstall` / `icon:make`.
+- **Launchers:** `Eventra-Local.cmd` (UTF-8 codepage, title, exit codes), `scripts/eventra-local.ps1`
+  (UTF-8 output), hardened `scripts/eventra-local.mjs` (ASCII output, HTTP already-running guard,
+  auto-open browser, friendly errors). Helpers `reset:local` / `update:local`.
+- **Desktop quality:** app `<title>Eventra Business</title>` + favicon (`public/favicon.svg` + `.ico`).
+- **Docs:** `WINDOWS_INSTALL.md`; updates to `LOCAL_USAGE`, `BUILD_STATUS`, `TECHNICAL_HANDOFF`.
+
+### Verified live (Windows 11)
+Desktop + Start Menu launch → HTTP 200 on `/app`, title + preview banner; startup, shutdown (port
+released), restart recovery (data survives), multiple-launch guard, idempotent re-install. Typecheck /
+lint (0 errors) / tests (134) / build green.
+
 ## MEGA MODULE 5 — Pre-Install Readiness & Embedded Hardening (in code) — 2026-07-12
 
 Makes Eventra Business **installation-ready**: the only remaining steps before seeing it in Shopify Admin

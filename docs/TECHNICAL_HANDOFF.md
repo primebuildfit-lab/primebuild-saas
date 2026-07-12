@@ -104,5 +104,21 @@ migrations/0003 → seeds/seed` to a **new, separate** Eventra project; set the 
 provisions the org/workspace on first Shopify install; wire `DataContext` to `/app/data`; run the live
 isolation matrix (`RLS_SECURITY_MODEL.md §7`) + in-browser reload check.
 
+## Local desktop launch — Windows (2026-07-12)
+
+Eventra Business runs locally with no external services and is integrated into Windows. Full guide:
+`docs/WINDOWS_INSTALL.md`; daily use: `docs/LOCAL_USAGE.md`.
+
+- **Shortcuts:** `npm run shortcuts:install` → Desktop + Start Menu (`Eventra ▸ Eventra Business`), icon
+  `assets/eventra.ico`, target `Eventra-Local.cmd`, working dir = repo root. `shortcuts:uninstall` removes.
+- **Launchers:** `Eventra-Local.cmd` / `scripts/eventra-local.ps1` / `node scripts/eventra-local.mjs`
+  (`npm run start:local`) → preview + file mode on `http://localhost:3000/app`. ASCII output + UTF-8
+  codepage (no encoding assumptions); HTTP-based already-running guard; auto-opens the browser; clean exit
+  codes; friendly errors on missing deps.
+- **Data:** `apps/business/.eventra/dev-store.json` (git-ignored, survives restarts). Reset:
+  `npm run reset:local`.
+- **Limitations:** foreground app (console must stay open), no MSI/service/auto-start, runs from the source
+  folder (re-run `shortcuts:install` if moved). Requires Node ≥ 20.19.
+
 ## No production services touched
 No Supabase provisioned, no billing/ads connected, no Android/iOS publish, no PrimeBuild changes.

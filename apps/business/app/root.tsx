@@ -1,10 +1,17 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from "react-router";
-import type { LinksFunction } from "react-router";
+import type { LinksFunction, MetaFunction } from "react-router";
 
 import stylesheet from "./app.css?url";
 
 export const links: LinksFunction = () => [
   { rel: "stylesheet", href: stylesheet },
+  { rel: "icon", href: "/favicon.svg", type: "image/svg+xml" },
+  { rel: "alternate icon", href: "/favicon.ico" },
+];
+
+export const meta: MetaFunction = () => [
+  { title: "Eventra Business" },
+  { name: "application-name", content: "Eventra Business" },
 ];
 
 export default function App() {
