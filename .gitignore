@@ -19,6 +19,10 @@ database.sqlite
 .env.*
 !.env.example
 
+# Local file-mode persistence snapshots (MM4/MM5 dev only)
+**/.eventra/
+
+
 # Lockfile is committed. Keep npm's; ignore others.
 yarn.lock
 pnpm-lock.yaml

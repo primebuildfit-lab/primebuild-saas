@@ -16,11 +16,12 @@
   possible advertiser — never a special case in code, never its branding/DB/logic/colors.
 - **Maturity:** Pre-production. Business product is a complete, tested **mock-driven** app; Consumer/Admin
   are foundation shells; no backend/billing/ads are connected anywhere.
-- **Current phase:** **MM4 (Business Persistence) implemented in code** — the real, org-based persistence
-  layer exists behind an env gate with **mock mode as default**. Awaiting the external gates (Supabase
-  project + Shopify credentials) to go live.
-- **Status:** All tests green (**Business 121**, +packages/consumer/admin ≈ 162 total); typecheck / build /
-  boundary checks pass. Nothing live (no cloud infra provisioned).
+- **Current phase:** **MM5 (Pre-Install Readiness) implemented in code** — Business is **installation-ready**
+  (certified READY FOR SHOPIFY AUTHORIZATION). UI is wired to the persistence layer; a labeled local
+  preview renders every screen without Shopify. Awaiting only Brian's Shopify auth + dev-store + install.
+- **Status:** All tests green (**Business 134**, **185** total across 9 workspaces); typecheck / lint
+  (0 errors) / build / boundary / SQL-readiness / preinstall gate all pass. Nothing live (no cloud infra,
+  no install).
 - **Health:** Good. Clean, typed, consistent, tested. The former schema/plan inconsistency (old Blocker 3)
   is **resolved** (reconciled to the locked org model). Remaining debt is the mock→live cutover (external
   gates) + the deferred Business-UI convergence onto `@eventra/config`/`@eventra/ui`.
@@ -170,8 +171,8 @@ no secrets in git (`.env.example` only; client apps read only `VITE_` non-secret
   (paused) → MM1 (platform docs) → MM2 (architecture lock) → MM3 (monorepo foundation) → **MM4 Business
   Persistence (in code)**. All done.
 
-**Current module (next up):** **live cutover** — provision Supabase + link Shopify, flip to `supabase`
-mode, wire `DataContext`→`/app/data`, run the live isolation matrix + in-browser reload (external gates).
+**Current module (next up):** **Shopify dev-store install** (Brian-gated) — authorize Shopify, select the
+approved dev store, run `docs/SHOPIFY_DEV_INSTALL_RUNBOOK.md`. Then the later live-Supabase cutover.
 
 **Remaining:** P1 foundation (store→org rename, platform schema, 3-principal RLS, auth adapters) → P2
 Business persistence (wire loaders/actions on the platform schema; Shopify pilot; isolation tests) → P3

@@ -207,3 +207,19 @@ workspace in V1. A4 soft-delete retention is indefinite in V1.
 ### Open (unchanged by MM4)
 Live Supabase provisioning + Shopify credentials (external gates); full Business-UI convergence onto
 `@eventra/config`/`@eventra/ui`; nested record routes vs query-param modals.
+
+---
+
+## MEGA MODULE 5 — Pre-Install Readiness (implemented in code, 2026-07-12)
+
+Makes Business installation-ready behind the Shopify/Supabase/install gate. See
+`docs/EVENTRA_PREINSTALL_CERTIFICATION.md` (decision: READY FOR SHOPIFY AUTHORIZATION).
+
+| # | Decision | Value | Status |
+|---|----------|-------|--------|
+| D67 | **UI↔persistence via an optimistic action seam** | `DataProvider` hydrates from loader data and emits each mutation to `onPersist`→`/app/data`; local state stays synchronous (no component-contract change). Mock is the pure-client default. Failures surface a real error banner — never a faked success. | ✅ |
+| D68 | **Env-gated local preview** | `EVENTRA_PREVIEW=true` (dev-only, never production, never `supabase` mode) renders the Business UI without a Shopify session for labeled local inspection. Does NOT impersonate OAuth. `shopify.server` uses non-production placeholder credentials so the app can boot for preview. | ✅ |
+| D69 | **Server-side entitlement enforcement** | Country limits enforced in the write path from the LOCKED model (`@eventra/entitlements`); downgrade is non-destructive (excess → read-only, never deleted). | ✅ |
+
+**Scopes (least-privilege, re-reviewed):** `read_products` only — no write scopes (V1 actions visual-only).
+**External gates (unchanged):** Supabase provisioning, Shopify OAuth/credentials, install/deploy, merge to main.

@@ -7,9 +7,16 @@ import {
 import { PrismaSessionStorage } from "@shopify/shopify-app-session-storage-prisma";
 import prisma from "./db.server";
 
+// In non-production (local dev / MM5 preview) fall back to placeholder credentials
+// so the app can BOOT without Shopify secrets for labeled preview inspection. These
+// placeholders cannot authenticate anything real, and the preview loader skips
+// `authenticate.admin` entirely. In production, missing secrets still fail loudly.
+const isProd = process.env.NODE_ENV === "production";
+const PLACEHOLDER = "preview-unconfigured";
+
 const shopify = shopifyApp({
-  apiKey: process.env.SHOPIFY_API_KEY,
-  apiSecretKey: process.env.SHOPIFY_API_SECRET || "",
+  apiKey: process.env.SHOPIFY_API_KEY || (isProd ? undefined : PLACEHOLDER),
+  apiSecretKey: process.env.SHOPIFY_API_SECRET || (isProd ? "" : PLACEHOLDER),
   apiVersion: ApiVersion.October25,
   scopes: process.env.SCOPES?.split(","),
   appUrl: process.env.SHOPIFY_APP_URL || "",

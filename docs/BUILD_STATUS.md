@@ -10,6 +10,28 @@ approval still pending from the user)._
 
 ---
 
+## MEGA MODULE 5 — Pre-Install Readiness implemented in code (2026-07-12) 🟦
+
+Business is **installation-ready** — certified **READY FOR SHOPIFY AUTHORIZATION**
+(`docs/EVENTRA_PREINSTALL_CERTIFICATION.md`). No install, no Supabase, no OAuth, no merge to main.
+
+**Delivered:**
+- **Client persistence wiring** — `DataProvider` hydrates from loader data + persists mutations through an
+  optimistic `/app/data` seam (mock pure-client default preserved; all tests green).
+- **Local preview** — env-gated, labeled, no Shopify session. **Verified live in the browser:** all 12
+  Business screens render with **zero console errors**; an in-app file-mode write **survived reload**.
+- **Server-side entitlement enforcement** (country limits, non-destructive downgrade).
+- **Tooling** — `preinstall:check` (READY gate), `check:sql`, `verify:persistence`; RLS isolation matrix.
+- **Docs** — MM5 audit, Shopify checklist (scopes least-privilege = `read_products` only), install runbook,
+  screen review, certification.
+- **Lint** — fixed pre-existing `app.search`/`app.calendar` errors → **0 lint errors**.
+- **Verification** — typecheck ✅ · lint ✅ · tests ✅ (Business 134 / ~181 total) · build ✅ · boundaries ✅
+  · SQL readiness ✅ · preinstall gate ✅ READY.
+
+**Remaining (Brian-gated):** Shopify auth + dev-store selection + install; later live-Supabase cutover.
+
+---
+
 ## MEGA MODULE 4 — Business Persistence implemented in code (2026-07-12) 🟦
 
 The Business app now has a real, **org-based persistence layer** behind an env gate, with **mock mode as
