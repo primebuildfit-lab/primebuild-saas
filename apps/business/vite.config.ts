@@ -60,4 +60,9 @@ export default defineConfig({
   optimizeDeps: {
     include: ["@shopify/app-bridge-react"],
   },
+  // Shared workspace packages are TypeScript source — bundle (don't externalize)
+  // them into the SSR build so Node never tries to import raw .ts.
+  ssr: {
+    noExternal: [/^@eventra\//],
+  },
 }) satisfies UserConfig;

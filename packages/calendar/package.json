@@ -1,0 +1,19 @@
+{
+  "name": "@eventra/calendar",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Pure calendar/date engine: date-rule resolution, recurrence/offset, grids, ranges, prep timing. No app/UI/state deps.",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "types": "./src/index.ts",
+  "dependencies": {
+    "@eventra/types": "*",
+    "date-fns": "^4.1.0"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  }
+}
