@@ -180,3 +180,30 @@ in direction**; **MM2 architecture lock (D47–D59)** documented; **MM3 platform
 implemented** — npm-workspaces monorepo, 7 shared packages, Consumer/Admin shells, Business green
 (**138 tests across 9 workspaces**). **Phase-5 DB implementation remains PAUSED.** No Supabase / billing /
 ads / PrimeBuild changes.
+
+---
+
+## MEGA MODULE 4 — Business Persistence (implemented in code, 2026-07-12)
+
+Turns the Business app from mock-only into a real, org-based, persistent application **in code**, behind
+an env gate with mock as default. No infrastructure provisioned. See `docs/MM4_PERSISTENCE.md`.
+
+| # | Decision | Value | Status |
+|---|----------|-------|--------|
+| D63 | **Persistence via a repository contract + adapters** | One `BusinessRepository` interface; `mock` (in-memory), `file` (snapshot-on-disk dev), `supabase` (RLS) adapters selected by `persistenceMode()`. Callers depend only on the contract. | ✅ |
+| D64 | **Schema/plan reconciliation (resolves Blocker 3)** | DB + `@eventra/entitlements` are authoritative (locked `business.*` plans, workspace/year limits); the Business UI façade (`PlanId`, `mockPlans`) is retained as a compat display layer, bridged by `app/lib/planModel.ts`. `vip`⇒`business.pro` (legacy alias). Full UI convergence deferred to a later module. | ✅ |
+| D65 | **Store → Org/Workspace in the persistence layer** | DB is org/workspace-based (RLS `is_org_member`/`is_workspace_member`); 1 store = 1 org + 1 workspace (V1); façade `storeId` **≡** persistent `workspaceId`, so UI/tests are unchanged. Roles `owner/admin/editor/viewer` (façade `staff`→`editor`). | ✅ |
+| D66 | **Integrity: soft-delete + audit + versioning** | Merchant tables gain `created_at/updated_at/created_by`, `deleted_at` soft-delete (reads exclude, snapshots retain), and `campaigns.version` memory chaining (source never overwritten — D15). | ✅ |
+
+### Reconciled by MM4
+| Old | Correction |
+|-----|-----------|
+| Paused Phase-5 SQL (`plans.id in free/starter/growth/vip`, `planning_horizon_months`, `store_id`) | 🔁 **Reconciled** to `business.*` + `planning_horizon_years` + `workspace_id`, org/workspace tenancy, audit/soft-delete/versioning. Store-based original preserved in git history. |
+
+### Logged assumptions (configurable — `@eventra/config`)
+A1 `vip`⇒`business.pro`. A2 Free enforces **0** managed countries (locked). A3 1 store = 1 org + 1
+workspace in V1. A4 soft-delete retention is indefinite in V1.
+
+### Open (unchanged by MM4)
+Live Supabase provisioning + Shopify credentials (external gates); full Business-UI convergence onto
+`@eventra/config`/`@eventra/ui`; nested record routes vs query-param modals.

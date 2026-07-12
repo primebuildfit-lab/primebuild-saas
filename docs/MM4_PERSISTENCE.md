@@ -138,8 +138,94 @@ churning the 87 UI tests**. Full UI convergence onto `@eventra/config` is a sepa
 
 ---
 
-## PART 3–10 — see implementation sections below (updated as built)
+## PART 3 — Organization model (store → org/workspace)
 
-(Implementation status tracked in `BUILD_STATUS.md`; decisions in `DECISIONS.md` D63–.)
+The **persistence layer + DB** are now org-based; the Business **UI façade** keeps `Store`/`storeId`
+for compatibility (Part 3: "keep compatibility whenever possible"), bridged at the boundary.
+
+- **DB entities:** `organizations`, `workspaces`, `memberships` (roles `owner/admin/editor/viewer`),
+  `invitations`, `subscriptions` (org-scoped). Merchant tables carry `workspace_id`.
+- **Types:** `@eventra/types` already models `Organization/Workspace/Membership/Role/Permission`. The
+  Business façade adds `TenantScope` (`userId`, `organizationId`, `workspaceId`, `role`) — the
+  server-resolved context passed to every repository call. `WorkspaceNote` added.
+- **Mapping:** 1 store ⇒ 1 org + 1 workspace (A3). The façade `storeId` **equals** the persistent
+  `workspaceId`, so existing components/tests are unchanged. Role/plan bridging lives in
+  `app/lib/planModel.ts` (tested).
+- **Provisioning:** `db/tenant.server.ts` provisions org+workspace+membership+subscription+defaults from
+  the Shopify-verified shop domain, with deterministic ids (`ids.server.ts`) for idempotent installs.
+
+## PART 4/5 — Persistence + server actions
+
+- **Contract:** `db/repository.ts` `BusinessRepository` — the single interface all callers depend on.
+- **Adapters:** `db/memoryRepository.ts` (in-memory, isolated per workspace, `snapshot()`/restore),
+  `db/fileRepository.server.ts` (snapshot-on-disk dev persistence), `db/supabaseRepository.server.ts`
+  (org/workspace + RLS, code-complete). Selected by `db/repository.server.ts` per `persistenceMode()`.
+- **Server actions:** `db/dataActions.ts` (`dispatchDataAction`, pure + exhaustive intent union) is the
+  write core; `routes/app.data.tsx` is the HTTP resource route (`GET` → catalog+bundle; `POST` →
+  dispatched intent) with a server-resolved scope. Mock mode keeps the pure-client `DataContext` path
+  (default), so no UI/test changes; the resource route is the seam for `supabase` mode.
+
+## PART 6 — Security / isolation
+
+- **Never trust client ids:** every write takes a **server-resolved** `TenantScope`; the repo filters by
+  `scope.workspaceId`. Tests prove update/delete cannot reach another workspace's row (`not_found`).
+- **RLS** (`0002_rls.sql`): `is_org_member` / `is_workspace_member`, `WITH CHECK` on every merchant table
+  blocks cross-tenant writes; catalog is read-for-authenticated. Principal-ready (`is_self` reserved).
+- **Isolation tests:** `test/db/persistence.test.ts` covers the app-level boundary; the SQL matrix
+  (`RLS_SECURITY_MODEL.md §7`) remains a pending live-DB task (external gate).
+
+## PART 7 — Validation & integrity
+
+`db/validation.ts` (pure, shared by both adapters): required-field + date-order + enum validation;
+duplicate prevention (custom event name+date, template name); referential guards; `requireFound`.
+Integrity in the schema: FKs + `on delete cascade`, `campaigns_dates_ordered` check, positive-duration
+check. **Soft delete** (`deleted_at`) for custom events/campaigns/templates/notes — reads exclude,
+snapshots retain (retention, A4). **Audit** (`created_at/updated_at/created_by`) on all merchant tables +
+`updated_at` triggers. **Versioning:** `campaigns.version` increments along a reuse chain; the source is
+never overwritten (D15).
+
+## PART 8 — Performance (prepared)
+
+- **No N+1:** `loadBundle` issues one query per table via `Promise.all` (7 parallel reads), not per-row.
+- **Indexes:** tenant + hot-path indexes (`campaigns(workspace_id) where deleted_at is null`,
+  `(workspace_id,status)`, `(workspace_id,updated_at desc)`, `created_from_id`, per-table `workspace_id`).
+- **Batching:** the in-memory/file adapters mutate in place; the file adapter writes one snapshot per
+  mutation (dev only). Reads return cloned data so callers can't corrupt the store.
+- **Caching prep:** catalog (`countries/plans/global_events`) is platform-owned and effectively static —
+  the natural cache boundary (per-process memoization / HTTP cache headers on `/app/data` GET). Documented
+  as the first optimization once live.
+- **Future optimization points (documented, not premature):** (1) partial/covering indexes for calendar
+  range scans; (2) `loadBundle` field projection instead of `select *`; (3) cursor pagination for
+  campaigns when a workspace exceeds ~1k rows; (4) catalog CDN/edge cache; (5) connection pooling via the
+  Supabase pooler in serverless.
+
+## PART 9 — Testing
+
++34 business tests (87 → 121). Coverage: CRUD (every entity), campaign memory/versioning, workspace
+isolation (read + write), survives-reload (in-memory snapshot + file across instances), soft-delete
+retention, validation/failure/invalid-input, dispatcher routing, mode selection, plan/role bridge. No
+existing test changed behavior; the reconciled `mappers.test.ts` tracks the new columns.
+
+## PART 10 — Migration strategy & mode selection
+
+- **Modes** (`db/env.server.ts` `persistenceMode()`): `mock` (default, in-memory demo, ephemeral) →
+  `file` (`EVENTRA_PERSISTENCE_MODE=file`, snapshot-on-disk, survives restart, no secrets) → `supabase`
+  (only when `persistenceEnabled()` — all four secrets present). The app **always runs out of the box**;
+  production is opt-in.
+- **Mock mode never breaks:** the default path is unchanged; `mock`/`file` need no Supabase.
+- **DB migrations:** ordered `0001_schema → 0002_rls → 0003_reference_data → seed` (dev only), applied to
+  a **new, separate** Eventra Supabase project (the external gate). All reconciled to the locked org
+  model; the store-based originals remain in git history.
+- **Cutover:** flip `EVENTRA_PERSISTENCE=true` + secrets → `supabase` mode; `resolveTenant` provisions the
+  org/workspace on first Shopify install; the same `BusinessRepository` contract means no caller changes.
+
+## Remaining external gates (not autonomous)
+
+1. Provision the new Eventra Supabase project (cost/authorization) + apply `supabase/*`.
+2. Link the Shopify app (`client_id` + secret) for `authenticate.admin`.
+3. Then wire `DataContext` to `/app/data` under `supabase` mode and run the live isolation matrix +
+   in-browser reload verification.
+
+(Decisions recorded in `DECISIONS.md` D63–D66; status in `BUILD_STATUS.md`; summary in `CHANGELOG.md`.)
 </content>
 </invoke>

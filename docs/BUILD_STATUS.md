@@ -10,6 +10,38 @@ approval still pending from the user)._
 
 ---
 
+## MEGA MODULE 4 — Business Persistence implemented in code (2026-07-12) 🟦
+
+The Business app now has a real, **org-based persistence layer** behind an env gate, with **mock mode as
+default** — the app still runs out of the box and every prior test passes. **No infrastructure was
+provisioned.**
+
+**Delivered:**
+- **Reconciliation (resolves old Blocker 3):** `supabase/*` rewritten to the **locked org model** —
+  `organization`+`workspace` tenancy, `business.*` plans with workspace/year limits, audit + soft-delete +
+  campaign versioning; RLS `is_org_member`/`is_workspace_member`; reconciled reference data + demo seed.
+  Full audit + inconsistency inventory (R1–R9) in `docs/MM4_PERSISTENCE.md`.
+- **Persistence layer:** `BusinessRepository` contract; **in-memory**, **file-backed (dev)**, and
+  **Supabase (RLS, org-aware)** adapters; `persistenceMode()` selector (`mock|file|supabase`);
+  `planModel.ts` façade↔locked bridge; validation/integrity guards; org-aware tenant provisioning.
+- **Server actions:** pure `dispatchDataAction` + `routes/app.data.tsx` resource route (GET catalog+bundle
+  / POST intent), server-resolved scope, never trusts client ids.
+- **Tests:** +34 (Business 87 → **121**) — CRUD, isolation, campaign memory/versioning, survives-reload
+  (snapshot + on-disk), soft-delete retention, validation/failure, mode selection, plan bridge.
+- **Verification:** typecheck ✅ · business tests ✅ · packages tests ✅ · boundary check ✅ · build ✅.
+
+**Compatibility (kept green):** the Business UI façade (`Store`/`storeId`, `PlanId`) is unchanged; the
+DB/persistence layer is org-based and bridged (façade `storeId` ≡ persistent `workspaceId`). Full UI
+convergence onto `@eventra/config`/`@eventra/ui` is a later module.
+
+**Remaining external gates:** provision the separate Eventra Supabase project + link Shopify creds → flip
+to `supabase` mode → wire `DataContext`→`/app/data` + run the live isolation matrix + in-browser reload.
+
+**Pre-existing debt (not MM4):** lint errors in `app.search.tsx`/`app.calendar.tsx` (react-hooks rules,
+from MM3) remain; unrelated to persistence, left untouched to avoid churn.
+
+---
+
 ## MEGA MODULE 3 — Platform Foundation implemented (2026-07-11) 🟩
 
 The repo is now an **npm-workspaces monorepo**; the Business app is fully functional (87 tests) in

@@ -77,5 +77,32 @@ env templates; boundary validator; docs.
   new surfaces use the shared engine. Converge in MM4.
 - **Consumer/Admin real routing depth, real data, auth, billing, ads** — later Mega Modules.
 
+## MM4 — Business Persistence: run & verify (2026-07-12)
+
+The Business app now has an org-based persistence layer behind an env gate. **Mock is the default** — no
+setup needed.
+
+**Persistence modes** (`apps/business/app/db/env.server.ts#persistenceMode`):
+- `mock` (default) — in-memory demo data, ephemeral per process. No env needed.
+- `file` — set `EVENTRA_PERSISTENCE_MODE=file` (optionally `EVENTRA_PERSISTENCE_FILE=<path>`). Snapshot on
+  disk; **survives restarts**. Dev only, no secrets.
+- `supabase` — set `EVENTRA_PERSISTENCE=true` + `SUPABASE_URL`/`SUPABASE_ANON_KEY`/
+  `SUPABASE_SERVICE_ROLE_KEY`/`SUPABASE_JWT_SECRET`. Requires the provisioned project (external gate).
+
+**Verify (all green as of MM4):**
+```
+npm run typecheck --workspace @eventra/business   # tsc clean
+npm run test --workspace @eventra/business         # 121 tests
+npm run test:packages                              # shared packages
+npm run check:workspaces                           # boundary + cycles
+npm run build --workspace @eventra/business        # RR production build
+```
+Persistence/CRUD/isolation/memory/reload are proven by `test/db/persistence.test.ts` (in-memory + on-disk).
+
+**Live cutover (when the gates open):** apply `supabase/migrations/0001 → policies/0002 →
+migrations/0003 → seeds/seed` to a **new, separate** Eventra project; set the `supabase` env; `resolveTenant`
+provisions the org/workspace on first Shopify install; wire `DataContext` to `/app/data`; run the live
+isolation matrix (`RLS_SECURITY_MODEL.md §7`) + in-browser reload check.
+
 ## No production services touched
 No Supabase provisioned, no billing/ads connected, no Android/iOS publish, no PrimeBuild changes.

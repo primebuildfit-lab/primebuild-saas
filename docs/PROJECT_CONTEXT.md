@@ -2,7 +2,7 @@
 
 > **Read this first.** This is the single source of truth for project state. Chat history is no longer
 > authoritative. When this file conflicts with older docs, this file + `DECISIONS.md` win. Keep it
-> updated when state changes. Last updated: 2026-07-12 · HEAD `589509e` (branch `main`, clean).
+> updated when state changes. Last updated: 2026-07-12 · branch `mm4-business-persistence` (MM4 in code).
 
 ---
 
@@ -16,11 +16,14 @@
   possible advertiser — never a special case in code, never its branding/DB/logic/colors.
 - **Maturity:** Pre-production. Business product is a complete, tested **mock-driven** app; Consumer/Admin
   are foundation shells; no backend/billing/ads are connected anywhere.
-- **Current phase:** Between **MM3 (monorepo foundation, done)** and **P1/P2 (platform persistence)**.
-  Everything is *Ready for Review* — **awaiting Brian's approval** to start connecting real infrastructure.
-- **Status:** All 138 tests green across 9 workspaces; typecheck/build/boundary checks pass. Nothing live.
-- **Health:** Good. Clean, typed, consistent, tested. Debt is the expected mock→real gap plus one known
-  schema inconsistency (see Blockers).
+- **Current phase:** **MM4 (Business Persistence) implemented in code** — the real, org-based persistence
+  layer exists behind an env gate with **mock mode as default**. Awaiting the external gates (Supabase
+  project + Shopify credentials) to go live.
+- **Status:** All tests green (**Business 121**, +packages/consumer/admin ≈ 162 total); typecheck / build /
+  boundary checks pass. Nothing live (no cloud infra provisioned).
+- **Health:** Good. Clean, typed, consistent, tested. The former schema/plan inconsistency (old Blocker 3)
+  is **resolved** (reconciled to the locked org model). Remaining debt is the mock→live cutover (external
+  gates) + the deferred Business-UI convergence onto `@eventra/config`/`@eventra/ui`.
 
 **Executive summary:** Eventra began as a single Shopify app (Business). It was redesigned into **one
 platform with three products** — Business, Consumer, Admin — sharing one backend. The repo is now an
@@ -160,11 +163,15 @@ no secrets in git (`.env.example` only; client apps read only `VITE_` non-secret
   packages to demonstrate boundaries. 3 tests each.
 - **Structure** — `services/{api,workers}` contracts, `supabase/*` SQL + RLS + seed, env templates,
   boundary validator, full docs.
+- **MM4 Business Persistence (in code):** org-based persistence layer — `BusinessRepository` contract +
+  in-memory/file/Supabase adapters, reconciled schema/RLS/seed, validation/integrity, soft-delete/audit/
+  versioning, server-action resource route, mode selection. Behind an env gate; mock default. +34 tests.
 - **Phases:** Phase 1 Foundation → Phases 2–4 (mock product) → hardening sprint → Phase-5 groundwork
-  (paused) → MM1 (platform docs) → MM2 (architecture lock) → MM3 (monorepo foundation). All done.
+  (paused) → MM1 (platform docs) → MM2 (architecture lock) → MM3 (monorepo foundation) → **MM4 Business
+  Persistence (in code)**. All done.
 
-**Current module (next up):** **P1 Platform Foundation → P2 Business Persistence** — not started, awaiting
-approval + credentials.
+**Current module (next up):** **live cutover** — provision Supabase + link Shopify, flip to `supabase`
+mode, wire `DataContext`→`/app/data`, run the live isolation matrix + in-browser reload (external gates).
 
 **Remaining:** P1 foundation (store→org rename, platform schema, 3-principal RLS, auth adapters) → P2
 Business persistence (wire loaders/actions on the platform schema; Shopify pilot; isolation tests) → P3
@@ -172,14 +179,13 @@ Consumer MVP / P4 Admin MVP (parallel) → P5 notifications + verified deals →
 multi-platform adapters (Woo/Wix/Squarespace) → P8 mobile (Play/App Store) + ads → P9 AI. ~3–4× scope.
 
 **Blockers:**
-1. **Approval gate** — Brian must approve the architecture lock + open decisions before real infra work.
-2. **External credentials** — Shopify Partner app link (`client_id` + API secret) and a **new, separate**
-   Eventra Supabase project (cost/authorization) are required for P2 and were the designated stop gates.
-3. **Schema inconsistency (must fix before P2):** `supabase/migrations/0001_schema.sql` (the paused
-   Phase-5 Business slice) still encodes the **OLD** plan model — `plans.id in ('free','starter','growth',
-   'vip')` and `planning_horizon_months` — which contradicts the **locked** model (Free/Starter/Growth/
-   **Business Pro**, workspace limits, **year** horizons) now in `@eventra/config`. It must be reconciled +
-   store→org before applying.
+1. **Approval gate** — architecture lock + open decisions (Brian). MM4 proceeded on Brian's direction.
+2. **External credentials (remaining stop gates)** — Shopify Partner app link (`client_id` + API secret)
+   and a **new, separate** Eventra Supabase project (cost/authorization). Required to flip to `supabase`
+   mode and run the live isolation matrix + in-browser reload verification.
+3. ~~Schema inconsistency~~ — **RESOLVED in MM4.** `supabase/*` is reconciled to the locked org model
+   (`business.*` plans, workspace/year limits, `workspace_id`, audit/soft-delete/versioning); the façade
+   is bridged by `app/lib/planModel.ts`. See `docs/MM4_PERSISTENCE.md §2`.
 
 **Known technical debt (from `PROJECT_AUDIT.md`, dispositioned):** Business still uses its own
 `app/components/ui/*` instead of `@eventra/ui` (converge MM4); Business `app/db` not yet generalized to
