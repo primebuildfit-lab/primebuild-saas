@@ -1,5 +1,10 @@
 # Eventra — Plan Limits, Downgrade & Retention Specification
 
+> ⚠️ **PLATFORM EXPANSION (2026-07-11):** the enforcement *mechanism* below is valid and now also
+> covers the **45-day trial → read-only grace**. The **§1 plan table (Free/$10/$20/VIP $50) is
+> superseded** by the new business plans **Starter $15 / Growth $30 / Business Pro $45** (no free
+> tier) — see `MONETIZATION.md` and `DECISIONS.md` (D39/D40). Original content kept for history.
+
 > Technical spec for enforcing plan entitlements. Uses the **approved** plan names/prices/limits
 > (D9) — this document invents no new plans or prices. Mock-layer behavior is implemented where
 > noted; the server-side enforcement points are the Phase-5 contract.

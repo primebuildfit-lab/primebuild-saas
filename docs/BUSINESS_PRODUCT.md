@@ -1,107 +1,134 @@
-# Eventra Business — Product Architecture (PROPOSED)
+# Eventra Business — Complete Product Design (PROPOSED, platform-first)
 
-> The existing campaign-planning + campaign-memory product, **generalized beyond Shopify**. Shopify is
-> now one integration among several. **Proposed — awaiting approval.** No implementation here.
-> The current mock UI (dashboard, calendar, events, campaigns, memory, templates, countries, settings,
-> analytics, admin-of-catalog) becomes the Business web surface.
+> The campaign-planning + campaign-memory product, generalized beyond Shopify. Shopify is **one
+> integration**, not the product. Shares the platform backend. **Proposed — awaiting approval. No
+> implementation.** Supersedes the shorter v3 draft (MEGA MODULE 1 expansion). The current mock UI is
+> the Business web surface.
 
-## 1. Purpose (unchanged core)
-Help businesses find commercial opportunities, prepare campaigns early, and **reuse what worked**
-(campaign memory). Core promise and the four questions are unchanged. What changes: the **audience**
-(any business, integrated or not) and the **plan/trial model**.
+## 1. Purpose (unchanged core, platform-first framing)
+Find commercial opportunities → prepare campaigns early → **reuse what worked** (campaign memory). Works
+for any business — with or without a store integration. A store connection is an *attribute* of the
+**Org** (the tenant), not its identity.
 
 ## 2. Users & roles
-| Role | Description |
-|------|-------------|
-| Business owner | Creates the business org on signup; full access; manages subscription. |
-| Business staff | (Post-MVP) invited member of an org with scoped permissions. |
-| — | Platform admins are **not** business users; they live in the Admin Console. |
+| Role | Scope |
+|------|-------|
+| Owner | Creates the Org on signup; full access; manages subscription/billing. |
+| Admin (org) | Manage planning, campaigns, integrations, members (no billing). |
+| Editor | Create/edit campaigns, events, templates; no settings/members. |
+| Viewer | Read-only. |
+Teams are **post-MVP**; MVP ships Owner-only, but the role model is defined now so RLS/permissions are
+built once. Platform admins are **not** business users.
 
-A **Business org** is the tenant (was "store"). A store/site connection is an *attribute* of the org,
-not its identity — so businesses **without** any integration are first-class.
-
-## 3. Plans & entitlements (PROPOSED — prices approved; entitlements need sign-off)
-Approved prices (do not change): **Starter $15/mo**, **Growth $30/mo**, **Business Pro $45/mo**. There is
-**no free business tier** — the entry experience is the **45-day trial** (§4). Old business plans
-(Free/Starter $10/Growth $20/VIP $50) are **superseded** (see `DECISIONS.md`).
-
-| Entitlement | Starter ($15) | Growth ($30) | Business Pro ($45) |
-|-------------|:-------------:|:------------:|:------------------:|
-| Countries / markets | 2 | 3 | Unlimited |
-| Saved campaigns | 25 | 150 | Unlimited |
-| Planning horizon | 4 months | 8 months | 12+ months |
-| Campaign memory / history | basic | extended | full + versioned |
-| Templates | basic duplication | full | advanced |
-| Commerce integrations connected | 1 | up to 3 | unlimited |
-| Submit **verified deals** to Consumer | — (proposed) | ✓ | ✓ priority review |
-| Team members | 1 | proposed: 3 | proposed: more |
-| Analytics | light | standard | advanced |
-
-**Open business decisions (flagged):** exact numeric caps; whether Starter can submit verified deals;
-team-member counts (teams are otherwise post-MVP); annual pricing; whether "integrations connected"
-should be a limit at all for a planning-first product.
-
-Enforcement rules (unchanged, `PLAN_ENFORCEMENT.md`): limits enforced server-side; downgrades never
-delete data — excess becomes **read-only** and restores on upgrade. Single plan-config source.
-
-## 4. Trial lifecycle (NEW)
-- Every **new business org** starts a **45-day full Business Pro** trial — no plan chosen up front.
-- During the trial: full Business Pro entitlements; a persistent "X days left" indicator; no card
-  required to start (payment collection timing is an open billing decision).
-- **At trial end**, the org must select a paid plan (Starter/Growth/Business Pro).
-- If none is selected, the org enters a **read-only "grace" state**: all data retained and viewable,
-  edits/creates blocked, with an upgrade prompt — mirroring the downgrade-retention rule (never delete).
-- Selecting a plan restores editing (subject to that plan's limits; excess stays read-only per
-  `PLAN_ENFORCEMENT.md`).
-
-States: `trialing → active(plan) | grace(expired) → active(plan)`; plus `past_due`/`canceled` from
-billing. Trial start/end, conversions, and cancellations are surfaced in the Admin Console.
-
-## 5. Platform detection & onboarding (integrations as adapters)
-Business does **not** require a store connection. Onboarding:
-1. Create org (name, country/countries, business type).
-2. Ask "How do you sell?" → choose an integration, or **"No integration / physical / other"**.
-3. Connect (if applicable) via that platform's adapter; otherwise proceed straight to the planner.
-
-Adapters implement a common **CommerceConnection** interface (`PLATFORM_ARCHITECTURE.md §9`):
-
-| Platform | Mechanism | Reads (min scope) |
-|----------|-----------|-------------------|
-| **Shopify** | Embedded app + App Bridge session tokens (existing) | products/collections (`read_products`) |
-| **WooCommerce** | WordPress plugin + REST API keys (or OAuth) | products |
-| **Wix** | Wix OAuth app | products |
-| **Squarespace** | OAuth / API | products |
-| **Custom ecommerce** | API keys + webhooks, or manual | optional |
-| **Physical / none** | No connection; manual business profile | — |
-
-Product/collection attachment on campaigns uses the connected adapter when present; otherwise a manual
-list (the current mock-catalog UX generalizes to "manual products"). Core planning/memory works
-identically with or without an integration.
-
-## 6. Business route / page map (PROPOSED)
-The existing `/app/*` surface is **rescoped to Business** and rooted for multi-platform (not only
-Shopify embedded). Proposed structure:
+## 3. Merchant onboarding (platform-first)
 ```
-/business/onboarding            Org creation + integration choice (new)
-/business                        Dashboard (existing app._index)
-/business/calendar               Year/Month/Day (existing)
-/business/events                 Official catalog + Event Creator + hide/restore (existing)
-/business/countries              Market selection (existing; plan-limited)
-/business/campaigns[/:id][/new]  Campaigns CRUD + memory (existing; nested routes per ROUTING.md)
-/business/campaign-library       Memory/history (existing)
-/business/templates              Templates (existing)
-/business/deals                  Submit/track verified deals for Consumer (NEW) [Growth+]
-/business/integrations           Connect/manage commerce platform(s) (NEW)
-/business/analytics              Light analytics (existing)
-/business/billing                Plan + trial status + upgrade/downgrade (existing UI, real billing P5+)
-/business/settings               Account, calendar, appearance, notifications (existing)
+1. Sign up (email/OAuth) or arrive via a store install (Shopify/Woo/Wix/…)
+2. Create Org: name, primary country/countries, business type/category
+3. "How do you sell?" → choose integration OR "No integration / physical / other"
+4. If integration: run its adapter (connect/authorize); else skip
+5. Land in the planner with the 45-day full Business-Pro trial active
 ```
-The Shopify embedded entry (`/app`) remains as a thin host that mounts the Business surface inside
-Shopify Admin; non-Shopify businesses use the same surface at `/business` after their own auth.
+No store connection is required to use the planner. Onboarding is identical across platforms except the
+connect step.
 
-## 7. Reuse from current codebase
-Nearly all current Business work carries forward: design system + UI primitives, `DataContext` domains,
-calendar/date engine, domain types, mock data patterns, plan-limit + downgrade-retention logic, the
-Phase-5 Supabase business schema + server foundation (`app/db/*`) — which becomes the **Business slice**
-of the platform schema. Main additions: multi-platform adapters, org-based tenancy (was store-based),
-trial lifecycle, and the verified-deal submission surface.
+## 4. Platform detection & store creation
+- **Arriving from a store** (e.g., Shopify install): the platform is known; the adapter provisions the
+  Org + connection automatically (shop domain → Org).
+- **Arriving from the web**: the user picks the platform in onboarding; the adapter runs OAuth/API-key
+  connect; "custom" uses API keys/webhooks; "none/physical" creates an Org with a **manual** product
+  list.
+- **Store creation** = Org creation + optional CommerceConnection record (`PLATFORM_ARCHITECTURE.md §9`).
+
+## 5. Future integrations (adapters)
+Shopify (now) → WooCommerce → Wix → Squarespace → custom → others. All implement the common
+`CommerceConnection` interface; adding one is a self-contained adapter + onboarding branch, never a core
+rewrite. Product/collection attach uses the connected adapter when present, else the manual list.
+
+## 6. Planning workflow
+Dashboard surfaces **Upcoming Opportunities**, **Active Campaigns**, **Preparation Needed**, and
+**Quick Actions** (existing). The merchant reviews an upcoming event → opens it → creates a campaign
+from it. Prep status (Unprepared/Planning/Ready/Passed) is derived from linked campaigns + dates.
+
+## 7. Campaign workflow
+Create/edit/duplicate/mark-ready/mark-active/complete/archive/delete. Fields: name, linked event,
+country, objective, description, prep/start/end, offer, products/collections (adapter or manual), notes,
+status, actions (visual-only in V1). **Reuse creates a new record and never overwrites history** (D15).
+
+## 8. Calendar workflow
+Year → Month (drag-to-move campaigns) → Day detail. Shows official events, custom events, campaigns, and
+prep windows; filters by country/category/status/type. Reuses the existing calendar engine + dnd.
+
+## 9. Countries / markets
+Per-Org enablement (was per-store), plan-limited. Curated catalog (US + CA now; expand via Admin).
+Downgrade → excess markets read-only, never deleted.
+
+## 10. Templates
+Reusable campaign structures (name, category, default duration/lead, offer, notes). Create-from-campaign
+and use-template-to-create. Plan-gated depth (basic → advanced).
+
+## 11. Campaign memory (the core advantage)
+Every campaign is preserved with what/when/event/products/offer/notes; reuse duplicates into a new
+year/event as a **new linked version**; original is never overwritten. Library groups completed/archived
+campaigns for reuse. History retention scales by plan.
+
+## 12. Verified-deal submission (NEW; ties Business → Consumer)
+Growth+ Orgs can **submit** an official promotion for admin verification; once verified/published it can
+alert consumers who follow the company/category (`VERIFIED_DEALS.md`). Submission UI: deal details,
+proof/source link, dates, scope (country/category). Status tracked (submitted/in-review/verified/
+rejected).
+
+## 13. Future AI assistant (explicitly future)
+Draft campaign suggestions from past performance, recommended timing/offers, checklist generation. Gated
+behind approval; V1 stays manual + deterministic.
+
+## 14. Future automation engine (explicitly future; V1 actions are visual-only, D7)
+Turn visual campaign actions into real, **merchant-approved** executions (e.g., prepare a Shopify
+discount draft, schedule a banner). Never auto-changes a store without clear approval. Post-MVP + per
+integration.
+
+## 15. Future reports & analytics
+- **Analytics (near-term):** light usage/opportunity stats (exists) → standard (campaign outcomes,
+  prep-rate, calendar coverage) → advanced (revenue attribution when integrations provide it).
+- **Reports (future):** exportable summaries per season/campaign; scheduled email reports (Pro).
+
+## 16. Settings
+Account/org, calendar preferences (week start, default view, density), appearance (accent), notification
+defaults (prep reminders 30/14/7/1), integrations management, members (post-MVP), billing view. Reuses
+the existing settings surface.
+
+## 17. Permissions
+Org-scoped RBAC (Owner/Admin/Editor/Viewer). Enforced server-side + RLS by `org_id` and role. Client
+never asserts org/role. Billing actions owner-only.
+
+## 18. Subscription handling
+- **Trial:** 45 days full Business Pro; countdown; at end → choose plan or read-only grace (never
+  delete). Restore on upgrade.
+- **Plans:** Starter $15 / Growth $30 / Business Pro $45 (`MONETIZATION.md`). Limits enforced
+  server-side; downgrade → excess read-only (`PLAN_ENFORCEMENT.md`, already implemented for campaigns).
+- **Billing:** Shopify Billing for Shopify Orgs; PSP (e.g. Stripe) for web/other-platform Orgs (design
+  only).
+
+## 19. Business route / page map (rescoped)
+```
+/business/onboarding                Org creation + integration choice
+/business                           Dashboard
+/business/calendar                  Year/Month/Day
+/business/events                    Official catalog + Event Creator + hide/restore
+/business/countries                 Markets (plan-limited)
+/business/campaigns[/:id][/new]     Campaigns CRUD + memory (nested routes, ROUTING.md)
+/business/campaign-library          Memory/history
+/business/templates                 Templates
+/business/deals                     Submit/track verified deals [Growth+]
+/business/integrations              Connect/manage commerce platform(s)
+/business/analytics                 Analytics (light→advanced by plan)
+/business/reports                   Reports [future]
+/business/billing                   Plan + trial status + upgrade/downgrade
+/business/settings                  Account, calendar, appearance, notifications, members[future]
+```
+`/app` stays as the thin Shopify-embedded host that mounts this surface inside Shopify Admin.
+
+## 20. Reuse from current codebase
+Very high: design system + UI primitives, `DataContext` domains, calendar/date engine, domain types,
+plan-limit + downgrade-retention logic, mock architecture + tests, and the Supabase business schema +
+`app/db/*` server foundation (becomes the Business slice under `org_id`). New: multi-platform adapters,
+org tenancy, trial lifecycle, verified-deal submission, roles/permissions.

@@ -1,93 +1,92 @@
-# Eventra Admin Console — Information Architecture (PROPOSED)
+# Eventra Admin Console — Complete Design (PROPOSED)
 
-> Private, desktop-optimized (tablet/mobile-usable) web control center for platform staff. Not
-> distributed in any app store. Shares the platform backend. **Proposed — awaiting approval.**
+> Private, desktop-first (tablet/mobile-usable) web control center for platform staff. Controls every
+> platform service. Not distributed in any app store. Shares the backend. **Proposed — awaiting
+> approval. No implementation.** Supersedes the shorter v3 draft (MEGA MODULE 1 expansion).
 
-## 1. Purpose & roles
-Operate and monitor the whole platform: consumers, businesses, subscriptions, trials, advertising,
-verified deals, the global calendar, integrations, health, and staff permissions.
-
-Admin principal type is separate from Consumer/Business. Proposed admin roles (RBAC — exact matrix is an
+## 1. Access, roles & audit
+Admins are a **separate principal type** (internal SSO/email + MFA). Proposed RBAC (exact matrix is an
 open decision):
 | Role | Scope |
 |------|-------|
-| Superadmin | Everything, incl. admin permissions + destructive ops. |
-| Ops | Users, subscriptions, trials, support/moderation. |
-| Content | Calendar/events, countries/categories, monitored companies. |
+| Superadmin | Everything incl. security, permissions, destructive ops, feature flags, config. |
+| Ops | Users, subscriptions, trials, support, moderation. |
+| Content | Calendar/events, countries/categories, companies. |
 | Deals reviewer | Verified-deal queue + sources. |
-| Ads manager | Advertisers, campaigns, placements. |
-| Read-only / analyst | Dashboards + analytics, no writes. |
+| Ads manager | Advertisers, campaigns, placements, reporting. |
+| Analyst / read-only | Dashboards + analytics only. |
+**Every write is audit-logged** (actor, action, target, before/after, timestamp, IP). Destructive
+actions require confirmation and (for some) a second-admin approval.
 
-Every admin write is **audit-logged** (actor, action, target, timestamp).
+## 2. Modules — purpose · actions · displays · future
+| Module | Purpose | Key actions | Displays | Future expansion |
+|--------|---------|-------------|----------|------------------|
+| **Overview** | At-a-glance platform health & KPIs | drill into alerts | MRR, active users (C/B), trials ending, deal queue size, health, recent activity | customizable dashboards, saved views |
+| **Users (all)** | Unified people search | search, open, suspend | cross-type user search (consumer + business) | merged identity insights |
+| **Business Customers** | Manage Orgs | view, adjust plan/trial, suspend, impersonate (audited) | Org, integration type, plan/trial, owners, usage | health scoring, CS notes |
+| **Consumer Users** | Manage shoppers | view, suspend, reset, moderate | account, tier, follows, alert settings, region | cohort tools |
+| **Subscriptions** | All subscriptions | change plan, refund (via billing), cancel | consumer (Free/Ad-Free/Verified) + business (Starter/Growth/Pro) | dunning management |
+| **Trials** | 45-day business trials | extend, convert, message | active, days-left, ending-soon, expired | automated nudges |
+| **Advertising** | Ad platform control | create advertiser/campaign/creative, set placement/priority/frequency, pace | advertisers, campaigns, spend/pacing (see `ADVERTISING.md`) | advertiser self-serve portal |
+| **PrimeBuild campaigns** | PrimeBuild as **one advertiser** | manage PB campaigns like any advertiser | PB campaigns/creatives/reporting | none special-cased |
+| **Future advertisers** | Onboard new advertisers | invite, KYC, contract, enable | pipeline, status | self-serve onboarding |
+| **Companies** | Company registry + monitoring | add/edit company, mark monitored, link sources | company profiles, monitored flag, categories | logo/asset mgmt, dedupe |
+| **Verified Deals** | Review & publish deals | verify/reject, edit, set confidence, schedule | queue, submissions, verified feed, confidence (see `VERIFIED_DEALS.md`) | ML-assisted triage |
+| **Countries** | Curated country catalog | add/edit/enable | countries, per-country coverage | localization |
+| **Categories** | Commercial categories | add/edit/merge | category tree, usage counts | taxonomy tooling |
+| **Calendar** | Global official events | CRUD events + rules (incl. `offsetDays`), importance/category | events per country, rule preview | bulk import, rule tester |
+| **Notifications** | Delivery ops | edit templates, quiet-hour policy, resend, throttle | sent/failed/opened, per-channel health | A/B templates |
+| **Analytics** | Cross-product insight | filter, export | usage, engagement, funnels, deal/ad performance | dashboards, cohorts |
+| **Support** | Assist users | open/assign/resolve tickets, canned replies | tickets, SLAs, linked user | in-app chat |
+| **Moderation** | Content/account safety | review reports, act (warn/suspend/remove) | report queue, flags | automated filters |
+| **Logs** | Operational + audit trail | search, filter, export | audit log (writes), system logs, delivery logs | SIEM export |
+| **Server Health** | Uptime & jobs | acknowledge, retry jobs | service status, queue depth (notifications/monitoring), error rates | on-call integration |
+| **Integrations** | Commerce connections | inspect, reauthorize, disable | Shopify/Woo/Wix/Squarespace/custom health + config | per-adapter diagnostics |
+| **Billing** | Money ops | refunds, credits, invoices, reconcile | PSP + Shopify billing status, failed payments | revenue recognition |
+| **Security** | Platform safety | manage MFA policy, sessions, IP allowlists, review anomalies | admin sessions, RLS advisor results, incidents | secret rotation, alerts |
+| **Permissions** | Admin RBAC | create/edit roles, assign, revoke | role matrix, admin accounts | granular scopes |
+| **Version Control** | App builds | publish version, force-update flag, rollback pointer | Consumer/Business build versions, min-supported | staged rollout |
+| **Feature Flags** | Gradual rollout / kill-switch | toggle per surface/cohort/%; kill-switch | flag list, targeting, state | experiment framework |
+| **Configuration** | Platform settings | edit non-secret config (limits, defaults, copy) | config values, change history | typed config schema |
 
-## 2. Information architecture (modules)
-Grouped for a desktop left-nav; collapses to a drawer on tablet/mobile.
-
-- **Overview** — platform KPIs, health summary, recent activity, alerts.
-- **People**
-  - Consumer users — search, detail, status, follows, alert settings, moderation.
-  - Business customers — orgs, integration type, plan/trial, owners/staff, activity.
-- **Subscriptions & Revenue**
-  - Consumer subscriptions (Free/Ad-Free/Verified Deals).
-  - Business subscriptions (Starter/Growth/Business Pro).
-  - **Trials** — active 45-day trials, days remaining, ending soon.
-  - **Conversions & cancellations** — funnel, churn, MRR (post-billing).
-- **Advertising**
-  - Advertisers (incl. **PrimeBuild as one advertiser**, never special-cased).
-  - Ad campaigns, creatives, placements, targeting, pacing, reporting.
-- **Verified Deals**
-  - Review **queue** (submitted promotions → verify/reject).
-  - **Sources** — official promotion-verification sources per company/category.
-  - Monitored companies — the roster of companies whose promos are tracked.
-- **Calendar & Catalog**
-  - Global events (official dates) — CRUD, rules (incl. `offsetDays`), importance/category.
-  - Countries & categories — curated catalog.
-- **Notifications**
-  - Delivery monitoring (sent/failed/opened), templates, quiet-hour policies.
-- **Integrations**
-  - Shopify and non-Shopify (Woo/Wix/Squarespace/custom) connection health + config.
-  - App versions (Consumer/Business builds; forced-update flags).
-- **Support & Moderation** — tickets, reports, content moderation, account actions.
-- **Analytics** — cross-product usage, engagement, deals performance, ad performance.
-- **System Health** — server/integration status, job queues (notifications, monitoring), error rates.
-- **Admin & Permissions** — staff accounts, roles, audit log.
-
-## 3. Admin route / page map (PROPOSED)
+## 3. Route / page map
 ```
-/admin                              Overview dashboard
-/admin/consumers[/:id]              Consumer users list / detail
-/admin/businesses[/:id]             Business customers list / detail
-/admin/subscriptions/consumer       Consumer subscriptions
-/admin/subscriptions/business       Business subscriptions
-/admin/trials                       45-day trials (active / ending / expired)
-/admin/revenue                      Conversions, cancellations, churn, MRR
-/admin/ads/advertisers[/:id]        Advertisers (incl. PrimeBuild)
-/admin/ads/campaigns[/:id]          Ad campaigns / creatives / placements
-/admin/ads/reporting                Ad performance
-/admin/deals/queue                  Verified-deal review queue
-/admin/deals/sources                Verification sources
-/admin/companies[/:id]              Monitored companies
-/admin/calendar/events[/:id]        Global events CRUD
-/admin/catalog/countries            Countries
-/admin/catalog/categories           Categories
-/admin/notifications                Delivery monitoring + templates
-/admin/integrations                 Integration health + config
-/admin/app-versions                 Consumer/Business app versions
-/admin/support                      Tickets / reports / moderation
-/admin/analytics                    Cross-product analytics
-/admin/health                       Server & integration health
-/admin/staff                        Admin accounts + roles
+/admin                              Overview
+/admin/users                        Unified user search
+/admin/businesses[/:id]             Business customers
+/admin/consumers[/:id]              Consumer users
+/admin/subscriptions/{consumer,business}
+/admin/trials
+/admin/revenue                      Conversions/cancellations/churn/MRR
+/admin/ads/{advertisers,campaigns,reporting}[/:id]
+/admin/companies[/:id]
+/admin/deals/{queue,sources}[/:id]
+/admin/catalog/{countries,categories}
+/admin/calendar/events[/:id]
+/admin/notifications
+/admin/analytics
+/admin/support[/:id]
+/admin/moderation
+/admin/logs
+/admin/health
+/admin/integrations
+/admin/billing
+/admin/security
+/admin/staff                        Admin accounts
+/admin/permissions                  Roles
+/admin/versions                     App versions
+/admin/flags                        Feature flags
+/admin/config                       Configuration
 /admin/audit                        Audit log
 ```
 
 ## 4. Layout & responsiveness
-Desktop-first: persistent left-nav + top bar + dense data tables with filters, detail drawers, and
-bulk actions. Tablet: nav collapses to a drawer; tables become horizontally scrollable cards.
-Mobile: usable for triage (queues, trial/renewal alerts, support) though not the primary surface.
+Desktop-first: persistent left-nav (grouped: People · Revenue · Growth surfaces · Catalog · Ops ·
+System), top bar with global search + environment badge, dense filterable tables, detail drawers, bulk
+actions. Tablet: nav → drawer; tables → scrollable/cards. Mobile: triage-usable (queues, trials,
+support, health), not primary.
 
-## 5. Key workflows (referenced elsewhere)
-- **Verified-deal approval:** `/admin/deals/queue` — see `PLATFORM_ARCHITECTURE.md §7`.
-- **Trial monitoring/conversion:** `/admin/trials` + `/admin/revenue` — see `BUSINESS_PRODUCT.md §4`.
-- **Ad management:** `/admin/ads/*` — see `MONETIZATION.md §5`.
-- **Global calendar editing:** `/admin/calendar/events` — the existing merchant-facing admin-of-catalog
-  screen graduates into this authoritative console.
+## 5. Cross-references
+Verified deals → `VERIFIED_DEALS.md`; advertising → `ADVERTISING.md`; trials/billing → `MONETIZATION.md`
++ `BUSINESS_PRODUCT.md §18`; security/tenancy → `PLATFORM_ARCHITECTURE.md §11`; journeys →
+`USER_FLOWS.md`.

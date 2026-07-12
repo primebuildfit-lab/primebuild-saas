@@ -63,8 +63,8 @@ variants, permissions, store listings) over the **same backend**. The Admin Cons
 | 3 | Consumer plans & entitlements | `CONSUMER_PRODUCT.md §3`, `MONETIZATION.md §2` |
 | 4 | Business plans & entitlements | `BUSINESS_PRODUCT.md §3`, `MONETIZATION.md §3` |
 | 5 | Trial lifecycle | `BUSINESS_PRODUCT.md §4`, `MONETIZATION.md §4` |
-| 6 | Advertising architecture | `MONETIZATION.md §5`, `PLATFORM_ARCHITECTURE.md §6` |
-| 7 | Verified-deal monitoring & approval | `PLATFORM_ARCHITECTURE.md §7`, `ADMIN_CONSOLE.md` |
+| 6 | Advertising architecture | **`ADVERTISING.md`** (+ `MONETIZATION.md §5`) |
+| 7 | Verified-deal monitoring & approval | **`VERIFIED_DEALS.md`** (+ `ADMIN_CONSOLE.md`) |
 | 8 | Notification architecture | `PLATFORM_ARCHITECTURE.md §8` |
 | 9 | Platform detection & onboarding | `BUSINESS_PRODUCT.md §5`, `PLATFORM_ARCHITECTURE.md §9` |
 | 10 | Shared backend domains | `PLATFORM_ARCHITECTURE.md §10` |
@@ -77,7 +77,11 @@ variants, permissions, store listings) over the **same backend**. The Admin Cons
 | 17 | Migration impact on current code | `PLATFORM_ARCHITECTURE.md §17` |
 | 18 | Reusable existing work | `PLATFORM_ARCHITECTURE.md §18` |
 | 19 | What Phase 5 must change | `PLATFORM_ARCHITECTURE.md §19` |
-| 20 | Updated phases & complexity | `PLATFORM_ARCHITECTURE.md §20` |
+| 20 | Updated phases & complexity | **`PLATFORM_ROADMAP.md`** (+ `PLATFORM_ARCHITECTURE.md §20`) |
+
+**MEGA MODULE 1 also added dedicated docs:** `VERIFIED_DEALS.md`, `ADVERTISING.md`, `USER_FLOWS.md`,
+`PLATFORM_ROADMAP.md`, and `DOC_IMPACT.md` (documentation impact matrix + self-audit). Full document
+statuses are in `DOC_IMPACT.md`.
 
 ## 5. Mobile, desktop & downloadable-app strategy
 - **Eventra Consumer:** primary target Android via **Google Play**, plus a responsive web PWA sharing

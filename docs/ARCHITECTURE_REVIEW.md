@@ -1,5 +1,10 @@
 # Eventra (Calendar Engine) — Architecture Review & Lock v2
 
+> ⚠️ **PLATFORM EXPANSION (2026-07-11):** this is now the **Eventra Business** architecture review.
+> Platform-level architecture (three products, shared backend, multi-principal tenancy) is defined in
+> `PLATFORM_ARCHITECTURE.md`, which supersedes this at platform scope. Business plans/prices here are
+> superseded by `MONETIZATION.md`. Content preserved as history.
+
 **Status:** ✅ **Approved with amendments (2026-07-11)** — folded in below. Awaiting final Architecture Lock go-ahead.
 **Rule:** No application code is written until the Architecture Lock is approved.
 

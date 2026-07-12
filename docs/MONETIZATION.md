@@ -1,71 +1,85 @@
-# Eventra — Monetization (PROPOSED)
+# Eventra — Monetization (PROPOSED, complete)
 
-> Single reference for all pricing, plans, advertising, verified-deal monetization, and the trial +
-> billing model across the three products. Prices below are **approved inputs**; **entitlements are
-> proposals** pending sign-off. **No billing is implemented** by this package.
+> Single reference for all pricing, plans, advertising, trials, and future revenue lines across the
+> three products. Prices are **approved inputs**; **entitlements are proposals** pending sign-off. **No
+> billing is implemented.** Supersedes the shorter v3 draft (MEGA MODULE 1 expansion).
 
-## 1. Revenue streams
-1. **Consumer subscriptions** — Ad-Free ($15), Verified Deals ($30).
-2. **Business subscriptions** — Starter ($15), Growth ($30), Business Pro ($45).
-3. **Advertising** — shown to Consumer Free users; advertisers include PrimeBuild and future third
-   parties.
-4. (Future) verified-deal placements / promoted companies — **not** in this scope; flagged only.
+## 1. Revenue streams (now vs future)
+| Stream | Status | Notes |
+|--------|--------|-------|
+| Consumer subscriptions | now (design) | Ad-Free $15, Verified Deals $30 |
+| Business subscriptions | now (design) | Starter $15, Growth $30, Business Pro $45 |
+| Advertising | now (design) | House/direct ads to Consumer Free (`ADVERTISING.md`) |
+| Yearly plans | future | Discounted annual billing for all paid tiers |
+| Enterprise / multi-brand | future | Large businesses, multi-org, SSO, SLA |
+| Marketplace | future | Templates / services / partner offers |
+| Affiliate | future | Referral revenue on outbound deals (with disclosure) |
+| API monetization | future | Paid access to platform data/APIs for partners |
 
 ## 2. Consumer plans (approved prices)
 | Plan | Price | Ads | Highlights |
 |------|-------|-----|-----------|
 | Free | $0/mo | Yes | General calendar, basic notifications |
 | Ad-Free | $15/mo | No | Everything in Free, no ads |
-| Verified Deals | $30/mo | No | Ad-free + verified-promo alerts + company/category selection + priority alerts |
-Entitlement detail + open decisions: `CONSUMER_PRODUCT.md §3`.
+| Verified Deals | $30/mo | No | Ad-free + verified alerts + company/category selection + priority alerts + unlimited follows |
+Entitlement detail + open decisions: `CONSUMER_PRODUCT.md §5`.
 
 ## 3. Business plans (approved prices; supersede old Free/Starter$10/Growth$20/VIP$50)
 | Plan | Price | Highlights (proposed) |
 |------|-------|-----------------------|
 | Starter | $15/mo | 2 markets, 25 saved campaigns, 4-mo horizon, 1 integration |
 | Growth | $30/mo | 3 markets, 150 saved, 8-mo horizon, up to 3 integrations, verified-deal submission |
-| Business Pro | $45/mo | Unlimited markets/campaigns, 12+-mo horizon, unlimited integrations, advanced templates |
-No free business tier — entry is the **45-day trial**. Entitlement detail + open decisions:
-`BUSINESS_PRODUCT.md §3`.
+| Business Pro | $45/mo | Unlimited markets/campaigns, 12+-mo horizon, unlimited integrations, advanced templates/reports |
+No free business tier — entry is the **45-day full-Pro trial**. Detail: `BUSINESS_PRODUCT.md §3, §18`.
 
-## 4. Trial & downgrade model (business)
-- New business org → **45 days full Business Pro**, no plan pre-selected.
-- Trial end → must select a paid plan; if not, **read-only grace** (data retained, edits blocked).
-- Downgrades / expiry never delete data: excess becomes **read-only**, restores on upgrade
-  (`PLAN_ENFORCEMENT.md`). This is already implemented for campaigns in the mock layer and extends to
-  the trial-grace state.
-- Consumer plans have no trial in this proposal (open decision: introductory Ad-Free trial?).
+## 4. Trials
+- **Business:** 45 days full Business Pro, no plan pre-selected; countdown; at end → choose a plan or
+  **read-only grace** (data retained). Restore on upgrade.
+- **Consumer:** no trial in this proposal (open decision: introductory Ad-Free trial or 7-day Verified
+  Deals trial to drive conversion).
 
-## 5. Advertising architecture (PROPOSED — no ad network wired)
-- **Where:** designated slots in Eventra Consumer for **Free** users only; suppressed for Ad-Free and
-  Verified Deals. Never in Business or Admin surfaces.
-- **Who:** advertisers are platform records managed in the Admin Console (`/admin/ads/*`). **PrimeBuild
-  is one advertiser record** — not hardcoded, not privileged in code.
-- **What (V1 proposal):** first-party, admin-managed **house ads / sponsored placements** (image +
-  link + targeting by country/category), served from our own ad domain — **no third-party ad-network
-  SDK** at launch (avoids privacy/SDK complexity and keeps the Play listing clean). Third-party
-  networks are a later, explicitly-approved step.
-- **Model:** house/direct-sold placements (flat or CPM booked by admins); reporting in `/admin/ads`.
-- **Data/consent:** ad targeting uses only country/category + follows the user already set; a consent/
-  privacy flow is required for the Android release (open compliance decision).
+## 5. Advertising (summary; full design in `ADVERTISING.md`)
+House/direct-sold placements to **Consumer Free** users only; advertisers (incl. PrimeBuild) managed in
+the Admin Console; priority + frequency caps + pacing; CTR/impression reporting. No third-party ad
+network at launch. Paid tiers exclude ads server-side.
 
-## 6. Verified deals (trust product, ties Business ↔ Consumer)
-- Businesses (Growth+) **submit** official promotions; admins **verify** against approved sources
-  (`PLATFORM_ARCHITECTURE.md §7`); verified deals drive **Verified Deals**-tier consumer alerts.
-- Monetization: primarily makes the $30 consumer tier and Growth+ business tiers valuable. Paid
-  promotion of verified deals is a **future** option, not in scope.
+## 6. Upgrades & downgrades
+- **Upgrade:** immediate entitlement raise; proration per billing provider; read-only excess becomes
+  editable (restoration).
+- **Downgrade:** never deletes data — excess (campaigns/markets/history) becomes **read-only** under the
+  retention policy (`PLAN_ENFORCEMENT.md`; implemented for campaigns in the mock layer today).
+- **Cancel:** access ends at period end; data retained per policy; re-subscribe restores editing.
 
-## 7. Billing model (PROPOSED — not implemented)
-- **Business (Shopify):** Shopify Billing API for Shopify-integrated orgs.
-- **Business (non-Shopify) & Consumer web:** a PSP (e.g. Stripe) for cards/subscriptions.
-- **Consumer Android:** **Google Play Billing** is typically required for in-app digital subscriptions —
-  a significant constraint (Play fees, mandated billing). **Open decision:** Play Billing vs web-based
-  subscription (with Play policy implications). Must be resolved before the Android release.
-- Plan definitions/limits live in **one config source** (as today with `mockPlans.ts`), extended to
-  cover consumer + business families and read by both UI and server enforcement.
-- **Nothing here is built.** Billing implementation is a later, approved phase.
+## 7. Future yearly plans
+Annual billing at a discount (e.g., ~2 months free) for every paid consumer + business tier. Requires
+proration/renewal handling in billing. Design-only.
 
-## 8. Open monetization decisions (summary)
-Consumer follow limits per tier; whether Ad-Free gets any verified alerts; business numeric caps;
-Starter verified-deal access; team-member counts; annual pricing; consumer trial; **Play Billing vs web
-billing**; ad consent/privacy model; PSP choice.
+## 8. Future enterprise / multi-brand
+For large businesses: multiple Orgs under one account, SSO, custom limits, SLA, priority support,
+optional custom contracts/invoicing. Pricing bespoke. Design-only.
+
+## 9. Future marketplace
+A place to buy/sell campaign templates, seasonal playbooks, or partner services; Eventra takes a fee.
+Requires seller onboarding, payouts, moderation. Design-only, later.
+
+## 10. Future affiliate
+Revenue share on outbound deal/company links (clearly disclosed, never compromising verified-deal
+neutrality). Must not bias verification. Design-only.
+
+## 11. Future API monetization
+Paid, rate-limited API/data access for partners (calendar, verified deals feed) with keys, quotas, and
+billing. Design-only; strong data-boundary + ToS requirements.
+
+## 12. Billing model (PROPOSED — not implemented)
+- **Business (Shopify Orgs):** Shopify Billing API.
+- **Business (web/other-platform) & Consumer web:** a PSP (e.g. Stripe).
+- **Consumer mobile:** **Google Play Billing / Apple StoreKit** are typically **required** for in-app
+  digital subscriptions (store fees + mandated billing) — a major constraint. **Open decision:** store
+  billing vs web billing (with policy implications).
+- Plan definitions/limits live in **one config source** (as with `mockPlans.ts`), extended to consumer +
+  business families and read by both UI and server enforcement.
+
+## 13. Open monetization decisions (for Brian)
+Exact entitlements per tier; consumer follow limits; whether Starter submits verified deals; team-member
+counts; **yearly pricing**; consumer trial?; **store billing vs web billing** on mobile; PSP choice; ad
+consent model; enterprise packaging; whether/when to pursue marketplace/affiliate/API lines.

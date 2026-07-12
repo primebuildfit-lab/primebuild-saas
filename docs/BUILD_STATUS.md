@@ -18,10 +18,13 @@ one integration), and the Eventra Admin Console (web). **Phase-5 database implem
 until this architecture is reviewed and approved.
 
 - Checkpoint tag `pre-platform-expansion` (commit `0e7bb7b`) preserves all prior work.
-- Architecture package delivered (docs only, no code): `docs/PLATFORM_VISION.md`,
-  `CONSUMER_PRODUCT.md`, `BUSINESS_PRODUCT.md`, `ADMIN_CONSOLE.md`, `MONETIZATION.md`,
-  `PLATFORM_ARCHITECTURE.md`; `DECISIONS.md` updated (old Shopify-first items rescoped/superseded, new
-  D36–D46 proposed).
+- Architecture package delivered (docs only, no code), then **deepened to complete spec in MEGA MODULE
+  1**: `PLATFORM_VISION`, `PLATFORM_ARCHITECTURE`, `CONSUMER_PRODUCT`, `BUSINESS_PRODUCT`,
+  `ADMIN_CONSOLE`, `MONETIZATION`, plus dedicated `VERIFIED_DEALS`, `ADVERTISING`, `USER_FLOWS`,
+  `PLATFORM_ROADMAP`, and `DOC_IMPACT` (impact matrix + self-audit). `DECISIONS.md` updated (old
+  Shopify-first items rescoped/superseded, new D36–D46). Superseded-plan banners added to
+  `BUSINESS_RULES`, `PRODUCT_ROADMAP`, `PLAN_ENFORCEMENT`, `ARCHITECTURE_REVIEW`, and root `CLAUDE.md`
+  (content preserved). Full per-doc status: `docs/DOC_IMPACT.md`.
 - New pricing (approved): Consumer Free $0 / Ad-Free $15 / Verified Deals $30; Business Starter $15 /
   Growth $30 / Business Pro $45 + a 45-day full-Pro trial (old business plans superseded). Exact
   entitlements are **proposed, pending sign-off**.

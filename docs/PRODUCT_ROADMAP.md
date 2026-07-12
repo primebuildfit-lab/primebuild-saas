@@ -1,5 +1,10 @@
 # Eventra — Product Roadmap, Business Rules & MVP Build Plan (v2.0)
 
+> ⚠️ **PLATFORM EXPANSION (2026-07-11):** the **phase plan here is replaced** by `PLATFORM_ROADMAP.md`,
+> and the **subscription table (Free/$10/$20/VIP $50) is superseded** by `MONETIZATION.md`. The Eventra
+> **Business** product definition, objects, and non-negotiable rules below remain valid (scoped to
+> Business; Shopify = one integration). See `PLATFORM_VISION.md`. Original kept for history.
+
 > Highest-priority product document (priority #2). Product type: Shopify App + SaaS.
 > Market: small/medium Shopify merchants. Model: freemium monthly subscription.
 

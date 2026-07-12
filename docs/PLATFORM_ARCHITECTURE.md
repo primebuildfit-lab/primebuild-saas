@@ -15,6 +15,43 @@ Roles: Consumer tiers (Free/Ad-Free/Verified); Business owner/staff; Admin roles
 A single human could hold multiple principals (a shopper who also runs a business) — kept as separate
 accounts, never merged in code.
 
+## 3. Product relationships — shared vs isolated
+The three products run on **one backend** with clear sharing/isolation rules.
+
+**Completely shared services** (one implementation, all products): authentication core (per-principal
+adapters), the **event/calendar catalog**, **countries** & **categories**, the **companies** registry,
+the **notification** service, **analytics** ingestion, the **advertisement** engine, the **subscription**
+& billing core, **monitoring**/health, and the **verified-deals** pipeline.
+
+**Shared data (read rules differ per surface):**
+| Data | Consumer | Business | Admin |
+|------|----------|----------|-------|
+| Countries / categories / global events (catalog) | read | read | read/write |
+| Companies registry | read (public profile) | read (own identity) | read/write |
+| Verified/published deals | read (tier-gated) | read | read/write |
+| Plans (config) | read | read | read/write |
+
+**Isolated data (never crosses the boundary):**
+| Data | Owner | Never visible to |
+|------|-------|------------------|
+| Consumer follows / alert prefs / wishlist | consumer account | other consumers, businesses |
+| Business campaigns / memory / custom events / prefs | org | consumers, other orgs |
+| Deal **submissions** (pre-publish) | org + admin | consumers, other orgs |
+| Ad performance per advertiser | advertiser + admin | consumers, other advertisers |
+| Admin logs / config / permissions | platform | consumers, businesses |
+
+**Shared users?** A person may hold multiple principals (consumer + business) but the **accounts are
+distinct**; the platform never auto-merges identities or leaks data across them. "Shared" auth means one
+auth *system*, not one shared record set.
+
+**Security boundaries:** the hard lines are (1) consumer ↔ business (a consumer only sees *published*
+business data), (2) org ↔ org, (3) principal ↔ admin. All enforced by RLS keyed to the authenticated
+principal + a server check — never client-supplied ids (`§11`).
+
+**Admin permissions:** admins act across boundaries **only** via role-scoped access + service role, and
+**every action is audit-logged**. Admin roles (`ADMIN_CONSOLE.md §1`) scope which modules/actions are
+allowed; destructive/sensitive actions require confirmation and sometimes a second admin.
+
 ## 6. Advertising architecture (first-party; no ad network)
 Domains: `advertisers` (incl. PrimeBuild as a normal record), `ad_campaigns`, `ad_creatives`,
 `ad_placements` (surface+slot+targeting: country/category), `ad_events` (impression/click).

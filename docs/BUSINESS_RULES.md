@@ -1,5 +1,10 @@
 # Eventra — Business Rules & Product Vision
 
+> ⚠️ **PLATFORM EXPANSION (2026-07-11):** this document is now scoped to **Eventra Business**. Shopify is
+> **one integration**, not the product (D5 rescoped). The **subscription block (Free/$10/$20/VIP $50) is
+> superseded** by `MONETIZATION.md` (Starter $15 / Growth $30 / Business Pro $45 + 45-day trial). Core
+> planning/memory/multi-store rules remain valid. See `PLATFORM_VISION.md`. Content preserved as history.
+
 > Source material (priority #3). Consolidated from the original product brief and
 > the AI development context. Where this conflicts with the Roadmap, the Roadmap wins;
 > where it conflicts with a later direct user instruction, the user wins.

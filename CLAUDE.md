@@ -1,5 +1,13 @@
 # CLAUDE.md — Permanent Rules for Eventra (Calendar Engine)
 
+> ⚠️ **PLATFORM EXPANSION (2026-07-11, proposed):** Eventra is now **one platform, three products**
+> (Consumer / Business / Admin) — see `docs/PLATFORM_VISION.md`. These permanent rules still hold, with
+> two rescopes: (1) **Shopify is one integration of Eventra Business**, not the whole product (§0/§6
+> rescoped, D5); (2) the **plan/pricing in §9 is superseded** for Business by `docs/MONETIZATION.md`
+> (Starter $15 / Growth $30 / **Business Pro** $45 + a 45-day trial), and consumer plans are new. The
+> independence-from-PrimeBuild, design-system, multi-tenant, security, and quality rules are unchanged
+> and apply platform-wide. Nothing here is deleted; see `docs/DOC_IMPACT.md`.
+
 > This file defines the **permanent working rules** for any AI assistant (Claude)
 > or developer building this project. Read it fully **before every task**.
 > Nothing in application code, chat history, or older PrimeBuild material may
