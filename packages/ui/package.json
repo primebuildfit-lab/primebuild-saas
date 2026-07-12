@@ -1,0 +1,22 @@
+{
+  "name": "@eventra/ui",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared, product-neutral UI primitives + responsive app shell. Self-styled (CSS variables), accessible, no product/routing assumptions.",
+  "exports": {
+    ".": "./src/index.tsx",
+    "./tokens.css": "./src/tokens.css"
+  },
+  "types": "./src/index.tsx",
+  "peerDependencies": {
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.25"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
+  }
+}

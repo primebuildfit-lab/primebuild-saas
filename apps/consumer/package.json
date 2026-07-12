@@ -1,0 +1,33 @@
+{
+  "name": "@eventra/consumer",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Eventra Consumer — foundation shell (web/PWA target). Not the full product.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@eventra/config": "*",
+    "@eventra/entitlements": "*",
+    "@eventra/types": "*",
+    "@eventra/ui": "*",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router": "^7.12.0"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/react": "^18.3.25",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "jsdom": "^25.0.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vitest": "^2.1.9"
+  }
+}
