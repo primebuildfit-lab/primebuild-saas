@@ -17,8 +17,10 @@ import type { TenantScope } from "~/types/domain";
  */
 export async function resolveScopeAndRepo(
   request: Request,
+  opts: { preview?: boolean } = {},
 ): Promise<{ scope: TenantScope; repo: BusinessRepository }> {
-  if (persistenceMode() === "supabase") {
+  // Preview never uses supabase (enforced by previewEnabled) and never authenticates.
+  if (persistenceMode() === "supabase" && !opts.preview) {
     const { resolveTenant, clientForTenant } = await import("./tenant.server");
     const scope = await resolveTenant(request);
     const client = await clientForTenant(scope);

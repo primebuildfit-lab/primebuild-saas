@@ -110,6 +110,7 @@ export const campaignToRow = (c: Partial<Campaign>): Row => {
   const set = (k: string, v: unknown) => {
     if (v !== undefined) row[k] = v;
   };
+  set("id", c.id); // included only when the caller provides a client id (create with id parity)
   set("workspace_id", c.storeId);
   set("name", c.name);
   set("global_event_id", c.globalEventId ?? null);

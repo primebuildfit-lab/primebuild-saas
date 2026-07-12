@@ -201,11 +201,11 @@ export function createMemoryRepository(
     },
 
     // ── custom events ──
-    async createCustomEvent(scope, input) {
+    async createCustomEvent(scope, input, id) {
       const s = stateFor(scope);
       validateCustomEventInput(input);
       assertNoDuplicateCustomEvent(live(s.customEvents), input);
-      const event: CustomEvent = { ...input, id: createId("cev"), storeId: scope.workspaceId };
+      const event: CustomEvent = { ...input, id: id ?? createId("cev"), storeId: scope.workspaceId };
       s.customEvents.push({ ...event });
       return clone(event);
     },
@@ -228,13 +228,13 @@ export function createMemoryRepository(
     },
 
     // ── campaigns ──
-    async createCampaign(scope, input) {
+    async createCampaign(scope, input, id) {
       const s = stateFor(scope);
       validateCampaignInput(input);
       const now = new Date().toISOString();
       const campaign: Campaign = {
         ...input,
-        id: createId("cmp"),
+        id: id ?? createId("cmp"),
         storeId: scope.workspaceId,
         version: 1,
         createdAt: now,
@@ -290,12 +290,12 @@ export function createMemoryRepository(
     },
 
     // ── notes ──
-    async createNote(scope, body) {
+    async createNote(scope, body, id) {
       const s = stateFor(scope);
       const clean = validateNoteBody(body);
       const now = new Date().toISOString();
       const note: WorkspaceNote = {
-        id: createId("note"),
+        id: id ?? createId("note"),
         storeId: scope.workspaceId,
         body: clean,
         createdAt: now,

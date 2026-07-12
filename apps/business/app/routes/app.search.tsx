@@ -45,14 +45,14 @@ export default function SearchRoute() {
   const initialQ = params.get("q") ?? "";
   const [query, setQuery] = useState(initialQ);
   const [debounced, setDebounced] = useState(initialQ);
-  const [searching, setSearching] = useState(false);
+  // "Searching" is derived, not stored: while the typed query differs from the
+  // debounced value we are mid-debounce. This avoids a setState-in-effect.
+  const searching = query !== debounced;
 
-  // Debounced deterministic search with a brief loading state.
+  // Debounced deterministic search: commit the query + sync the URL after a pause.
   useEffect(() => {
-    setSearching(true);
     const t = window.setTimeout(() => {
       setDebounced(query);
-      setSearching(false);
       const next = new URLSearchParams(params);
       if (query) next.set("q", query);
       else next.delete("q");

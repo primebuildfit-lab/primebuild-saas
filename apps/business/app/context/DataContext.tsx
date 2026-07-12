@@ -41,18 +41,35 @@ import {
 import { getPlan, canAddCountry as canAddCountryFor } from "~/lib/planEntitlements";
 import { createId } from "~/lib/id";
 import { duplicateCampaign } from "~/lib/campaigns";
+import type { Catalog, StoreBundle } from "~/db/repository";
+import type { DataIntent } from "~/db/dataActions";
 
 /**
- * Mutable tenant store for Phases 2–4, seeded from typed mock data.
+ * Mutable tenant store for the Business surface. Seeded from typed mock data by
+ * default (Phases 2–4 behaviour, used by tests) OR hydrated from server loader
+ * data + persisted through a server action seam when the `/app` route supplies
+ * `initialData` + `onPersist` (MM5, Part 3).
  *
- * State is split into three domain contexts — Identity/Plan, Catalog, and
- * Campaigns — so a mutation in one domain does not re-render consumers of
- * another (e.g. editing a campaign no longer re-renders the app shell, which
- * only reads identity/plan/countries). `useData()` composes all three for
- * backward compatibility. In Phase 5 each context is replaced by React Router
- * route loaders/actions backed by Supabase (see docs/STATE_ARCHITECTURE.md);
- * the split mirrors the natural loader boundaries.
+ * The persistence seam is OPTIMISTIC: each mutation updates local state
+ * synchronously (unchanged component contracts) and, when `onPersist` is present,
+ * emits a `DataIntent` that the route POSTs to `/app/data`. On a persistence
+ * failure the route reconciles by revalidating the loader — local data is never
+ * silently lost or faked. With no props the provider is pure-client (mock).
  */
+
+// ─────────────────────────── persistence seam ───────────────────────────
+export interface InitialData {
+  catalog: Catalog;
+  bundle: StoreBundle;
+}
+type Persist = (intent: DataIntent) => void;
+
+const PersistCtx = createContext<Persist | undefined>(undefined);
+/** The route's persistence dispatcher (undefined in pure-mock/test mode). */
+export function usePersist(): Persist {
+  const p = useContext(PersistCtx);
+  return p ?? (() => {});
+}
 
 // ─────────────────────────── Identity + Plan ───────────────────────────
 interface PlanContextValue {
@@ -68,8 +85,26 @@ interface PlanContextValue {
 }
 const PlanCtx = createContext<PlanContextValue | null>(null);
 
-function PlanProviderInner({ children }: { children: ReactNode }) {
-  const [planId, setPlanId] = useState<PlanId>(demoSubscription.planId);
+function PlanProviderInner({
+  children,
+  initial,
+  onPersist,
+}: {
+  children: ReactNode;
+  initial?: InitialData;
+  onPersist?: Persist;
+}) {
+  const [planId, setPlanIdState] = useState<PlanId>(
+    initial?.bundle.subscription?.planId ?? demoSubscription.planId,
+  );
+
+  const setPlanId = useCallback(
+    (id: PlanId) => {
+      setPlanIdState(id);
+      onPersist?.({ intent: "setPlan", planId: id });
+    },
+    [onPersist],
+  );
 
   const plan = useMemo(() => getPlan(planId), [planId]);
   const subscription = useMemo<Subscription>(
@@ -93,7 +128,7 @@ function PlanProviderInner({ children }: { children: ReactNode }) {
       setPlanId,
       canAddCountry,
     }),
-    [planId, plan, subscription, canAddCountry],
+    [planId, plan, subscription, canAddCountry, setPlanId],
   );
   return <PlanCtx.Provider value={value}>{children}</PlanCtx.Provider>;
 }
@@ -118,36 +153,53 @@ interface CatalogContextValue {
 }
 const CatalogCtx = createContext<CatalogContextValue | null>(null);
 
-function CatalogProviderInner({ children }: { children: ReactNode }) {
+function CatalogProviderInner({
+  children,
+  initial,
+  onPersist,
+}: {
+  children: ReactNode;
+  initial?: InitialData;
+  onPersist?: Persist;
+}) {
   const [storeCountries, setStoreCountries] = useState<StoreCountry[]>(() =>
-    demoStoreCountries.map((c) => ({ ...c })),
+    (initial?.bundle.storeCountries ?? demoStoreCountries).map((c) => ({ ...c })),
   );
   const [eventPreferences, setEventPreferences] = useState<StoreEventPreference[]>(
-    () => seedEventPrefs.map((p) => ({ ...p })),
+    () => (initial?.bundle.eventPreferences ?? seedEventPrefs).map((p) => ({ ...p })),
   );
   const [customEvents, setCustomEvents] = useState<CustomEvent[]>(() =>
-    seedCustomEvents.map((e) => ({ ...e })),
+    (initial?.bundle.customEvents ?? seedCustomEvents).map((e) => ({ ...e })),
   );
   const [preferences, setPreferences] = useState<StorePreference>(() => ({
-    ...demoStorePreference,
-    accent: "indigo",
-    density: "comfortable",
+    ...(initial?.bundle.preferences ?? {
+      ...demoStorePreference,
+      accent: "indigo",
+      density: "comfortable",
+    }),
   }));
+
+  const countries = initial?.catalog.countries ?? catalog;
+  const globalEvents = initial?.catalog.globalEvents ?? seedGlobalEvents;
 
   const enabledCountryCodes = useMemo(
     () => storeCountries.filter((c) => c.enabled).map((c) => c.countryCode),
     [storeCountries],
   );
 
-  const setCountryEnabled = useCallback((code: string, enabled: boolean) => {
-    setStoreCountries((prev) => {
-      const existing = prev.find((c) => c.countryCode === code);
-      if (existing) {
-        return prev.map((c) => (c.countryCode === code ? { ...c, enabled } : c));
-      }
-      return [...prev, { storeId: demoStore.id, countryCode: code, enabled }];
-    });
-  }, []);
+  const setCountryEnabled = useCallback(
+    (code: string, enabled: boolean) => {
+      setStoreCountries((prev) => {
+        const existing = prev.find((c) => c.countryCode === code);
+        if (existing) {
+          return prev.map((c) => (c.countryCode === code ? { ...c, enabled } : c));
+        }
+        return [...prev, { storeId: demoStore.id, countryCode: code, enabled }];
+      });
+      onPersist?.({ intent: "setCountryEnabled", countryCode: code, enabled });
+    },
+    [onPersist],
+  );
 
   const isEventHidden = useCallback(
     (globalEventId: string) =>
@@ -155,51 +207,75 @@ function CatalogProviderInner({ children }: { children: ReactNode }) {
     [eventPreferences],
   );
 
-  const hideEvent = useCallback((globalEventId: string) => {
-    setEventPreferences((prev) => {
-      const existing = prev.find((p) => p.globalEventId === globalEventId);
-      if (existing) {
-        return prev.map((p) =>
-          p.globalEventId === globalEventId ? { ...p, hidden: true } : p,
-        );
-      }
-      return [...prev, { storeId: demoStore.id, globalEventId, hidden: true }];
-    });
-  }, []);
+  const hideEvent = useCallback(
+    (globalEventId: string) => {
+      setEventPreferences((prev) => {
+        const existing = prev.find((p) => p.globalEventId === globalEventId);
+        if (existing) {
+          return prev.map((p) =>
+            p.globalEventId === globalEventId ? { ...p, hidden: true } : p,
+          );
+        }
+        return [...prev, { storeId: demoStore.id, globalEventId, hidden: true }];
+      });
+      onPersist?.({ intent: "setEventHidden", globalEventId, hidden: true });
+    },
+    [onPersist],
+  );
 
-  const restoreEvent = useCallback((globalEventId: string) => {
-    setEventPreferences((prev) =>
-      prev.map((p) =>
-        p.globalEventId === globalEventId ? { ...p, hidden: false } : p,
-      ),
-    );
-  }, []);
+  const restoreEvent = useCallback(
+    (globalEventId: string) => {
+      setEventPreferences((prev) =>
+        prev.map((p) =>
+          p.globalEventId === globalEventId ? { ...p, hidden: false } : p,
+        ),
+      );
+      onPersist?.({ intent: "setEventHidden", globalEventId, hidden: false });
+    },
+    [onPersist],
+  );
 
-  const addCustomEvent = useCallback((input: Omit<CustomEvent, "id" | "storeId">) => {
-    const event: CustomEvent = { ...input, id: createId("cev"), storeId: demoStore.id };
-    setCustomEvents((prev) => [...prev, event]);
-    return event;
-  }, []);
+  const addCustomEvent = useCallback(
+    (input: Omit<CustomEvent, "id" | "storeId">) => {
+      const event: CustomEvent = { ...input, id: createId("cev"), storeId: demoStore.id };
+      setCustomEvents((prev) => [...prev, event]);
+      onPersist?.({ intent: "createCustomEvent", input, id: event.id });
+      return event;
+    },
+    [onPersist],
+  );
 
-  const updateCustomEvent = useCallback((id: string, patch: Partial<CustomEvent>) => {
-    setCustomEvents((prev) => prev.map((e) => (e.id === id ? { ...e, ...patch } : e)));
-  }, []);
+  const updateCustomEvent = useCallback(
+    (id: string, patch: Partial<CustomEvent>) => {
+      setCustomEvents((prev) => prev.map((e) => (e.id === id ? { ...e, ...patch } : e)));
+      onPersist?.({ intent: "updateCustomEvent", id, patch });
+    },
+    [onPersist],
+  );
 
-  const deleteCustomEvent = useCallback((id: string) => {
-    setCustomEvents((prev) => prev.filter((e) => e.id !== id));
-  }, []);
+  const deleteCustomEvent = useCallback(
+    (id: string) => {
+      setCustomEvents((prev) => prev.filter((e) => e.id !== id));
+      onPersist?.({ intent: "deleteCustomEvent", id });
+    },
+    [onPersist],
+  );
 
-  const updatePreferences = useCallback((patch: Partial<StorePreference>) => {
-    setPreferences((prev) => ({ ...prev, ...patch }));
-  }, []);
+  const updatePreferences = useCallback(
+    (patch: Partial<StorePreference>) => {
+      setPreferences((prev) => ({ ...prev, ...patch }));
+      onPersist?.({ intent: "updatePreferences", patch });
+    },
+    [onPersist],
+  );
 
   const value = useMemo<CatalogContextValue>(
     () => ({
-      countries: catalog,
+      countries,
       storeCountries,
       enabledCountryCodes,
       setCountryEnabled,
-      globalEvents: seedGlobalEvents,
+      globalEvents,
       eventPreferences,
       isEventHidden,
       hideEvent,
@@ -212,9 +288,11 @@ function CatalogProviderInner({ children }: { children: ReactNode }) {
       updatePreferences,
     }),
     [
+      countries,
       storeCountries,
       enabledCountryCodes,
       setCountryEnabled,
+      globalEvents,
       eventPreferences,
       isEventHidden,
       hideEvent,
@@ -250,12 +328,20 @@ interface CampaignsContextValue {
 }
 const CampaignsCtx = createContext<CampaignsContextValue | null>(null);
 
-function CampaignsProviderInner({ children }: { children: ReactNode }) {
+function CampaignsProviderInner({
+  children,
+  initial,
+  onPersist,
+}: {
+  children: ReactNode;
+  initial?: InitialData;
+  onPersist?: Persist;
+}) {
   const [campaigns, setCampaigns] = useState<Campaign[]>(() =>
-    seedCampaigns.map((c) => ({ ...c })),
+    (initial?.bundle.campaigns ?? seedCampaigns).map((c) => ({ ...c })),
   );
   const [templates, setTemplates] = useState<Template[]>(() =>
-    seedTemplates.map((t) => ({ ...t })),
+    (initial?.bundle.templates ?? seedTemplates).map((t) => ({ ...t })),
   );
 
   const createCampaign = useCallback(
@@ -269,35 +355,55 @@ function CampaignsProviderInner({ children }: { children: ReactNode }) {
         updatedAt: now,
       };
       setCampaigns((prev) => [campaign, ...prev]);
+      onPersist?.({ intent: "createCampaign", input, id: campaign.id });
       return campaign;
     },
-    [],
+    [onPersist],
   );
 
-  const updateCampaign = useCallback((id: string, patch: Partial<Campaign>) => {
-    setCampaigns((prev) =>
-      prev.map((c) =>
-        c.id === id ? { ...c, ...patch, updatedAt: new Date().toISOString() } : c,
-      ),
-    );
-  }, []);
+  const updateCampaign = useCallback(
+    (id: string, patch: Partial<Campaign>) => {
+      setCampaigns((prev) =>
+        prev.map((c) =>
+          c.id === id ? { ...c, ...patch, updatedAt: new Date().toISOString() } : c,
+        ),
+      );
+      onPersist?.({ intent: "updateCampaign", id, patch });
+    },
+    [onPersist],
+  );
 
-  const deleteCampaign = useCallback((id: string) => {
-    setCampaigns((prev) => prev.filter((c) => c.id !== id));
-  }, []);
+  const deleteCampaign = useCallback(
+    (id: string) => {
+      setCampaigns((prev) => prev.filter((c) => c.id !== id));
+      onPersist?.({ intent: "deleteCampaign", id });
+    },
+    [onPersist],
+  );
 
   // Functional update keeps this action referentially stable (no `campaigns` dep),
   // so consumers memoized on it don't re-render on every campaign change.
-  const duplicate = useCallback((id: string, overrides?: Partial<Campaign>) => {
-    let copy: Campaign | undefined;
-    setCampaigns((prev) => {
-      const source = prev.find((c) => c.id === id);
-      if (!source) return prev;
-      copy = duplicateCampaign(source, overrides);
-      return [copy, ...prev];
-    });
-    return copy;
-  }, []);
+  const duplicate = useCallback(
+    (id: string, overrides?: Partial<Campaign>) => {
+      let copy: Campaign | undefined;
+      setCampaigns((prev) => {
+        const source = prev.find((c) => c.id === id);
+        if (!source) return prev;
+        copy = duplicateCampaign(source, overrides);
+        return [copy, ...prev];
+      });
+      if (copy) {
+        // Pass id parity so the persisted duplicate matches the optimistic copy.
+        onPersist?.({
+          intent: "duplicateCampaign",
+          id,
+          overrides: { ...overrides, id: copy.id, name: copy.name },
+        });
+      }
+      return copy;
+    },
+    [onPersist],
+  );
 
   const setCampaignStatus = useCallback(
     (id: string, status: CampaignStatus) => updateCampaign(id, { status }),
@@ -310,13 +416,21 @@ function CampaignsProviderInner({ children }: { children: ReactNode }) {
     [updateCampaign],
   );
 
-  const addTemplate = useCallback((template: Template) => {
-    setTemplates((prev) => [template, ...prev]);
-  }, []);
+  const addTemplate = useCallback(
+    (template: Template) => {
+      setTemplates((prev) => [template, ...prev]);
+      onPersist?.({ intent: "addTemplate", template });
+    },
+    [onPersist],
+  );
 
-  const deleteTemplate = useCallback((id: string) => {
-    setTemplates((prev) => prev.filter((t) => t.id !== id));
-  }, []);
+  const deleteTemplate = useCallback(
+    (id: string) => {
+      setTemplates((prev) => prev.filter((t) => t.id !== id));
+      onPersist?.({ intent: "deleteTemplate", id });
+    },
+    [onPersist],
+  );
 
   const value = useMemo<CampaignsContextValue>(
     () => ({
@@ -348,13 +462,27 @@ function CampaignsProviderInner({ children }: { children: ReactNode }) {
 }
 
 // ─────────────────────────── Composed provider ───────────────────────────
-export function DataProvider({ children }: { children: ReactNode }) {
+export function DataProvider({
+  children,
+  initialData,
+  onPersist,
+}: {
+  children: ReactNode;
+  /** Server-loaded catalog + bundle. When omitted, the provider seeds from mock. */
+  initialData?: InitialData;
+  /** Persistence dispatcher from the route. When omitted, the provider is pure-client. */
+  onPersist?: Persist;
+}) {
   return (
-    <PlanProviderInner>
-      <CatalogProviderInner>
-        <CampaignsProviderInner>{children}</CampaignsProviderInner>
-      </CatalogProviderInner>
-    </PlanProviderInner>
+    <PersistCtx.Provider value={onPersist}>
+      <PlanProviderInner initial={initialData} onPersist={onPersist}>
+        <CatalogProviderInner initial={initialData} onPersist={onPersist}>
+          <CampaignsProviderInner initial={initialData} onPersist={onPersist}>
+            {children}
+          </CampaignsProviderInner>
+        </CatalogProviderInner>
+      </PlanProviderInner>
+    </PersistCtx.Provider>
   );
 }
 

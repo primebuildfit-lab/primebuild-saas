@@ -63,19 +63,25 @@ export default function CalendarRoute() {
     emptyCampaignValues(),
   );
 
+  // Build a fresh URLSearchParams for each update instead of mutating `params`
+  // in place — mutating it would invalidate values derived from it (year/month/
+  // view) and break memoization preservation.
   const setView = (v: CalendarView) => {
-    params.set("view", v);
-    setParams(params, { replace: true });
+    const next = new URLSearchParams(params);
+    next.set("view", v);
+    setParams(next, { replace: true });
   };
   const setYear = (y: number) => {
-    params.set("y", String(y));
-    setParams(params, { replace: true });
+    const next = new URLSearchParams(params);
+    next.set("y", String(y));
+    setParams(next, { replace: true });
   };
   const setMonth = (m: number, y: number) => {
-    params.set("m", String(m));
-    params.set("y", String(y));
-    params.set("view", "month");
-    setParams(params, { replace: true });
+    const next = new URLSearchParams(params);
+    next.set("m", String(m));
+    next.set("y", String(y));
+    next.set("view", "month");
+    setParams(next, { replace: true });
   };
 
   const entries = useMemo(

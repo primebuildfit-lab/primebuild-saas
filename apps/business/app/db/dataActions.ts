@@ -19,10 +19,14 @@ import { RepositoryError } from "./repository";
 export type DataIntent =
   | { intent: "setCountryEnabled"; countryCode: string; enabled: boolean }
   | { intent: "setEventHidden"; globalEventId: string; hidden: boolean }
-  | { intent: "createCustomEvent"; input: Omit<CustomEvent, "id" | "storeId"> }
+  | { intent: "createCustomEvent"; input: Omit<CustomEvent, "id" | "storeId">; id?: string }
   | { intent: "updateCustomEvent"; id: string; patch: Partial<CustomEvent> }
   | { intent: "deleteCustomEvent"; id: string }
-  | { intent: "createCampaign"; input: Omit<Campaign, "id" | "storeId" | "createdAt" | "updatedAt"> }
+  | {
+      intent: "createCampaign";
+      input: Omit<Campaign, "id" | "storeId" | "createdAt" | "updatedAt">;
+      id?: string;
+    }
   | { intent: "updateCampaign"; id: string; patch: Partial<Campaign> }
   | { intent: "deleteCampaign"; id: string }
   | { intent: "duplicateCampaign"; id: string; overrides?: Partial<Campaign> }
@@ -30,7 +34,7 @@ export type DataIntent =
   | { intent: "moveCampaign"; id: string; startDate: string; endDate: string }
   | { intent: "addTemplate"; template: Omit<Template, "storeId"> }
   | { intent: "deleteTemplate"; id: string }
-  | { intent: "createNote"; body: string }
+  | { intent: "createNote"; body: string; id?: string }
   | { intent: "updateNote"; id: string; body: string }
   | { intent: "deleteNote"; id: string }
   | { intent: "updatePreferences"; patch: Partial<StorePreference> }
@@ -47,13 +51,13 @@ export async function dispatchDataAction(
     case "setEventHidden":
       return repo.setEventHidden(scope, action.globalEventId, action.hidden);
     case "createCustomEvent":
-      return repo.createCustomEvent(scope, action.input);
+      return repo.createCustomEvent(scope, action.input, action.id);
     case "updateCustomEvent":
       return repo.updateCustomEvent(scope, action.id, action.patch);
     case "deleteCustomEvent":
       return repo.deleteCustomEvent(scope, action.id);
     case "createCampaign":
-      return repo.createCampaign(scope, action.input);
+      return repo.createCampaign(scope, action.input, action.id);
     case "updateCampaign":
       return repo.updateCampaign(scope, action.id, action.patch);
     case "deleteCampaign":
@@ -69,7 +73,7 @@ export async function dispatchDataAction(
     case "deleteTemplate":
       return repo.deleteTemplate(scope, action.id);
     case "createNote":
-      return repo.createNote(scope, action.body);
+      return repo.createNote(scope, action.body, action.id);
     case "updateNote":
       return repo.updateNote(scope, action.id, action.body);
     case "deleteNote":

@@ -2,12 +2,10 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import type {
   Campaign,
   CampaignStatus,
-  CustomEvent,
   StorePreference,
   Subscription,
   Template,
   TenantScope,
-  WorkspaceNote,
 } from "~/types/domain";
 import { duplicateCampaign as buildDuplicate } from "~/lib/campaigns";
 import { toLockedPlanId } from "~/lib/planModel";
@@ -58,8 +56,6 @@ function unwrap<T>(res: { data: T | null; error: { message: string } | null }): 
   if (res.error) throw new Error(res.error.message);
   return res.data as T;
 }
-
-const NOT_DELETED = { deleted_at: null } as const;
 
 export function createSupabaseRepository(client: SupabaseClient): BusinessRepository {
   const ws = (scope: TenantScope) => scope.workspaceId;
@@ -152,13 +148,13 @@ export function createSupabaseRepository(client: SupabaseClient): BusinessReposi
       );
     },
 
-    async createCustomEvent(scope, input) {
+    async createCustomEvent(scope, input, id) {
       validateCustomEventInput(input);
       const existing = (unwrap(
         await client.from("custom_events").select("*").eq("workspace_id", ws(scope)).is("deleted_at", null),
       ) as Row[]).map(rowToCustomEvent);
       assertNoDuplicateCustomEvent(existing, input);
-      const row = customEventToRow({ ...input, storeId: ws(scope) });
+      const row = customEventToRow({ ...input, storeId: ws(scope), ...(id ? { id } : {}) });
       return rowToCustomEvent(
         unwrap(await client.from("custom_events").insert(row).select().single()) as Row,
       );
@@ -198,9 +194,9 @@ export function createSupabaseRepository(client: SupabaseClient): BusinessReposi
       );
     },
 
-    async createCampaign(scope, input) {
+    async createCampaign(scope, input, id) {
       validateCampaignInput(input);
-      const row = campaignToRow({ ...input, storeId: ws(scope), version: 1 });
+      const row = campaignToRow({ ...input, storeId: ws(scope), version: 1, ...(id ? { id } : {}) });
       return rowToCampaign(
         unwrap(await client.from("campaigns").insert(row).select().single()) as Row,
       );
@@ -209,6 +205,7 @@ export function createSupabaseRepository(client: SupabaseClient): BusinessReposi
       const current = await fetchCampaign(scope, id);
       validateCampaignPatch(patch, current);
       const row = campaignToRow(patch);
+      delete row.id;
       delete row.workspace_id;
       delete row.version;
       delete row.created_from_id;
@@ -277,13 +274,13 @@ export function createSupabaseRepository(client: SupabaseClient): BusinessReposi
       );
     },
 
-    async createNote(scope, body) {
+    async createNote(scope, body, id) {
       const clean = validateNoteBody(body);
       return rowToWorkspaceNote(
         unwrap(
           await client
             .from("workspace_notes")
-            .insert({ workspace_id: ws(scope), body: clean })
+            .insert({ workspace_id: ws(scope), body: clean, ...(id ? { id } : {}) })
             .select()
             .single(),
         ) as Row,

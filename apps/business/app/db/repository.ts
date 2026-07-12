@@ -56,9 +56,12 @@ export interface BusinessRepository {
   setEventHidden(scope: TenantScope, globalEventId: string, hidden: boolean): Promise<void>;
 
   // ── custom events ──
+  // `id` is optional: the client may pass its optimistic id so the persisted
+  // record matches the UI (avoids write-after-create id races). Still tenant-gated.
   createCustomEvent(
     scope: TenantScope,
     input: Omit<CustomEvent, "id" | "storeId">,
+    id?: string,
   ): Promise<CustomEvent>;
   updateCustomEvent(
     scope: TenantScope,
@@ -71,6 +74,7 @@ export interface BusinessRepository {
   createCampaign(
     scope: TenantScope,
     input: Omit<Campaign, "id" | "storeId" | "createdAt" | "updatedAt">,
+    id?: string,
   ): Promise<Campaign>;
   updateCampaign(scope: TenantScope, id: string, patch: Partial<Campaign>): Promise<Campaign>;
   deleteCampaign(scope: TenantScope, id: string): Promise<void>;
@@ -92,7 +96,7 @@ export interface BusinessRepository {
   deleteTemplate(scope: TenantScope, id: string): Promise<void>;
 
   // ── notes ──
-  createNote(scope: TenantScope, body: string): Promise<WorkspaceNote>;
+  createNote(scope: TenantScope, body: string, id?: string): Promise<WorkspaceNote>;
   updateNote(scope: TenantScope, id: string, body: string): Promise<WorkspaceNote>;
   deleteNote(scope: TenantScope, id: string): Promise<void>;
 

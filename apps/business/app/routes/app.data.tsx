@@ -2,6 +2,7 @@ import type { ActionFunctionArgs, LoaderFunctionArgs } from "react-router";
 import { resolveScopeAndRepo } from "~/db/scope.server";
 import { dispatchDataAction, type DataIntent } from "~/db/dataActions";
 import { RepositoryError } from "~/db/repository";
+import { previewEnabled } from "~/db/env.server";
 
 /**
  * Resource route (MM4, Part 5) — the server-side persistence surface for the
@@ -13,7 +14,7 @@ import { RepositoryError } from "~/db/repository";
  *  POST /app/data      → body: DataIntent (JSON) → dispatched write, returns result
  */
 export async function loader({ request }: LoaderFunctionArgs) {
-  const { scope, repo } = await resolveScopeAndRepo(request);
+  const { scope, repo } = await resolveScopeAndRepo(request, { preview: previewEnabled() });
   const [catalog, bundle] = await Promise.all([
     repo.loadCatalog(),
     repo.loadBundle(scope),
@@ -22,7 +23,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
 }
 
 export async function action({ request }: ActionFunctionArgs) {
-  const { scope, repo } = await resolveScopeAndRepo(request);
+  const { scope, repo } = await resolveScopeAndRepo(request, { preview: previewEnabled() });
   let intent: DataIntent;
   try {
     intent = (await request.json()) as DataIntent;

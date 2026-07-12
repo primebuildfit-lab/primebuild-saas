@@ -40,3 +40,20 @@ export function persistenceMode(): PersistenceMode {
 export function fileSnapshotPath(): string {
   return process.env.EVENTRA_PERSISTENCE_FILE || ".eventra/dev-store.json";
 }
+
+/**
+ * Local, clearly-labeled PREVIEW mode (MM5, Part 10). When enabled, the `/app`
+ * route renders the Business UI **without** a Shopify session so screens can be
+ * inspected locally before installation. It does NOT impersonate OAuth or fake an
+ * App Bridge session — it simply bypasses the auth gate for a labeled local demo.
+ *
+ * HARD SAFETY: refuses to enable in production, and never activates in `supabase`
+ * persistence mode (real data must go through real auth).
+ */
+export function previewEnabled(): boolean {
+  return (
+    process.env.EVENTRA_PREVIEW === "true" &&
+    process.env.NODE_ENV !== "production" &&
+    !persistenceEnabled()
+  );
+}
