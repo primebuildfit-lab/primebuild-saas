@@ -4,9 +4,10 @@
 > bracketed values as each step actually completes — do not pre-fill URLs or mark steps done before they
 > happen.
 
-## Current status: ⛔ EVENTRA NOT INSTALLED
+## Current status: 🟡 SUPABASE LIVE — deploy + Shopify install still pending (external)
 
-Nothing external has been executed. Everything below is prepared in code and waiting on Brian.
+**Supabase is provisioned, migrated, and RLS-validated** (2026-07-13). Railway deploy and the Shopify
+Partner app/install remain blocked on interactive login only Brian can perform.
 
 ## Environment / links (to be filled after each step)
 
@@ -22,12 +23,19 @@ Nothing external has been executed. Everything below is prepared in code and wai
 
 ## Step log
 
-### 1. Supabase project — ⛔ BLOCKED (Brian)
-- [ ] Create a **separate** Eventra Supabase project (never `primebuild-core`).
-- [ ] Put URL + anon + service-role + JWT secret into the host secret store (not git).
-- [ ] Apply migrations in order: `0001_schema` → `0002_rls` → `0003_reference_data` → `0004_internal_os`
-      → `0005_internal_os_rls` → dev seed **only in a dev project** (production: no fictional seed).
-- [ ] Verify tables/relations/RLS/indexes/triggers; run `preinstall_rls_matrix.sql` → 0 cross-tenant leakage.
+### 1. Supabase project — ✅ DONE + VALIDATED (2026-07-13)
+- [x] Created a **separate** Eventra Supabase project `eventra` (ref `kavsuxzzxzzwiunjfiyk`, region us-east-1),
+      in the PrimeBuild org but a distinct project — **primebuild-core untouched**.
+- [x] Applied migrations in order: `0001_schema` → `0002_rls` → `0003_reference_data` → `0004_internal_os`
+      → `0005_internal_os_rls` → `0006_harden_function_search_path`. **No dev/fictional seed in the project.**
+- [x] Verified: **34 tables**, RLS enabled on all; reference data loaded (2 countries, 4 plans, 11 events).
+- [x] **Live RLS validated with two real tenants:** User A sees only their own campaign (0 leakage from Org B);
+      cross-tenant write blocked by `WITH CHECK`; Internal-OS tables invisible to non-admins and readable only
+      by a `platform_admin`. All test data deleted afterward → clean production state.
+- [x] Security advisor `set_updated_at` search_path fixed (0006). SECURITY DEFINER helper functions kept
+      EXECUTE-able by `authenticated` on purpose (needed by RLS; self-referential booleans, no leakage).
+- [ ] **Brian:** copy `Project URL`, `anon (publishable) key`, `service_role key`, and `JWT secret` from
+      Supabase → Settings → API into the Railway secret store (never into git or chat).
 
 ### 2. Hosting (Railway) — ⛔ BLOCKED (Brian)
 - [ ] Service root directory = repo root; build/start per `railway.json`; health `/healthz`.

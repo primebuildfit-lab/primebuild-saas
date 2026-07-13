@@ -31,14 +31,18 @@ No URL is invented here — per instruction, the real domain is published only o
 | Public HTTPS URL live | **BLOCKED** | no deploy |
 | Production no-mock (fail-loud) | **PASS (code)** | `env.server.ts` `persistenceMode`; no silent fallback |
 
-### Supabase
+### Supabase — ✅ LIVE + VALIDATED (2026-07-13)
 | Item | Status |
 |------|--------|
-| Schema/RLS/rollback authored (0001–0005) | **PASS** |
+| Schema/RLS/rollback authored (0001–0006) | **PASS** |
 | SQL readiness (static) | **PASS** (`check:sql`) |
-| Real project connected | **BLOCKED** |
-| Migrations applied to real project | **BLOCKED** |
-| Live RLS cross-tenant matrix | **BLOCKED** (`supabase/tests/preinstall_rls_matrix.sql` ready) |
+| Real project connected | **PASS** — `eventra` (ref `kavsuxzzxzzwiunjfiyk`), separate from primebuild-core |
+| Migrations applied to real project | **PASS** — 0001→0006; 34 tables, RLS on all; ref data (2/4/11) |
+| Live RLS tenant isolation | **PASS** — User A sees only own data, 0 leakage from Org B |
+| Live RLS `WITH CHECK` cross-tenant write | **PASS** — foreign-workspace write blocked |
+| Live Internal-OS platform isolation | **PASS** — non-admin blocked; platform_owner allowed |
+| Production has no fictional data | **PASS** — all test rows deleted; only reference data remains |
+| Security advisors | **PASS (WARN-only)** — search_path fixed; definer-fn notices documented |
 
 ### Shopify
 | Item | Status |
