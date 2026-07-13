@@ -21,6 +21,8 @@
     "check": "npm run lint && npm run typecheck && npm run test && npm run build",
     "check:workspaces": "node scripts/check-boundaries.mjs",
     "check:sql": "node scripts/check-sql-readiness.mjs",
+    "check:pwa": "node scripts/check-pwa.mjs",
+    "verify": "npm run typecheck && npm run lint && npm run test && npm run build && npm run check:workspaces && npm run check:sql && npm run check:pwa",
     "verify:persistence": "node scripts/verify-file-persistence.mjs",
     "preinstall:check": "node scripts/preinstall-check.mjs",
     "start:local": "node scripts/eventra-local.mjs",

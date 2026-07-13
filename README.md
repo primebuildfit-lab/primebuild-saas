@@ -15,8 +15,13 @@ Eventra is a standalone product. PrimeBuild is only the **first test store** —
 branding, colors, code, accounts, or logic anywhere. See `CLAUDE.md`.
 
 ## Status
-**Phase 0 — Architecture & Product Lock.** No application code yet. Architecture Review **approved with
-amendments**; Architecture Lock awaiting final go-ahead. See `docs/BUILD_STATUS.md`.
+**Installation phase — Business product complete on mock data; certified `READY FOR SHOPIFY
+AUTHORIZATION`.** The Business app (12 screens) runs on a typed mock/file persistence layer with a
+Supabase org/workspace adapter + RLS designed and unit-tested (not yet provisioned). Plans and roles
+have a single canonical source (`@eventra/config` / `@eventra/identity`); server-side role enforcement
+gates every write; the app ships a PWA manifest + service worker. Remaining work is Brian-gated
+(Shopify credentials, a separate Supabase project, deploy/install). See `docs/BUILD_STATUS.md` and
+`docs/STABILIZATION_2026-07-13.md`.
 
 ## Stack (locked)
 **Shopify official React Router app template** · React · TypeScript · Tailwind CSS · Framer Motion ·
@@ -47,6 +52,5 @@ npm run dev         # local dev server
 > Phases 1–4 run on mock data — no Shopify or Supabase credentials needed. Real
 > Shopify/Supabase env vars (see `.env.example`) are wired in Phase 5.
 
-## Status
-Phase 1 — Foundation is code-complete (52 app files). Build verification is pending a
-connected environment (the Cowork cloud session blocks the npm registry). See `docs/BUILD_STATUS.md`.
+> _(Historical note: an earlier draft of this README described the project as "Phase 0 — no code yet."
+> That is obsolete. The code is the source of truth — see `docs/BUILD_STATUS.md`.)_

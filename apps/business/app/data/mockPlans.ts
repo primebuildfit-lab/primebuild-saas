@@ -1,8 +1,20 @@
 import type { Plan } from "~/types/domain";
 
 /**
- * Working prices/limits (D9). Single source of truth — never hardcode elsewhere.
- * Server-side enforcement of these limits arrives in Phase 5.
+ * Business plan DISPLAY façade (legacy vocabulary: free|starter|growth|vip).
+ *
+ * ⚠️ SINGLE SOURCE OF TRUTH FOR AUTHORIZATION/ENFORCEMENT IS `@eventra/config`
+ * (`BUSINESS_PLANS`, the locked model business.free/starter/growth/pro). This file
+ * is ONLY the current merchant-facing display layer and is bridged to the canonical
+ * model by `~/lib/planModel.ts`. Server enforcement reads the canonical config, not
+ * these display fields (see docs/DECISIONS.md D70 and docs/STABILIZATION_2026-07-13.md).
+ *
+ * These display values still show the OLD working prices ($0/$10/$20/$50, month
+ * horizons). Converging the merchant-facing display onto the locked model
+ * ($0/$15/$30/$45, "Business Pro", year horizons) is an APPROVED-business-rule change
+ * that is intentionally deferred to Brian's sign-off — do not flip silently.
+ * Whenever these display values change, they must stay derivable from / consistent
+ * with `@eventra/config`; never introduce a third set of numbers.
  */
 export const plans: Plan[] = [
   {

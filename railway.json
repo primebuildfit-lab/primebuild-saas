@@ -1,0 +1,14 @@
+{
+  "$schema": "https://railway.com/railway.schema.json",
+  "build": {
+    "builder": "NIXPACKS",
+    "buildCommand": "npm ci && npm run -w @eventra/business prisma -- generate && npm run build --workspace @eventra/business"
+  },
+  "deploy": {
+    "startCommand": "npm run -w @eventra/business prisma -- migrate deploy && npm run start --workspace @eventra/business",
+    "healthcheckPath": "/healthz",
+    "healthcheckTimeout": 120,
+    "restartPolicyType": "ON_FAILURE",
+    "restartPolicyMaxRetries": 5
+  }
+}

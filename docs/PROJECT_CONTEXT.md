@@ -2,7 +2,10 @@
 
 > **Read this first.** This is the single source of truth for project state. Chat history is no longer
 > authoritative. When this file conflicts with older docs, this file + `DECISIONS.md` win. Keep it
-> updated when state changes. Last updated: 2026-07-12 · branch `mm4-business-persistence` (MM4 in code).
+> updated when state changes. Last updated: 2026-07-13 · branch `local-install-phase` · **Phase 7 complete
+> in code** — Internal OS (Nivel A) + offer engine built on top of Phase 6 (Business frozen). Three strictly
+> separated levels: A Internal OS (`apps/admin`), B Business, C Personal. See
+> `docs/INTERNAL_OS_INFORMATION_ARCHITECTURE.md`, `docs/OFFER_ENGINE.md`, `docs/FINAL_CERTIFICATION_CHECKLIST.md`.
 
 ---
 
@@ -16,8 +19,11 @@
   possible advertiser — never a special case in code, never its branding/DB/logic/colors.
 - **Maturity:** Pre-production. Business product is a complete, tested **mock-driven** app; Consumer/Admin
   are foundation shells; no backend/billing/ads are connected anywhere.
-- **Current phase:** **Installed locally + Windows desktop integration** (on top of MM5 Pre-Install
-  Readiness). Business is **installation-ready** (certified READY FOR SHOPIFY AUTHORIZATION), the UI is
+- **Current phase:** **Phase 6 Pre-Certification (in code).** Plans + roles have a single canonical source
+  (`@eventra/config` / `@eventra/identity`) with server-side role enforcement; PWA + compliance webhooks +
+  health/readiness + deploy config are in place. Functionally frozen — next step is deploy/install/certify,
+  not development. On top of local Windows install + MM5. Business is **installation-ready** (certified READY
+  FOR SHOPIFY AUTHORIZATION), the UI is
   wired to the persistence layer, and it now launches like a normal Windows app (Desktop + Start Menu
   shortcuts, `npm run start:local`) in local preview + file mode — verified live. Awaiting only Brian's
   Shopify auth + dev-store + install for the cloud path. See `docs/WINDOWS_INSTALL.md`.

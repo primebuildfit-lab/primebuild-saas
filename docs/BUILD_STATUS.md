@@ -10,6 +10,52 @@ approval still pending from the user)._
 
 ---
 
+## PHASE 7 — Internal OS + Offer Engine + visual redesign (2026-07-13) 🟦
+
+Built the private platform admin console (Nivel A), strictly separated from Business (B) / Personal (C).
+Business stays functionally frozen. See `docs/INTERNAL_OS_INFORMATION_ARCHITECTURE.md`, `OFFER_ENGINE.md`,
+`DATA_MODEL.md`, `PLATFORM_ADMIN_SECURITY.md`.
+
+- **Platform roles** (`@eventra/identity`): 6 roles + matrix + `platformCan`; tenant roles can't reach
+  platform perms (D79).
+- **Offer engine** (`apps/admin/src/engine/*`, tested): scoring, 4-year horizon (certainty ladder),
+  change/cancellation detection, commissions (1–2% clamp), **AI port + deterministic fake** (human review,
+  no auto-publish) (D80–D82).
+- **Internal OS UI** (`apps/admin`): dark information-dense shell (sidebar/topbar/⌘K palette/env badge) +
+  real Home/Calendar/Offers/Sources/Companies/Users/Commissions/Jobs/Analytics/AI screens on marked DEV
+  SEED (no PrimeBuild); remaining modules = honest scaffolds (D83).
+- **Schema**: `supabase/migrations/0004_internal_os.sql` + `policies/0005_internal_os_rls.sql` (platform-
+  owned, admin-only RLS; media off Postgres). Not executed.
+- **Docs**: 11 new/updated incl. INTERNAL_OS IA, OFFER_ENGINE, DATA_MODEL, AI_ENGINE, COMMISSIONS,
+  PLATFORM_ADMIN_SECURITY, DESIGN_SYSTEM, GLOBAL_CALENDAR, AUTOMATIONS, ARCHITECTURE, ROADMAP;
+  FINAL_CERTIFICATION_CHECKLIST +Internal-OS section.
+- **Verified**: typecheck ✅ · lint ✅ · tests ✅ **~230** (business 150, admin 19, identity 23) · build ✅ ·
+  boundaries ✅ · sql ✅ · pwa ✅.
+
+---
+
+## PHASE 6 — Pre-Certification: infrastructure & activation closed (2026-07-13) 🟦
+
+Eventra is **functionally frozen** and infra-complete in code. Remaining steps are Brian-gated
+(credentials, deploy, install, device certification). See `docs/FINAL_CERTIFICATION_CHECKLIST.md`,
+`docs/DEPLOY.md`, `docs/INSTALL.md`.
+
+- **Compliance webhooks** added + registered (`customers/data_request`, `customers/redact`, `shop/redact`) —
+  HMAC-verified, idempotent (D76). Eventra stores no customer PII (`read_products` only).
+- **Health/readiness**: `/healthz` (liveness+version) and `/readyz` (supabase → live catalog read or 503);
+  request-id + structured logger, no secrets (D77).
+- **Deploy**: `railway.json` (Nixpacks from repo root, health `/healthz`) + `DEPLOY.md`; Supabase rollback
+  SQL (D75/D78).
+- **OAuth/onboarding/App Bridge**: verified already wired (library-handled OAuth/state/HMAC/token/session;
+  idempotent tenant provisioning; embedded Dashboard). No redesign.
+- **Docs**: `INSTALL`, `DEPLOY`, `TESTING`, `FINAL_CERTIFICATION_CHECKLIST`; README/DECISIONS/CHANGELOG updated.
+- **Verified**: typecheck ✅ · lint ✅ (0 err) · tests ✅ **~208** (business 150) · build ✅ · boundaries ✅ ·
+  sql ✅ · pwa ✅ · preinstall ✅ READY.
+- **Stabilization phase (earlier same day)**: canonical plans SoT (`@eventra/config`) + roles/permissions
+  (`@eventra/identity`) with server-side enforcement at `dispatchDataAction`; PWA. See D70–D74.
+
+---
+
 ## INSTALLATION PHASE — Local install + Windows desktop integration ready (2026-07-12) ✅
 
 Eventra Business is **installed and usable locally** with no external services (preview + file

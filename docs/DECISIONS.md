@@ -223,3 +223,59 @@ Makes Business installation-ready behind the Shopify/Supabase/install gate. See
 
 **Scopes (least-privilege, re-reviewed):** `read_products` only — no write scopes (V1 actions visual-only).
 **External gates (unchanged):** Supabase provisioning, Shopify OAuth/credentials, install/deploy, merge to main.
+
+---
+
+## STABILIZATION PHASE (implemented in code, 2026-07-13)
+
+Convergence + hardening before the Shopify/Supabase cutover. See `docs/STABILIZATION_2026-07-13.md`.
+
+| # | Decision | Value | Status |
+|---|----------|-------|--------|
+| D70 | **Plans: `@eventra/config` is the single canonical source** | `BUSINESS_PLANS` (locked `business.*`, $0/$15/$30/$45, workspace+country limits, YEAR horizons) is authoritative for identity + enforcement. The Business display façade (`data/mockPlans.ts`, legacy `free/starter/growth/vip`) is the ONLY display layer and is bridged by `lib/planModel.ts` (bidirectionally tested). No third set of numbers may exist. | ✅ |
+| D71 | **OPEN — merchant-facing Business plan display flip** | Converging the shown prices/names/limits from the old working values ($10/$20/$50, "VIP", month horizons) to the locked model ($15/$30/$45, "Business Pro", year horizons) is an **approved-business-rule change deferred to Brian**. Not flipped silently (CLAUDE.md §1). The bridge stays until Brian signs off; removal condition = display converged onto `@eventra/config`. | ⛔ Brian |
+| D72 | **Roles: `@eventra/identity` is the single canonical source** | Locked roles `owner|admin|editor|viewer` + a `ROLE_PERMISSIONS` matrix + `roleCan()`. Legacy façade `staff`→`editor`. **owner-only:** `plan:manage`, `org:manage`; **admin+:** `member:manage`; **editor+:** content writes; **viewer:** read-only. | ✅ |
+| D73 | **Server-side role enforcement at the single write choke point** | `dispatchDataAction` (the one path every mutation passes through, all modes) maps each intent → permission and denies with a `forbidden` RepositoryError (→ HTTP 403) before the repository is touched. UI hiding is convenience only. Allow/deny tested per role. | ✅ |
+| D74 | **PWA prepared (not installed on a device)** | Business ships `manifest.webmanifest`, a conservative service worker (never caches `/app/data`/auth/cross-origin; network-first navigations + offline fallback; static SWR), offline banner, and install hints. SW registers ONLY in a top-level window — never inside the Shopify Admin iframe. Physical-device install remains a manual Brian step. PNG icons (192/512) are a follow-up asset task; SVG icons ship today. | ✅ (code) |
+
+### Open (added this phase)
+D71 (display-price flip — Brian); PNG maskable icons; live device/PWA/Shopify-Mobile testing; Supabase +
+Shopify credentials (unchanged external gates).
+
+---
+
+## PHASE 6 — Pre-Certification (implemented in code, 2026-07-13)
+
+Closes infrastructure/activation. No new product features. See `docs/DEPLOY.md`, `docs/INSTALL.md`,
+`docs/FINAL_CERTIFICATION_CHECKLIST.md`.
+
+| # | Decision | Value | Status |
+|---|----------|-------|--------|
+| D75 | **Deploy via Nixpacks from the repo root (Railway)** | `railway.json` builds/starts the Business workspace from the monorepo root so `@eventra/*` resolve; health check = `/healthz`. The standalone `apps/business/Dockerfile` does NOT resolve workspace deps and is kept only for reference — use Nixpacks or a root-context Dockerfile. | ✅ (code) |
+| D76 | **GDPR compliance webhooks registered + handled** | `customers/data_request` + `customers/redact` acknowledged (Eventra stores NO customer PII — `read_products` only); `shop/redact` deletes sessions and (supabase mode) the org row (cascades all tenant data). All HMAC-verified via `authenticate.webhook`. Idempotent. Registered in `shopify.app.toml`. | ✅ |
+| D77 | **Health/readiness + minimal observability** | Public `/healthz` (liveness, build/version, no DB) and `/readyz` (mock/file always ready; supabase ready only if secrets present AND a live catalog read succeeds → 503 otherwise). Dependency-free request-id + structured-JSON logger (`observability.server`), no secrets logged. Heavy APM stays opt-in behind `OBSERVABILITY_DSN`. | ✅ |
+| D78 | **Supabase rollback provided** | `supabase/rollback/0001_drop.sql` (destructive, dev-only, drops all tables/functions in FK-safe order). Documented as never-for-real-data. | ✅ |
+
+### Open (added Phase 6)
+Root-context Dockerfile (if Docker preferred over Nixpacks); PNG 192/512 icons; live deploy + install +
+device certification (all in `FINAL_CERTIFICATION_CHECKLIST.md`).
+
+---
+
+## PHASE 7 — Internal OS, offer engine, visual redesign (implemented in code, 2026-07-13)
+
+Builds Nivel A (platform admin). Business (Nivel B) unchanged/frozen. See `INTERNAL_OS_INFORMATION_
+ARCHITECTURE.md`, `OFFER_ENGINE.md`, `DATA_MODEL.md`, `PLATFORM_ADMIN_SECURITY.md`.
+
+| # | Decision | Value | Status |
+|---|----------|-------|--------|
+| D79 | **Three strictly-separated levels** | A = Internal OS (`apps/admin`), B = Business, C = Personal. A platform role attaches only to an admin principal; a tenant role can NEVER grant a platform permission (`@eventra/identity`, tested + RLS `0005`). | ✅ |
+| D80 | **Offer engine = pure core + platform-owned schema** | Scoring (transparent 7-factor 0–100), 4-year horizon by recurrence (occurrences computed, not stored; projections labeled `historical_projection`, never `confirmed`), change/cancellation detection, all in `apps/admin/src/engine/*` (tested). Schema `0004`/RLS `0005` mirror it; media bytes stay off Postgres. | ✅ (code) |
+| D81 | **AI only through a port; human review mandatory** | `AIProvider` port + deterministic fake; confidence < 0.7 requires human review; low-confidence never auto-publishes; every result audited (`ai_reviews`). Real paid model only with authorization. | ✅ |
+| D82 | **Commissions hard-clamped to 1–2%, modeled only** | `clampRate` + DB CHECK force [1%,2%]; records are `modeled`, never `applied` without authorized billing. | ✅ |
+| D83 | **Dark, information-dense Internal OS with own identity** | Shopify used as ergonomics reference only — no Shopify code/brand/icons. Indigo/slate identity, dense tables/filters/command palette. Design-system extraction to `@eventra/ui` deferred. | ✅ |
+
+### Open (added Phase 7)
+Live Supabase for offer-engine + admin auth provider; real source connectors + job scheduler; real AI
+provider; Shopify Billing/real commissions; design-system extraction; scaffolded Internal-OS modules;
+Playwright E2E; a11y/perf audits. All development after activation; nothing deployed.

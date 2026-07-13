@@ -1,82 +1,69 @@
-import type { ReactNode } from "react";
-import { Link as RouterLink, Route, Routes, useLocation } from "react-router";
-import { AppShell, Card, PlaceholderPage, type NavItem } from "@eventra/ui";
-import { PRODUCTS } from "@eventra/config";
-import { isAdminPrincipal } from "@eventra/identity";
+import { Route, Routes } from "react-router";
+import { isAdminPrincipal, PLATFORM_ROLES } from "@eventra/identity";
 import type { Principal } from "@eventra/types";
+import { Shell } from "./os/Shell";
+import {
+  HomePage, GlobalCalendarPage, OffersPage, SourcesPage, CompaniesPage, UsersPage,
+  CommissionsPage, JobsPage, AnalyticsPage, AiPage, ModulePlaceholder, MOCK_PLATFORM_ROLE,
+} from "./os/pages";
 
-function Link({ to, children, style }: { to: string; children: ReactNode; style?: React.CSSProperties }) {
-  return <RouterLink to={to} style={style}>{children}</RouterLink>;
-}
-
-// Grouped admin navigation (desktop-first). Mirrors ADMIN_CONSOLE.md IA.
-const NAV: Omit<NavItem, "active">[] = [
-  { label: "Overview", to: "/", group: "" },
-  { label: "Consumers", to: "/consumers", group: "People" },
-  { label: "Businesses", to: "/businesses", group: "People" },
-  { label: "Plans", to: "/plans", group: "Revenue" },
-  { label: "Trials", to: "/trials", group: "Revenue" },
-  { label: "Billing", to: "/billing", group: "Revenue" },
-  { label: "Companies", to: "/companies", group: "Deals & Ads" },
-  { label: "Deals", to: "/deals", group: "Deals & Ads" },
-  { label: "Advertising", to: "/advertising", group: "Deals & Ads" },
-  { label: "Notifications", to: "/notifications", group: "Platform" },
-  { label: "Integrations", to: "/integrations", group: "Platform" },
-  { label: "Moderation", to: "/moderation", group: "Platform" },
-  { label: "Analytics", to: "/analytics", group: "System" },
-  { label: "System Health", to: "/health", group: "System" },
-  { label: "Feature Flags", to: "/flags", group: "System" },
-  { label: "Audit Logs", to: "/audit", group: "System" },
-  { label: "Settings", to: "/settings", group: "System" },
-];
-
-/** Mock admin principal boundary (no real privileged access). */
-const MOCK_ADMIN: Principal = { userId: "admin_demo", type: "admin", permissions: ["overview.read"] };
-
-function Overview() {
-  const isAdmin = isAdminPrincipal(MOCK_ADMIN);
-  return (
-    <div>
-      <PlaceholderPage title="Overview" note="Platform KPIs, health, trials ending, deal queue. Foundation shell." />
-      <Card style={{ marginTop: 16, padding: 16 }}>
-        <div style={{ fontSize: 13, color: "var(--eventra-text-muted)" }}>
-          Admin-principal boundary wired (mock): access requires an admin principal —{" "}
-          <b>{isAdmin ? "granted (mock)" : "denied"}</b>. No real privileged access; no live mutations.
-        </div>
-      </Card>
-    </div>
-  );
-}
+/**
+ * Eventra Internal OS (Phase 7, Nivel A). Platform-admin console — SEPARATE from
+ * the Business app (Nivel B) and the Personal app (Nivel C). Access requires an
+ * admin principal with a platform role; here that boundary is mocked (no live
+ * privileged access, no real mutations). Brian = platform_owner.
+ */
+const MOCK_PLATFORM_PRINCIPAL: Principal = {
+  userId: "brian_platform_owner",
+  type: "admin",
+  permissions: ["platform:*"],
+};
 
 export function App() {
-  const { pathname } = useLocation();
-  const nav: NavItem[] = NAV.map((n) => ({
-    ...n,
-    active: n.to === "/" ? pathname === "/" : pathname.startsWith(n.to),
-  }));
-  const page = (title: string, note: string) => <PlaceholderPage title={title} note={note} />;
+  // Deny-by-default gate: the Internal OS renders only for an admin principal with
+  // a recognized platform role. (Mock — a real gate resolves this server-side.)
+  const authorized =
+    isAdminPrincipal(MOCK_PLATFORM_PRINCIPAL) && PLATFORM_ROLES.includes(MOCK_PLATFORM_ROLE);
+
+  if (!authorized) {
+    return (
+      <div style={{ padding: 40, fontFamily: "system-ui" }}>
+        <h1>403 — Internal OS</h1>
+        <p>This console requires an Eventra platform administrator.</p>
+      </div>
+    );
+  }
+
+  const scaffold = (title: string, note: string) => <ModulePlaceholder title={title} note={note} />;
+
   return (
-    <AppShell productName={PRODUCTS.admin.name} badge="Admin" nav={nav} Link={Link} desktopFirst>
+    <Shell principalLabel="Brian · Platform Owner (mock)">
       <Routes>
-        <Route path="/" element={<Overview />} />
-        <Route path="/consumers" element={page("Consumers", "Consumer users.")} />
-        <Route path="/businesses" element={page("Businesses", "Business customers.")} />
-        <Route path="/plans" element={page("Plans", "Plans & entitlements config.")} />
-        <Route path="/trials" element={page("Trials", "45-day business trials + consumer trials.")} />
-        <Route path="/billing" element={page("Billing", "Providers, entitlements, reconciliation.")} />
-        <Route path="/companies" element={page("Companies", "Company registry + monitoring.")} />
-        <Route path="/deals" element={page("Deals", "Verified-deal review queue + sources.")} />
-        <Route path="/advertising" element={page("Advertising", "Advertisers, campaigns, placements.")} />
-        <Route path="/notifications" element={page("Notifications", "Delivery monitoring + templates.")} />
-        <Route path="/integrations" element={page("Integrations", "Commerce connections + health.")} />
-        <Route path="/moderation" element={page("Moderation", "Reports + content safety.")} />
-        <Route path="/analytics" element={page("Analytics", "Cross-product analytics.")} />
-        <Route path="/health" element={page("System Health", "Services, queues, incidents.")} />
-        <Route path="/flags" element={page("Feature Flags", "Rollout + kill-switches.")} />
-        <Route path="/audit" element={page("Audit Logs", "Every admin write, logged.")} />
-        <Route path="/settings" element={page("Settings", "Platform configuration.")} />
-        <Route path="*" element={page("Not found", "Unknown route.")} />
+        <Route path="/" element={<HomePage />} />
+        <Route path="/calendar" element={<GlobalCalendarPage />} />
+        <Route path="/offers" element={<OffersPage />} />
+        <Route path="/sources" element={<SourcesPage />} />
+        <Route path="/cancellations" element={scaffold("Cancellations", "Change/cancellation review queue backed by the detection engine (engine + tests exist; UI queue pending).")} />
+        <Route path="/campaigns" element={scaffold("Campaigns", "Per-company private campaigns (Nivel B owns creation; this is the platform read view).")} />
+        <Route path="/content" element={scaffold("Content", "Client-facing offer presentation builder + versions.")} />
+        <Route path="/templates" element={scaffold("Templates", "Reusable structures for campaigns/offers/content with consent controls.")} />
+        <Route path="/media" element={scaffold("Media", "Locations/context + media assets (metadata; large files off Postgres).")} />
+        <Route path="/companies" element={<CompaniesPage />} />
+        <Route path="/users" element={<UsersPage />} />
+        <Route path="/audiences" element={scaffold("Audiences", "Business vs personal audience comparison — kept strictly separate.")} />
+        <Route path="/analytics" element={<AnalyticsPage />} />
+        <Route path="/plans" element={scaffold("Plans & Membership", "Plan/entitlement configuration — canonical source is @eventra/config.")} />
+        <Route path="/commissions" element={<CommissionsPage />} />
+        <Route path="/integrations" element={scaffold("Integrations", "External connections (Shopify/Google/Meta/…). Adapters + PLANNED states, no live keys.")} />
+        <Route path="/ai" element={<AiPage />} />
+        <Route path="/jobs" element={<JobsPage />} />
+        <Route path="/countries" element={scaffold("Countries & Regions", "Platform catalog of countries/regions.")} />
+        <Route path="/health" element={scaffold("System Health", "Services/queues/incidents. Business /healthz + /readyz already exist.")} />
+        <Route path="/logs" element={scaffold("Logs", "Structured platform logs (request-id correlated).")} />
+        <Route path="/audit" element={scaffold("Audit", "Every admin write, logged with actor/before/after.")} />
+        <Route path="/settings" element={scaffold("Settings", "Platform/offers/AI/commissions/plans/security/data/system settings.")} />
+        <Route path="*" element={scaffold("Not found", "Unknown route.")} />
       </Routes>
-    </AppShell>
+    </Shell>
   );
 }

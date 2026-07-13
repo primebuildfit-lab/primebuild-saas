@@ -3,6 +3,97 @@
 All notable milestones. Dates are absolute. This file summarizes; `docs/DECISIONS.md` is authoritative for
 decisions and `docs/BUILD_STATUS.md` for per-module status.
 
+## Phase 7 — Internal OS, visual redesign, offer engine — 2026-07-13
+
+Builds the private platform admin console (Nivel A), strictly separated from Business (B) and Personal (C).
+No new Business features; Business stays functionally frozen. All gates green.
+
+### Added
+- **Platform roles** (`@eventra/identity`): `platform_owner|platform_admin|operations|support|analyst|
+  read_only` + `PLATFORM_ROLE_PERMISSIONS` + `platformCan()`. A tenant role can never grant a platform
+  permission (tested). Tests +8.
+- **Offer engine** (`apps/admin/src/engine/*`, pure + tested): domain types; deterministic `scoring`
+  (0–100, 7 factors); 4-year `occurrences` (recurrence-expanded, certainty ladder, never confirms a
+  projection); `changeDetection` (cancellation=critical, date=major); `commissions` (hard-clamped 1–2%,
+  modeled never charged); **AI port + deterministic fake** (human-review threshold, no auto-publish, cost 0).
+  Tests +14.
+- **Internal OS UI** (`apps/admin`): dark, information-dense shell (grouped collapsible sidebar, topbar,
+  ⌘K command palette, environment badge) + real screens on clearly-marked DEV SEED — Home (operational KPIs
+  + alerts + activity), Global Calendar (annual + horizon + ranking), Offers (filters + score + bulk-gated),
+  Sources, Companies, Users, Commissions, Jobs, Analytics, AI (runs the fake). Remaining modules are honest
+  scaffolds. Shell tests updated (+2).
+- **Offer-engine schema** (`supabase/migrations/0004_internal_os.sql` + `policies/0005_internal_os_rls.sql`):
+  platform-owned tables (sources/offers/versions/scores/verifications/cancellations/eligibility/commissions/
+  jobs/change_detections/ai_reviews/alerts/notes/integrations/media-metadata/metrics/platform_admins);
+  `is_platform_admin()`/`has_platform_role()` RLS; media bytes stay off Postgres. Not executed.
+- **Dev seed** (`apps/admin/src/data/seed.ts`): fictional, generic, `isDev`-marked (NO PrimeBuild); prod guard.
+- **Docs**: `INTERNAL_OS_INFORMATION_ARCHITECTURE`, `OFFER_ENGINE`, `GLOBAL_CALENDAR`, `AI_ENGINE`,
+  `COMMISSIONS`, `DATA_MODEL`, `PLATFORM_ADMIN_SECURITY`, `DESIGN_SYSTEM`, `AUTOMATIONS`, `ARCHITECTURE`,
+  `ROADMAP`; `FINAL_CERTIFICATION_CHECKLIST` gains an Internal-OS section (D79–D82).
+
+### Verified (all green)
+typecheck (0 err) · lint (0 err) · **~230 tests** (business 150, admin 19, identity 23, …) · build ·
+boundaries · sql · pwa.
+
+### Not done (Brian-gated / next phases)
+Live Supabase (offer-engine tables) + admin auth provider; real source connectors + job scheduler; real AI
+provider; Shopify Billing/real commissions; design-system extraction to `@eventra/ui`; scaffolded modules
+(Content/Templates/Media/Audiences/Integrations/Countries/Health/Logs/Audit/Settings/Plans); Playwright E2E;
+a11y/perf audits. No deploy/install/merge/push.
+
+## Phase 6 — Pre-certification: infra & activation closed — 2026-07-13
+
+Final technical phase before install. No new product features — Eventra is functionally frozen. All gates
+re-verified green. Full post-install list: `docs/FINAL_CERTIFICATION_CHECKLIST.md`.
+
+### Added
+- **GDPR compliance webhooks** (D76): `customers/data_request`, `customers/redact` (acknowledged — no
+  customer PII stored), `shop/redact` (deletes sessions + cascades the org in supabase mode). Registered in
+  `shopify.app.toml`; all HMAC-verified + idempotent.
+- **Health/readiness + observability** (D77): public `/healthz` (liveness + build/version) and `/readyz`
+  (supabase → live catalog read or 503); `lib/observability.server.ts` (request-id + structured logger,
+  no secrets) and `lib/version.server.ts`. Tests +7.
+- **Deploy config** (D75): root `railway.json` (Nixpacks from repo root, health `/healthz`) + `docs/DEPLOY.md`.
+- **Supabase rollback** (D78): `supabase/rollback/0001_drop.sql` (dev-only).
+- **Docs**: `INSTALL.md`, `DEPLOY.md`, `TESTING.md`, `FINAL_CERTIFICATION_CHECKLIST.md`.
+
+### Verified (all green)
+typecheck (0 err) · lint (0 err) · **~208 tests** (business 150) · build · boundaries · sql · pwa · preinstall.
+
+### Not done (Brian-gated, by design)
+Real deploy, Shopify credentials/`client_id`, Supabase provisioning + live RLS matrix, install, physical
+device/PWA/Shopify-Mobile certification, merge to main. No functional development remains.
+
+## Stabilization phase — Plans/roles convergence, server authz, PWA — 2026-07-13
+
+Pre-cutover hardening. No infra provisioned, no credentials, no deploy/install, no merge to main.
+All gates re-verified green (typecheck, lint, ~201 tests, build, boundaries, SQL readiness, preinstall,
+PWA check). Full report + Brian action list: `docs/STABILIZATION_2026-07-13.md`.
+
+### Added
+- **Canonical roles + permissions** in `@eventra/identity`: locked `owner|admin|editor|viewer`,
+  `ROLE_PERMISSIONS` matrix, `roleCan()`. Business maps intents→permissions (`app/lib/permissions.ts`)
+  and **enforces server-side** in the single write choke point `dispatchDataAction` (deny-by-default →
+  `forbidden`/403). Tests +9 (business) +7 (identity).
+- **PWA** (Business): `public/manifest.webmanifest`, conservative `public/sw.js` (never caches
+  `/app/data`/auth/cross-origin; network-first navigations + `offline.html`; static SWR), `PwaRuntime`
+  (SW register top-level only — never in the Shopify iframe — + offline banner + install hints), PWA
+  meta/manifest links in `root.tsx`, maskable icon. `scripts/check-pwa.mjs` + `npm run check:pwa`.
+- **Unified `npm run verify`** (typecheck+lint+test+build+boundaries+sql+pwa).
+- **`.env.example`**: `NODE_ENV` + a clearly-labeled PREPARED block (`BILLING_TEST_MODE`, `LOG_LEVEL`,
+  `OBSERVABILITY_DSN`, `SESSION_SECRET`, `ENCRYPTION_SECRET`, `EVENTRA_FEATURE_FLAGS`) — reserved, not yet
+  read by code.
+
+### Changed
+- **Plans single source of truth confirmed = `@eventra/config`.** `data/mockPlans.ts` documented as the
+  display-only façade bridged by `lib/planModel.ts`. Merchant-facing price/name/horizon flip to the locked
+  model is **deferred to Brian** (D71) — not changed silently.
+- Docs: corrected the obsolete "Phase 0 / no code" `README.md`; `DECISIONS.md` D70–D74.
+
+### Not done (external gates / Brian)
+Merchant price-display flip (D71); PNG 192/512 icons; live Supabase + Shopify credentials; OAuth/install;
+E2E harness; physical device/PWA/Shopify-Mobile testing; deploy; merge to main.
+
 ## Installation phase — Local install + Windows desktop integration — 2026-07-12
 
 Eventra Business is launchable like a normal Windows app, entirely locally (no Shopify/Supabase/deploy).

@@ -1,0 +1,79 @@
+/* Eventra Internal OS — dark, information-dense theme (Phase 7, Bloque 2/3).
+   Own identity (indigo accent, slate surfaces) — not Shopify's colors/brand. */
+.eos {
+  --eos-bg: #0b0f17;
+  --eos-surface: #111827;
+  --eos-surface-2: #172033;
+  --eos-surface-3: #1e293b;
+  --eos-border: #1f2a3a;
+  --eos-border-soft: #172033;
+  --eos-text: #e5e7eb;
+  --eos-text-strong: #f8fafc;
+  --eos-muted: #94a3b8;
+  --eos-faint: #64748b;
+  --eos-brand: #6366f1;
+  --eos-brand-strong: #818cf8;
+  --eos-brand-soft: rgba(99, 102, 241, 0.16);
+  --eos-good: #34d399;
+  --eos-good-soft: rgba(52, 211, 153, 0.15);
+  --eos-warn: #fbbf24;
+  --eos-warn-soft: rgba(251, 191, 36, 0.15);
+  --eos-bad: #f87171;
+  --eos-bad-soft: rgba(248, 113, 113, 0.15);
+  --eos-radius: 10px;
+
+  background: var(--eos-bg);
+  color: var(--eos-text);
+  min-height: 100vh;
+  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+}
+
+.eos ::-webkit-scrollbar { width: 10px; height: 10px; }
+.eos ::-webkit-scrollbar-thumb { background: #263244; border-radius: 8px; }
+.eos a { color: inherit; text-decoration: none; }
+
+/* Layout */
+.eos-layout { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+.eos-layout.collapsed { grid-template-columns: 64px 1fr; }
+.eos-sidebar {
+  background: var(--eos-surface); border-right: 1px solid var(--eos-border);
+  padding: 12px 10px; position: sticky; top: 0; height: 100vh; overflow-y: auto;
+}
+.eos-main { min-width: 0; }
+.eos-topbar {
+  height: 52px; border-bottom: 1px solid var(--eos-border); background: var(--eos-surface);
+  display: flex; align-items: center; gap: 12px; padding: 0 16px; position: sticky; top: 0; z-index: 20;
+}
+.eos-content { padding: 20px; max-width: 1360px; margin: 0 auto; }
+
+/* Nav */
+.eos-navgroup { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em;
+  color: var(--eos-faint); padding: 14px 10px 4px; }
+.eos-navitem {
+  display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 8px;
+  color: var(--eos-muted); font-weight: 500; cursor: pointer; white-space: nowrap;
+}
+.eos-navitem:hover { background: var(--eos-surface-2); color: var(--eos-text); }
+.eos-navitem.active { background: var(--eos-brand-soft); color: var(--eos-brand-strong); }
+.eos-navitem .dot { width: 7px; height: 7px; border-radius: 3px; background: currentColor; flex: none; opacity: .7; }
+
+/* Tables */
+.eos-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.eos-table th {
+  text-align: left; color: var(--eos-muted); font-weight: 600; font-size: 11.5px;
+  text-transform: uppercase; letter-spacing: .03em; padding: 8px 12px; border-bottom: 1px solid var(--eos-border);
+  position: sticky; top: 0; background: var(--eos-surface);
+}
+.eos-table td { padding: 9px 12px; border-bottom: 1px solid var(--eos-border-soft); }
+.eos-table tr:hover td { background: var(--eos-surface-2); }
+
+/* Responsive */
+@media (max-width: 900px) {
+  .eos-layout, .eos-layout.collapsed { grid-template-columns: 1fr; }
+  .eos-sidebar { position: fixed; z-index: 40; width: 248px; transform: translateX(-100%); transition: transform .18s; }
+  .eos-sidebar.open { transform: translateX(0); }
+  .eos-content { padding: 14px; }
+  .eos-table-wrap { overflow-x: auto; }
+}
+@media (prefers-reduced-motion: reduce) { .eos-sidebar { transition: none; } }

@@ -13,8 +13,10 @@ import type {
   Template,
   TenantScope,
 } from "~/types/domain";
+import { roleCan } from "@eventra/identity";
 import type { BusinessRepository } from "./repository";
 import { RepositoryError } from "./repository";
+import { requiredPermission } from "~/lib/permissions";
 
 export type DataIntent =
   | { intent: "setCountryEnabled"; countryCode: string; enabled: boolean }
@@ -45,6 +47,23 @@ export async function dispatchDataAction(
   scope: TenantScope,
   action: DataIntent,
 ): Promise<unknown> {
+  // Authorization gate (Bloque 2): every write is checked against the
+  // server-resolved role before it reaches the repository. Deny-by-default.
+  // Unknown intents fall through to the switch below, which throws the canonical
+  // RepositoryError — the gate must not mask that with a different error.
+  let permission: string | null = null;
+  try {
+    permission = requiredPermission(action);
+  } catch {
+    permission = null;
+  }
+  if (permission && !roleCan(scope.role, permission)) {
+    throw new RepositoryError(
+      `Role "${scope.role}" is not allowed to ${action.intent} (requires ${permission}).`,
+      "forbidden",
+    );
+  }
+
   switch (action.intent) {
     case "setCountryEnabled":
       return repo.setCountryEnabled(scope, action.countryCode, action.enabled);
