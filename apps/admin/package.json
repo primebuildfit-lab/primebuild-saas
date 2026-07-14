@@ -13,6 +13,7 @@
   "dependencies": {
     "@eventra/config": "*",
     "@eventra/identity": "*",
+    "@eventra/promotions": "*",
     "@eventra/types": "*",
     "@eventra/ui": "*",
     "react": "^18.3.1",

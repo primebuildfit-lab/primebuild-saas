@@ -1,79 +1,278 @@
-/* Eventra Internal OS — dark, information-dense theme (Phase 7, Bloque 2/3).
-   Own identity (indigo accent, slate surfaces) — not Shopify's colors/brand. */
-.eos {
-  --eos-bg: #0b0f17;
-  --eos-surface: #111827;
-  --eos-surface-2: #172033;
-  --eos-surface-3: #1e293b;
-  --eos-border: #1f2a3a;
-  --eos-border-soft: #172033;
-  --eos-text: #e5e7eb;
-  --eos-text-strong: #f8fafc;
-  --eos-muted: #94a3b8;
-  --eos-faint: #64748b;
-  --eos-brand: #6366f1;
-  --eos-brand-strong: #818cf8;
-  --eos-brand-soft: rgba(99, 102, 241, 0.16);
-  --eos-good: #34d399;
-  --eos-good-soft: rgba(52, 211, 153, 0.15);
-  --eos-warn: #fbbf24;
-  --eos-warn-soft: rgba(251, 191, 36, 0.15);
-  --eos-bad: #f87171;
-  --eos-bad-soft: rgba(248, 113, 113, 0.15);
-  --eos-radius: 10px;
+/* ============================================================================
+   EVENTRA INTERNAL OS — dark command-center theme.
+   Private administrative panel (Nivel A). NOT Business, NOT Shopify-embedded,
+   NOT Nexus/Partnera. Deep blue-black surfaces + violet brand, high information
+   density. Own identity — inspired organizationally (Stripe/Linear/Vercel/
+   Grafana) but no copied components or branding.
+   ========================================================================== */
+/* Self-contained reset — this app no longer imports the shared @eventra/ui
+   tokens, so editing this theme affects ONLY the Internal OS (admin). */
+html, body { margin: 0; }
 
-  background: var(--eos-bg);
-  color: var(--eos-text);
+.eos {
+  /* ---- Backgrounds ---- */
+  --background: #07111f;
+  --background-alt: #081522;
+  --sidebar: #06101b;
+  --topbar: #091522;
+
+  /* ---- Surfaces ---- */
+  --surface: #0e1a29;
+  --surface-elevated: #111f30;
+  --surface-hover: #142538;
+
+  /* ---- Borders ---- */
+  --border: rgba(148, 163, 184, 0.12);
+  --border-strong: rgba(148, 163, 184, 0.22);
+
+  /* ---- Text ---- */
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  --text-muted: #64748b;
+
+  /* ---- Brand ---- */
+  --brand-primary: #7c4dff;
+  --brand-secondary: #6d4aff;
+  --brand-soft: rgba(124, 77, 255, 0.16);
+  --brand-strong: #9d7bff;
+
+  /* ---- Status ---- */
+  --success: #84cc16;
+  --success-soft: rgba(132, 204, 22, 0.15);
+  --info: #38bdf8;
+  --info-soft: rgba(56, 189, 248, 0.15);
+  --warning: #f59e0b;
+  --warning-soft: rgba(245, 158, 11, 0.15);
+  --danger: #ef4444;
+  --danger-soft: rgba(239, 68, 68, 0.15);
+  --magenta: #ec4899;
+  --magenta-soft: rgba(236, 72, 153, 0.15);
+
+  --radius: 12px;
+  --radius-sm: 8px;
+
+  /* ---- Backward-compat aliases (older components read --eos-*) ---- */
+  --eos-bg: var(--background);
+  --eos-surface: var(--surface);
+  --eos-surface-2: var(--surface-elevated);
+  --eos-surface-3: var(--surface-hover);
+  --eos-border: var(--border);
+  --eos-border-soft: var(--border);
+  --eos-text: var(--text-primary);
+  --eos-text-strong: var(--text-primary);
+  --eos-muted: var(--text-secondary);
+  --eos-faint: var(--text-muted);
+  --eos-brand: var(--brand-primary);
+  --eos-brand-strong: var(--brand-strong);
+  --eos-brand-soft: var(--brand-soft);
+  --eos-good: var(--success);
+  --eos-good-soft: var(--success-soft);
+  --eos-warn: var(--warning);
+  --eos-warn-soft: var(--warning-soft);
+  --eos-bad: var(--danger);
+  --eos-bad-soft: var(--danger-soft);
+  --eos-radius: var(--radius-sm);
+
+  background: var(--background);
+  color: var(--text-primary);
   min-height: 100vh;
-  font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  font-family: Inter, "Geist", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   font-size: 14px;
+  -webkit-font-smoothing: antialiased;
 }
 
 .eos ::-webkit-scrollbar { width: 10px; height: 10px; }
-.eos ::-webkit-scrollbar-thumb { background: #263244; border-radius: 8px; }
+.eos ::-webkit-scrollbar-thumb { background: #1c2b3d; border-radius: 8px; }
+.eos ::-webkit-scrollbar-thumb:hover { background: #263a52; }
 .eos a { color: inherit; text-decoration: none; }
+.eos *, .eos *::before, .eos *::after { box-sizing: border-box; }
 
-/* Layout */
-.eos-layout { display: grid; grid-template-columns: 248px 1fr; min-height: 100vh; }
+/* ============================ Layout ============================ */
+.eos-layout { display: grid; grid-template-columns: 228px 1fr; min-height: 100vh; }
 .eos-layout.collapsed { grid-template-columns: 64px 1fr; }
+
 .eos-sidebar {
-  background: var(--eos-surface); border-right: 1px solid var(--eos-border);
-  padding: 12px 10px; position: sticky; top: 0; height: 100vh; overflow-y: auto;
+  background: var(--sidebar);
+  border-right: 1px solid var(--border);
+  position: sticky; top: 0; height: 100vh;
+  display: flex; flex-direction: column;
+  overflow: hidden;
 }
-.eos-main { min-width: 0; }
-.eos-topbar {
-  height: 52px; border-bottom: 1px solid var(--eos-border); background: var(--eos-surface);
-  display: flex; align-items: center; gap: 12px; padding: 0 16px; position: sticky; top: 0; z-index: 20;
-}
-.eos-content { padding: 20px; max-width: 1360px; margin: 0 auto; }
+.eos-sidebar-scroll { flex: 1; overflow-y: auto; padding: 6px 12px 14px; }
+.eos-main { min-width: 0; display: flex; flex-direction: column; }
+.eos-content { padding: 22px 24px; width: 100%; max-width: 1560px; margin: 0 auto; }
 
-/* Nav */
-.eos-navgroup { font-size: 10.5px; text-transform: uppercase; letter-spacing: .06em;
-  color: var(--eos-faint); padding: 14px 10px 4px; }
+/* ============================ Sidebar brand ============================ */
+.eos-brand {
+  display: flex; align-items: center; gap: 10px;
+  height: 64px; padding: 0 18px; flex: none;
+  border-bottom: 1px solid var(--border);
+}
+.eos-brand-mark {
+  width: 30px; height: 30px; border-radius: 9px; flex: none;
+  background: linear-gradient(140deg, var(--brand-primary), var(--brand-secondary));
+  display: inline-flex; align-items: center; justify-content: center; color: #fff;
+  box-shadow: 0 4px 14px rgba(124, 77, 255, 0.35);
+}
+.eos-brand-name { font-weight: 700; font-size: 16px; color: var(--text-primary); letter-spacing: -0.01em; }
+.eos-collapse-btn {
+  margin-left: auto; background: transparent; border: 0; color: var(--text-muted);
+  cursor: pointer; width: 30px; height: 30px; border-radius: 7px; display: inline-flex;
+  align-items: center; justify-content: center;
+}
+.eos-collapse-btn:hover { background: var(--surface-hover); color: var(--text-secondary); }
+
+/* ============================ Navigation ============================ */
+.eos-navgroup {
+  font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600;
+  color: var(--text-muted); padding: 16px 10px 6px;
+}
+.eos-navsep { height: 1px; background: var(--border); margin: 12px 8px 2px; }
 .eos-navitem {
-  display: flex; align-items: center; gap: 10px; padding: 7px 10px; border-radius: 8px;
-  color: var(--eos-muted); font-weight: 500; cursor: pointer; white-space: nowrap;
+  display: flex; align-items: center; gap: 11px; padding: 8px 10px; border-radius: 9px;
+  color: var(--text-secondary); font-weight: 500; font-size: 13.5px; cursor: pointer;
+  white-space: nowrap; position: relative;
 }
-.eos-navitem:hover { background: var(--eos-surface-2); color: var(--eos-text); }
-.eos-navitem.active { background: var(--eos-brand-soft); color: var(--eos-brand-strong); }
-.eos-navitem .dot { width: 7px; height: 7px; border-radius: 3px; background: currentColor; flex: none; opacity: .7; }
+.eos-navitem:hover { background: var(--surface-hover); color: var(--text-primary); }
+.eos-navitem.active {
+  background: var(--brand-soft); color: var(--text-primary); font-weight: 600;
+  box-shadow: inset 0 0 0 1px rgba(124, 77, 255, 0.28);
+}
+.eos-navitem.active .eos-navicon { color: var(--brand-strong); }
+.eos-navicon { width: 18px; height: 18px; flex: none; color: var(--text-muted); display: inline-flex; }
+.eos-navitem .eos-nav-label { flex: 1; overflow: hidden; text-overflow: ellipsis; }
+.eos-navsoon { font-size: 9px; color: var(--text-muted); text-transform: uppercase; letter-spacing: .05em; }
+.eos-layout.collapsed .eos-nav-label,
+.eos-layout.collapsed .eos-navgroup,
+.eos-layout.collapsed .eos-navsoon,
+.eos-layout.collapsed .eos-brand-name { display: none; }
 
-/* Tables */
+/* Sidebar footer (workspace card) */
+.eos-sidefoot { flex: none; padding: 10px 12px; border-top: 1px solid var(--border); }
+.eos-sidefoot-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px 12px;
+}
+
+/* ============================ Topbar ============================ */
+.eos-topbar {
+  height: 64px; flex: none; border-bottom: 1px solid var(--border); background: var(--topbar);
+  display: flex; align-items: center; gap: 12px; padding: 0 20px; position: sticky; top: 0; z-index: 30;
+}
+.eos-iconbtn {
+  background: transparent; border: 0; color: var(--text-secondary); cursor: pointer;
+  width: 36px; height: 36px; border-radius: 9px; display: inline-flex; align-items: center;
+  justify-content: center; position: relative;
+}
+.eos-iconbtn:hover { background: var(--surface-hover); color: var(--text-primary); }
+.eos-search {
+  display: flex; align-items: center; gap: 9px; height: 38px; width: 100%; max-width: 460px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 0 12px;
+  color: var(--text-muted); cursor: text; font-size: 13.5px;
+}
+.eos-search:hover { border-color: var(--border-strong); }
+.eos-kbd {
+  margin-left: auto; font-size: 11px; color: var(--text-muted); border: 1px solid var(--border);
+  border-radius: 6px; padding: 1px 6px; background: var(--background-alt);
+}
+.eos-badge-count {
+  position: absolute; top: 4px; right: 4px; min-width: 15px; height: 15px; padding: 0 3px;
+  border-radius: 8px; background: var(--danger); color: #fff; font-size: 9.5px; font-weight: 700;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+.eos-profile { display: inline-flex; align-items: center; gap: 9px; cursor: pointer; padding: 4px 6px; border-radius: 10px; }
+.eos-profile:hover { background: var(--surface-hover); }
+.eos-avatar {
+  width: 32px; height: 32px; border-radius: 9px; flex: none; display: inline-flex; align-items: center;
+  justify-content: center; font-size: 12px; font-weight: 700; color: #fff;
+  background: linear-gradient(140deg, var(--brand-primary), var(--magenta));
+}
+
+/* ============================ Cards / panels ============================ */
+.eos-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+.eos-card-pad { padding: 16px 18px; }
+.eos-card-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 14px 18px; border-bottom: 1px solid var(--border);
+}
+.eos-card-title { font-size: 14px; font-weight: 600; color: var(--text-primary); margin: 0; }
+.eos-card-sub { font-size: 12.5px; color: var(--text-secondary); margin: 2px 0 0; }
+.eos-link { color: var(--brand-strong); font-size: 12.5px; font-weight: 600; cursor: pointer; }
+.eos-link:hover { color: var(--brand-primary); }
+
+/* ============================ Metric card ============================ */
+.eos-metric { position: relative; overflow: hidden; }
+.eos-metric-label { font-size: 13px; color: var(--text-secondary); font-weight: 500; }
+.eos-metric-value { font-size: 32px; font-weight: 700; color: var(--text-primary); line-height: 1.1; margin-top: 8px; letter-spacing: -0.02em; }
+.eos-metric-value.muted { font-size: 18px; font-weight: 600; color: var(--text-muted); }
+.eos-metric-icon {
+  width: 46px; height: 46px; border-radius: 12px; display: inline-flex; align-items: center; justify-content: center; flex: none;
+}
+.eos-metric-trend { display: inline-flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; margin-top: 10px; }
+
+/* ============================ Tables ============================ */
+.eos-table-wrap { overflow-x: auto; }
 .eos-table { width: 100%; border-collapse: collapse; font-size: 13px; }
 .eos-table th {
-  text-align: left; color: var(--eos-muted); font-weight: 600; font-size: 11.5px;
-  text-transform: uppercase; letter-spacing: .03em; padding: 8px 12px; border-bottom: 1px solid var(--eos-border);
-  position: sticky; top: 0; background: var(--eos-surface);
+  text-align: left; color: var(--text-secondary); font-weight: 600; font-size: 11.5px;
+  text-transform: uppercase; letter-spacing: 0.04em; padding: 10px 14px; border-bottom: 1px solid var(--border);
+  background: var(--surface); white-space: nowrap;
 }
-.eos-table td { padding: 9px 12px; border-bottom: 1px solid var(--eos-border-soft); }
-.eos-table tr:hover td { background: var(--eos-surface-2); }
+.eos-table td { padding: 11px 14px; border-bottom: 1px solid var(--border); color: var(--text-primary); vertical-align: middle; }
+.eos-table tbody tr:last-child td { border-bottom: 0; }
+.eos-table tbody tr:hover td { background: var(--surface-hover); }
 
-/* Responsive */
-@media (max-width: 900px) {
-  .eos-layout, .eos-layout.collapsed { grid-template-columns: 1fr; }
-  .eos-sidebar { position: fixed; z-index: 40; width: 248px; transform: translateX(-100%); transition: transform .18s; }
-  .eos-sidebar.open { transform: translateX(0); }
-  .eos-content { padding: 14px; }
-  .eos-table-wrap { overflow-x: auto; }
+/* ============================ Badges / pills ============================ */
+.eos-pill {
+  display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px; border-radius: 999px;
+  font-size: 11.5px; font-weight: 600; white-space: nowrap;
 }
-@media (prefers-reduced-motion: reduce) { .eos-sidebar { transition: none; } }
+.eos-pill .eos-pill-dot { width: 6px; height: 6px; border-radius: 3px; background: currentColor; }
+
+/* ============================ Empty / error / skeleton ============================ */
+.eos-empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+  gap: 8px; padding: 30px 20px; color: var(--text-secondary);
+}
+.eos-empty-icon {
+  width: 40px; height: 40px; border-radius: 12px; background: var(--surface-elevated);
+  display: inline-flex; align-items: center; justify-content: center; color: var(--text-muted);
+}
+.eos-skel { background: linear-gradient(90deg, var(--surface-elevated) 25%, var(--surface-hover) 50%, var(--surface-elevated) 75%);
+  background-size: 200% 100%; animation: eos-shimmer 1.4s ease-in-out infinite; border-radius: 8px; }
+@keyframes eos-shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+/* ============================ Dropdown menu ============================ */
+.eos-menu {
+  position: absolute; z-index: 50; min-width: 220px; background: var(--surface-elevated);
+  border: 1px solid var(--border-strong); border-radius: 12px; padding: 6px; box-shadow: 0 16px 40px rgba(0,0,0,.5);
+}
+.eos-menu-item {
+  display: flex; align-items: center; gap: 10px; width: 100%; text-align: left; background: transparent;
+  border: 0; color: var(--text-primary); padding: 9px 10px; border-radius: 8px; cursor: pointer; font-size: 13px;
+}
+.eos-menu-item:hover { background: var(--surface-hover); }
+
+/* ============================ Overlay ============================ */
+.eos-overlay { position: fixed; inset: 0; background: rgba(3, 8, 15, 0.66); backdrop-filter: blur(2px); z-index: 60; }
+
+/* ============================ Responsive ============================ */
+@media (max-width: 1080px) {
+  .eos-metrics-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .eos-dash-row2 { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 860px) {
+  .eos-layout, .eos-layout.collapsed { grid-template-columns: 1fr; }
+  .eos-sidebar {
+    position: fixed; z-index: 70; width: 250px; transform: translateX(-100%);
+    transition: transform 0.2s ease;
+  }
+  .eos-sidebar.open { transform: translateX(0); box-shadow: 24px 0 60px rgba(0,0,0,.5); }
+  .eos-content { padding: 16px; }
+  .eos-metrics-grid { grid-template-columns: 1fr !important; }
+  .eos-search { max-width: none; }
+  .eos-hide-sm { display: none !important; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .eos-sidebar { transition: none; }
+  .eos-skel { animation: none; }
+}

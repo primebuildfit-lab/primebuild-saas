@@ -1,59 +1,76 @@
 /**
- * Internal OS navigation map (Phase 7, Bloque 1). Grouped, Shopify-ergonomics
- * (structure only, not their code/brand). `real: true` = a built screen; the rest
- * are honest scaffolds so the full IA is navigable without faking functionality.
+ * Internal OS navigation — 18 branches exactly as specified, in two sections:
+ * the operational branches (Inicio → Integraciones) and, after a divider labelled
+ * CONFIGURACIONES, the configuration branches (General → Facturación).
+ * Labels are Spanish (the console's language); icons come from the local set.
  */
+import type { ComponentType, SVGProps } from "react";
+import {
+  IconHome, IconCalendar, IconMegaphone, IconTag, IconContent, IconChecklist,
+  IconBarChart, IconUsers, IconLayout, IconImage, IconNodes, IconGear, IconCard,
+  IconGroup, IconSliders, IconHash, IconWorkflow, IconWallet, IconCode,
+} from "./icons";
+
+export type IconCmp = ComponentType<SVGProps<SVGSVGElement> & { size?: number }>;
+
 export interface OsNavItem {
   label: string;
   to: string;
-  group: string;
-  real?: boolean;
+  icon: IconCmp;
+  section: "main" | "config";
+  /** one-line purpose, shown in the command palette and as a title tooltip */
+  purpose: string;
 }
 
 export const OS_NAV: OsNavItem[] = [
-  { label: "Home", to: "/", group: "", real: true },
-  { label: "Global Calendar", to: "/calendar", group: "Offers", real: true },
-  { label: "Offers", to: "/offers", group: "Offers", real: true },
-  { label: "Sources", to: "/sources", group: "Offers", real: true },
-  { label: "Cancellations", to: "/cancellations", group: "Offers" },
-  { label: "Campaigns", to: "/campaigns", group: "Marketing" },
-  { label: "Content", to: "/content", group: "Marketing" },
-  { label: "Templates", to: "/templates", group: "Marketing" },
-  { label: "Media", to: "/media", group: "Marketing" },
-  { label: "Companies", to: "/companies", group: "Customers", real: true },
-  { label: "Users & Teams", to: "/users", group: "Customers", real: true },
-  { label: "Audiences", to: "/audiences", group: "Customers" },
-  { label: "Analytics", to: "/analytics", group: "Revenue", real: true },
-  { label: "Plans & Membership", to: "/plans", group: "Revenue" },
-  { label: "Commissions", to: "/commissions", group: "Revenue", real: true },
-  { label: "Integrations", to: "/integrations", group: "Platform" },
-  { label: "AI", to: "/ai", group: "Platform", real: true },
-  { label: "Automations & Jobs", to: "/jobs", group: "Platform", real: true },
-  { label: "Countries & Regions", to: "/countries", group: "Platform" },
-  { label: "System Health", to: "/health", group: "System" },
-  { label: "Logs", to: "/logs", group: "System" },
-  { label: "Audit", to: "/audit", group: "System" },
-  { label: "Settings", to: "/settings", group: "System" },
+  // ── Operational ──
+  { label: "Inicio", to: "/", icon: IconHome, section: "main", purpose: "¿Cómo está Eventra hoy?" },
+  { label: "Calendario", to: "/calendar", icon: IconCalendar, section: "main", purpose: "Calendario operacional global de Eventra" },
+  { label: "Campañas", to: "/campaigns", icon: IconMegaphone, section: "main", purpose: "Campañas internas, de empresas y automáticas" },
+  { label: "Ofertas", to: "/offers", icon: IconTag, section: "main", purpose: "Ofertas comerciales (descuentos, bundles, envíos…)" },
+  { label: "Contenido", to: "/content", icon: IconContent, section: "main", purpose: "Base de contenido global de Eventra" },
+  { label: "Estudio", to: "/studio", icon: IconCode, section: "main", purpose: "Anuncios y personalización de la app (JavaScript + Liquid)" },
+  { label: "Tareas", to: "/tasks", icon: IconChecklist, section: "main", purpose: "Trabajo interno del equipo" },
+  { label: "Analítica", to: "/analytics", icon: IconBarChart, section: "main", purpose: "Analítica global y comparaciones" },
+  { label: "Audiencia", to: "/audiences", icon: IconUsers, section: "main", purpose: "Audiencias empresariales y personales" },
+  { label: "Plantillas", to: "/templates", icon: IconLayout, section: "main", purpose: "Sistemas reutilizables" },
+  { label: "Medios", to: "/media", icon: IconImage, section: "main", purpose: "Imágenes, videos, documentos, licencias" },
+  { label: "Integraciones", to: "/integrations", icon: IconNodes, section: "main", purpose: "Integraciones reales y futuras" },
+  // ── Configuración ──
+  { label: "General", to: "/general", icon: IconGear, section: "config", purpose: "Configuración general del Internal OS" },
+  { label: "Membresías", to: "/memberships", icon: IconCard, section: "config", purpose: "Planes comerciales de Eventra" },
+  { label: "Equipos", to: "/teams", icon: IconGroup, section: "config", purpose: "Operadores, empleados, permisos" },
+  { label: "Canales", to: "/channels", icon: IconSliders, section: "config", purpose: "Canales de marketing y publicación" },
+  { label: "Etiquetas", to: "/labels", icon: IconHash, section: "config", purpose: "Taxonomía global" },
+  { label: "Automatizaciones", to: "/automations", icon: IconWorkflow, section: "config", purpose: "Jobs, sincronizaciones, alertas, IA" },
+  { label: "Facturación", to: "/billing", icon: IconWallet, section: "config", purpose: "Facturación global (administrativa, no mueve dinero)" },
 ];
 
-/** Command-palette actions (Bloque 21). Navigations + labeled quick actions. */
+/** Quick-create menu opened from the topbar `+` button. */
+export interface QuickAction {
+  id: string;
+  label: string;
+  to: string;
+}
+export const QUICK_CREATE: QuickAction[] = [
+  { id: "qc-campaign", label: "Nueva campaña", to: "/campaigns?create=1" },
+  { id: "qc-announcement", label: "Nuevo anuncio", to: "/studio?create=1" },
+  { id: "qc-offer", label: "Nueva oferta", to: "/offers?create=1" },
+  { id: "qc-task", label: "Nueva tarea", to: "/tasks?create=1" },
+  { id: "qc-content", label: "Nuevo contenido", to: "/content?create=1" },
+  { id: "qc-event", label: "Nuevo evento", to: "/calendar?create=1" },
+  { id: "qc-template", label: "Nueva plantilla", to: "/templates?create=1" },
+  { id: "qc-automation", label: "Nueva automatización", to: "/automations?create=1" },
+];
+
+/** Command palette (⌘K): every branch as a navigation + the quick-create actions. */
 export interface Command {
   id: string;
   label: string;
   to?: string;
   hint?: string;
 }
-
 export const OS_COMMANDS: Command[] = [
-  { id: "go-home", label: "Go to Home", to: "/" },
-  { id: "go-calendar", label: "Open Global Calendar", to: "/calendar" },
-  { id: "go-offers", label: "Open Offers", to: "/offers" },
-  { id: "go-cancellations", label: "Review cancellations", to: "/cancellations" },
-  { id: "go-sources", label: "Open Sources", to: "/sources" },
-  { id: "go-companies", label: "Open Companies", to: "/companies" },
-  { id: "go-jobs", label: "Open Automations & Jobs", to: "/jobs" },
-  { id: "go-commissions", label: "Open Commissions", to: "/commissions" },
-  { id: "go-health", label: "Open System Health", to: "/health" },
-  { id: "new-offer", label: "New offer (mock)", hint: "requires operations role" },
-  { id: "run-sync", label: "Run source sync (mock)", hint: "requires jobs:run" },
+  ...OS_NAV.map((n) => ({ id: `go-${n.to}`, label: `Ir a ${n.label}`, to: n.to, hint: n.purpose })),
+  ...QUICK_CREATE.map((q) => ({ id: q.id, label: q.label, to: q.to, hint: "Crear" })),
 ];
