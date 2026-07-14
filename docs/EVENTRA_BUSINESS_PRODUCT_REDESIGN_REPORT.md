@@ -1,5 +1,67 @@
 # Eventra — Business Product Redesign Report (Master Specification)
 
+---
+
+## ADDENDUM — Product Update completion pass (2026-07-13)
+
+A follow-up pass took the modules that were previously "themed, not restructured" and completed them to the
+product vision. **No backend, deploy, push, or Shopify/Railway action.** Committed locally (`1ebf93e`).
+
+**Screens improved / UX changes / product improvements**
+- **Opportunities (heart):** click any row → **detail drawer** with the explainable **ScoreBreakdown**, a
+  plain-language recommendation, market/category/difficulty/reliability facts, and a one-click **Create
+  promotion** flow (deep-links the Promotion Builder). Added a **country scope** selector.
+- **Calendar:** added the **importance filter** (High/Medium/Low) to the annual heatmap toolbar; inline month
+  accordion retained.
+- **Content:** rebuilt as a 4-workspace **marketing workspace** (Company / Campaign / Generated / Historical)
+  with a card grid, per-workspace counts, campaign links, and honest empty states — approved work is never
+  mixed with AI drafts.
+- **Campaign Library / memory:** the library was already memory-grouped with reuse; added an honest
+  **Results & lessons** block to each campaign (no invented CTR/revenue — "—" until analytics is connected).
+- **Billing:** default plan is now **Free**; added honest **45-day free-trial** messaging (starts on choosing
+  a paid plan). No billing logic changed; no money moves.
+- **Dashboard:** country scope filters opportunities/recommendations/timeline; real KPI cards retained.
+- **Polish:** fixed dark-mode contrast on info/preview/error banners (AI, preview, persist-error).
+
+**Components updated:** `OpportunityDrawer` (new), `CountrySelector`, `ScoreBreakdown`/`scoreFactors`
+(6 real factors), `OpportunityTable` (row-click), `CalendarToolbar` (importance), Content route
+(workspaces), Billing route (trial), `CampaignDetail` (results & lessons).
+
+**Build / tests:** typecheck ✅ · lint ✅ (0 errors) · **191 tests** ✅ · `react-router build` ✅ · preview
+serves `/app`, `/app/opportunities`, `/app/content`, `/app/billing`, `/app/calendar?view=year`, `/app/ai`
+all **HTTP 200** (billing shows Free+45-day; content shows the 4 workspaces).
+
+**Module status after this pass:** Dashboard ✅ · Calendar ✅ · Opportunities ✅ · Promotion Builder ✅ ·
+Campaign Library ✅ · Content ✅ · Templates ✅ · Countries ✅ · Sources ✅ · Analytics ✅ (builder + honest
+empties) · Team ✅ · Billing ✅ · Settings ✅ · Integrations ✅ (real states) · AI ✅ (architecture-only).
+Every module now has real/seed content with honest empty states — none are placeholder shells.
+
+**Remaining weaknesses (honest):**
+- Core *value* features show honest empty states because **no live performance data is connected** — real
+  analytics, campaign CTR/conversions/revenue, and AI generation are **backend/V2** (deferred by the owner).
+- **Promotions & Advertisements** are not yet distinct entities (need a schema); a promotion persists as a
+  campaign today.
+- **Live billing** not wired (Shopify Billing) — deliberately no charges in this version.
+- **Responsive** not re-audited at every listed breakpoint; **formal a11y (axe)** audit pending; list
+  virtualization not added.
+
+**Recommendations before Shopify launch:** (1) connect real Shopify/Supabase data into Analytics + campaign
+results; (2) add `Promotion`/`Advertisement` schema so the builder persists first-class; (3) wire Shopify
+Billing for the Free→trial→paid flow; (4) run a breakpoint + axe pass; (5) then deploy web (Railway) and
+`shopify app deploy`.
+
+### Launch classification: `EVENTRA BUSINESS EXPERIENCE NEEDS MORE PRODUCT POLISH`
+
+**Why (honest, not "READY FOR LAUNCH"):** the *experience* is genuinely commercial and **demo-ready** — you
+can open Eventra, feel a real marketing planning product, and show it to a client. But a **paying** customer
+would rely on the value features (analytics, campaign results, AI, live billing) that are intentionally
+**not connected to real data yet** — they show honest empty states by design. Per the spec's rule, I will not
+call it READY FOR LAUNCH until those data pipelines are live. The frontend is launch-quality; what remains is
+backend data + billing + audits, which the owner explicitly deferred to a later phase.
+
+---
+
+
 **Date:** 2026-07-13 · **Scope:** frontend + design only (`apps/business`).
 **Backend untouched:** live Supabase, migrations, persistence seam, business rules unchanged; **no** deploy,
 OAuth, or Shopify install performed. This report covers execution of the 4-part **Eventra Product Master
