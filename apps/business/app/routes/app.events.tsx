@@ -1,33 +1,23 @@
 import { useState } from "react";
+import { useNavigate } from "react-router";
 import { Plus } from "lucide-react";
 import { PageHeader, Button, Tabs } from "~/components/ui";
 import type { GlobalEvent } from "~/types/domain";
-import { useData } from "~/context/DataContext";
 import { EventCatalog } from "~/features/events/EventCatalog";
 import { CustomEventList } from "~/features/events/CustomEventList";
 import { CustomEventFormModal } from "~/features/events/CustomEventFormModal";
-import { CampaignFormModal } from "~/features/campaigns/CampaignFormModal";
-import {
-  emptyCampaignValues,
-  valuesFromEvent,
-  type CampaignFormValues,
-} from "~/features/campaigns/campaignModel";
 
 export default function EventsRoute() {
-  const { enabledCountryCodes } = useData();
+  const navigate = useNavigate();
   const [tab, setTab] = useState("official");
-
-  const [campaignModal, setCampaignModal] = useState(false);
-  const [campaignValues, setCampaignValues] = useState<CampaignFormValues>(() =>
-    emptyCampaignValues(),
-  );
 
   const [eventModal, setEventModal] = useState(false);
   const [editEventId, setEditEventId] = useState<string | undefined>(undefined);
 
-  const createCampaignForEvent = (event: GlobalEvent, year: number) => {
-    setCampaignValues(valuesFromEvent(event, year, enabledCountryCodes[0]));
-    setCampaignModal(true);
+  // From an event the correct action is "Create advertisement" — jump into the
+  // Promotion Builder with the event's opportunity (id = `${eventId}:${year}`).
+  const createAdForEvent = (event: GlobalEvent, year: number) => {
+    navigate(`/app/promotion-builder?opp=${encodeURIComponent(`${event.id}:${year}`)}`);
   };
 
   const openCreateEvent = () => {
@@ -43,8 +33,8 @@ export default function EventsRoute() {
   return (
     <div>
       <PageHeader
-        title="Events"
-        description="Browse official opportunities and manage your own store events."
+        title="Events & news"
+        description="The marketing events and news for your markets. Turn any event into an advertisement, or add your own store events."
         actions={
           <Button onClick={openCreateEvent}>
             <Plus className="h-4 w-4" />
@@ -64,16 +54,11 @@ export default function EventsRoute() {
       />
 
       {tab === "official" ? (
-        <EventCatalog onCreateCampaign={createCampaignForEvent} />
+        <EventCatalog onCreateCampaign={createAdForEvent} />
       ) : (
         <CustomEventList onEdit={openEditEvent} onCreate={openCreateEvent} />
       )}
 
-      <CampaignFormModal
-        open={campaignModal}
-        onClose={() => setCampaignModal(false)}
-        initialValues={campaignValues}
-      />
       <CustomEventFormModal
         open={eventModal}
         onClose={() => setEventModal(false)}

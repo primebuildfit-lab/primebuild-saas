@@ -231,7 +231,7 @@ export function EventCatalog({ onCreateCampaign }: EventCatalogProps) {
                           size="sm"
                           onClick={() => onCreateCampaign(event, year)}
                         >
-                          Create campaign
+                          Create advertisement
                         </Button>
                       </>
                     )}

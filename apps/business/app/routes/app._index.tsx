@@ -14,20 +14,14 @@ import {
 } from "lucide-react";
 import { PageHeader, Button, ScoreBadge, Badge, EmptyState, CountrySelector } from "~/components/ui";
 import { useData } from "~/context/DataContext";
+import { useAdvertising } from "~/context/AdvertisingContext";
+import { humanizeCategory } from "~/lib/format";
 import {
   buildOpportunities,
-  countByState,
   sortOpportunities,
   urgentOpportunities,
   type ScoredOpportunity,
 } from "~/lib/opportunities";
-import type { GlobalEvent } from "~/types/domain";
-import { CampaignFormModal } from "~/features/campaigns/CampaignFormModal";
-import {
-  emptyCampaignValues,
-  valuesFromEvent,
-  type CampaignFormValues,
-} from "~/features/campaigns/campaignModel";
 import { cn } from "~/lib/cn";
 
 const MS_DAY = 86_400_000;
@@ -55,22 +49,10 @@ export default function DashboardRoute() {
     plan,
     countries,
   } = useData();
+  const { advertisements } = useAdvertising();
 
-  const [modalOpen, setModalOpen] = useState(false);
   // Primary scope: "" = all enabled countries. Filters the whole dashboard.
   const [country, setCountry] = useState("");
-  const [initialValues, setInitialValues] = useState<CampaignFormValues>(() =>
-    emptyCampaignValues(),
-  );
-
-  const openBlank = () => {
-    setInitialValues(emptyCampaignValues());
-    setModalOpen(true);
-  };
-  const openForEvent = (event: GlobalEvent, year: number) => {
-    setInitialValues(valuesFromEvent(event, year, enabledCountryCodes[0]));
-    setModalOpen(true);
-  };
 
   // ── Real data — everything below is derived from the tenant's own catalog,
   //    campaigns and plan. No figure is invented; empty means empty. ──────────
@@ -92,7 +74,6 @@ export default function DashboardRoute() {
     [opportunities, country],
   );
 
-  const counts = useMemo(() => countByState(scoped), [scoped]);
   const urgent = useMemo(() => urgentOpportunities(scoped), [scoped]);
   const recommended = useMemo(
     () =>
@@ -122,6 +103,24 @@ export default function DashboardRoute() {
 
   const activeCount = campaigns.filter((c) => c.status === "active").length;
   const scheduledCount = campaigns.filter((c) => c.status === "scheduled").length;
+
+  // Advertisements, scoped to the selected country.
+  const ads = useMemo(
+    () => (country ? advertisements.filter((a) => !a.country || a.country === country) : advertisements),
+    [advertisements, country],
+  );
+  const adCounts = {
+    draft: ads.filter((a) => a.status === "draft").length,
+    scheduled: ads.filter((a) => a.status === "scheduled").length,
+    active: ads.filter((a) => a.status === "active").length,
+  };
+
+  // Explore opportunities grouped by category (real names + counts).
+  const byCategory = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const o of scoped) if (o.daysUntil >= 0 && o.state !== "cancelled") map.set(o.category, (map.get(o.category) ?? 0) + 1);
+    return [...map.entries()].map(([category, count]) => ({ category, count })).sort((a, b) => b.count - a.count);
+  }, [scoped]);
 
   // Combined 30–90 day timeline of real dated items.
   const timeline = useMemo(() => {
@@ -164,10 +163,12 @@ export default function DashboardRoute() {
         actions={
           <>
             <CountrySelector value={country} onChange={setCountry} />
-            <Button onClick={openBlank}>
-              <Plus className="h-4 w-4" />
-              Create campaign
-            </Button>
+            <Link to="/app/promotion-builder">
+              <Button>
+                <Plus className="h-4 w-4" />
+                Create advertisement
+              </Button>
+            </Link>
           </>
         }
       />
@@ -175,23 +176,24 @@ export default function DashboardRoute() {
       {/* Primary actions */}
       <div className="mb-6 grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
         <ActionTile to="/app/opportunities" icon={Sparkles} label="Explore opportunities" />
-        <ActionTile onClick={openBlank} icon={Megaphone} label="Create campaign" />
+        <ActionTile to="/app/promotion-builder" icon={Megaphone} label="Create advertisement" />
         <ActionTile to="/app/calendar" icon={CalendarRange} label="Open calendar" />
-        <ActionTile to="/app/content" icon={FileText} label="Add content" />
+        <ActionTile to="/app/offers" icon={FileText} label="Create offer" />
         <ActionTile to="/app/analytics" icon={BarChart3} label="Review results" />
       </div>
 
       {/* KPI cards — real counts only */}
       <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
         <Kpi
-          to="/app/opportunities"
-          label="Upcoming opportunities"
-          value={scoped.filter((o) => o.daysUntil >= 0).length}
+          to="/app/advertisements"
+          label="Current advertisements"
+          value={ads.length}
           rows={[
-            ["New", counts.new],
-            ["Verified", counts.verified],
-            ["Modified", counts.modified],
+            ["Active", adCounts.active],
+            ["Scheduled", adCounts.scheduled],
+            ["Draft", adCounts.draft],
           ]}
+          hint={ads.length === 0 ? "Create one from an event" : undefined}
         />
         <Kpi
           to="/app/campaigns"
@@ -222,6 +224,27 @@ export default function DashboardRoute() {
         />
       </div>
 
+      {/* Explore by category — real event categories with counts */}
+      {byCategory.length > 0 ? (
+        <section className="mb-6">
+          <h2 className="mb-3 text-sm font-semibold text-ink">Explore by category</h2>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6">
+            {byCategory.map((c) => (
+              <Link
+                key={c.category}
+                to={`/app/opportunities?category=${encodeURIComponent(c.category)}`}
+                className="flex items-center justify-between gap-2 rounded-xl border border-line bg-surface px-3 py-2.5 transition-colors hover:border-brand-300"
+              >
+                <span className="truncate text-sm font-medium text-ink">{humanizeCategory(c.category)}</span>
+                <span className="shrink-0 rounded-full bg-surface-2 px-1.5 text-xs font-semibold tabular-nums text-ink-muted">
+                  {c.count}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       <div className="grid gap-6 lg:grid-cols-3">
         <div className="space-y-6 lg:col-span-2">
           {/* Needs attention */}
@@ -248,8 +271,8 @@ export default function DashboardRoute() {
                     tone="red"
                     what={o.event.name}
                     why={`Urgent · prep window open · ${relDays(o.daysUntil)}`}
-                    onAction={() => openForEvent(o.event, o.year)}
-                    actionLabel="Create campaign"
+                    to={`/app/promotion-builder?opp=${encodeURIComponent(o.id)}`}
+                    actionLabel="Create advertisement"
                     badge={<ScoreBadge score={o.score} size="sm" />}
                   />
                 ))}
@@ -288,11 +311,7 @@ export default function DashboardRoute() {
             ) : (
               <div className="grid gap-3 sm:grid-cols-2">
                 {recommended.map((o) => (
-                  <RecommendationCard
-                    key={o.id}
-                    opp={o}
-                    onCreate={() => openForEvent(o.event, o.year)}
-                  />
+                  <RecommendationCard key={o.id} opp={o} />
                 ))}
               </div>
             )}
@@ -357,19 +376,13 @@ export default function DashboardRoute() {
           </Panel>
         </div>
       </div>
-
-      <CampaignFormModal
-        open={modalOpen}
-        onClose={() => setModalOpen(false)}
-        initialValues={initialValues}
-      />
     </div>
   );
 }
 
 function buildSummary(attention: number, urgent: number, prep: number): string {
   if (attention === 0) {
-    return "You're all caught up. Explore the opportunities Eventra found and turn the best ones into campaigns.";
+    return "You're all caught up. Explore the opportunities Eventra found and turn the best ones into advertisements.";
   }
   const parts: string[] = [];
   if (urgent > 0) parts.push(`${urgent} opportunit${urgent === 1 ? "y" : "ies"} that need attention`);
@@ -511,13 +524,7 @@ function AttentionRow({
   );
 }
 
-function RecommendationCard({
-  opp,
-  onCreate,
-}: {
-  opp: ScoredOpportunity;
-  onCreate: () => void;
-}) {
+function RecommendationCard({ opp }: { opp: ScoredOpportunity }) {
   return (
     <div className="flex flex-col gap-2 rounded-lg border border-line bg-surface-2 p-3">
       <div className="flex items-start justify-between gap-2">
@@ -529,7 +536,9 @@ function RecommendationCard({
       </div>
       <div className="mt-auto flex items-center justify-between gap-2">
         <span className="text-[11px] text-ink-faint capitalize">{opp.difficulty} · {opp.reliability}% reliable</span>
-        <Button size="sm" onClick={onCreate}>Create campaign</Button>
+        <Link to={`/app/promotion-builder?opp=${encodeURIComponent(opp.id)}`}>
+          <Button size="sm">Create advertisement</Button>
+        </Link>
       </div>
     </div>
   );

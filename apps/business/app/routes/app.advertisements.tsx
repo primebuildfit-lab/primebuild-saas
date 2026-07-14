@@ -11,6 +11,7 @@ import {
   DataTable,
   Button,
   EmptyState,
+  Drawer,
   type Column,
   type FilterChip,
 } from "~/components/ui";
@@ -32,10 +33,13 @@ import {
  * only; empty until you create one from the Promotion Builder.
  */
 export default function AdvertisementsRoute() {
-  const { advertisements } = useAdvertising();
+  const { advertisements, setAdvertisementStatus, duplicateAdvertisement, deleteAdvertisement } =
+    useAdvertising();
   const { campaigns } = useData();
   const [query, setQuery] = useState("");
   const [status, setStatus] = useState<AdvertisementStatus | null>(null);
+  const [selectedId, setSelectedId] = useState<string | null>(null);
+  const selected = advertisements.find((a) => a.id === selectedId) ?? null;
 
   const counts = useMemo(() => {
     const base = Object.fromEntries(AD_STATUS_ORDER.map((s) => [s, 0])) as Record<
@@ -143,9 +147,89 @@ export default function AdvertisementsRoute() {
         ) : visible.length === 0 ? (
           <EmptyState icon={Megaphone} title="No matches" description="Try a different search or clear the status filter." />
         ) : (
-          <DataTable columns={columns} rows={visible} rowKey={(a) => a.id} />
+          <DataTable columns={columns} rows={visible} rowKey={(a) => a.id} onRowClick={(a) => setSelectedId(a.id)} />
         )}
       </div>
+
+      <Drawer
+        open={Boolean(selected)}
+        onClose={() => setSelectedId(null)}
+        title={selected?.name}
+        description={selected ? PLACEMENT_LABEL[selected.placement] : undefined}
+        footer={
+          selected ? (
+            <>
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  const copy = duplicateAdvertisement(selected.id);
+                  if (copy) setSelectedId(copy.id);
+                }}
+              >
+                Duplicate
+              </Button>
+              {selected.status === "active" ? (
+                <Button variant="secondary" size="sm" onClick={() => setAdvertisementStatus(selected.id, "paused")}>
+                  Pause
+                </Button>
+              ) : selected.status === "paused" ? (
+                <Button variant="secondary" size="sm" onClick={() => setAdvertisementStatus(selected.id, "active")}>
+                  Reactivate
+                </Button>
+              ) : null}
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => {
+                  deleteAdvertisement(selected.id);
+                  setSelectedId(null);
+                }}
+              >
+                Delete
+              </Button>
+            </>
+          ) : null
+        }
+      >
+        {selected ? (
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-wrap gap-2">
+              <Badge tone={AD_STATUS_TONE[selected.status]}>{AD_STATUS_LABEL[selected.status]}</Badge>
+              {selected.country ? <Badge tone="blue">{getCountry(selected.country)?.name ?? selected.country}</Badge> : null}
+              {selected.campaignId ? <Badge tone="gray">{campaignName(selected.campaignId)}</Badge> : null}
+            </div>
+            <dl className="grid grid-cols-2 gap-3 text-sm">
+              <Fact label="Starts" value={selected.startDate ? formatDate(selected.startDate) : "—"} />
+              <Fact label="Ends" value={selected.endDate ? formatDate(selected.endDate) : "—"} />
+              {selected.title ? <Fact label="Headline" value={selected.title} /> : null}
+              {selected.cta ? <Fact label="CTA" value={selected.cta} /> : null}
+            </dl>
+            {selected.description ? (
+              <div>
+                <p className="text-xs font-medium text-ink-faint">Description</p>
+                <p className="mt-1 text-sm text-ink">{selected.description}</p>
+              </div>
+            ) : null}
+            <div className="rounded-lg border border-line bg-surface-2 p-3">
+              <p className="text-xs font-medium text-ink-faint">Results</p>
+              <p className="mt-1 text-sm text-ink-muted">
+                No results recorded yet. Performance connects when analytics is wired — Eventra never shows
+                invented numbers.
+              </p>
+            </div>
+          </div>
+        ) : null}
+      </Drawer>
+    </div>
+  );
+}
+
+function Fact({ label, value }: { label: string; value: string }) {
+  return (
+    <div>
+      <dt className="text-xs font-medium text-ink-faint">{label}</dt>
+      <dd className="mt-0.5 text-sm text-ink">{value}</dd>
     </div>
   );
 }
