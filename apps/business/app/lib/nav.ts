@@ -6,6 +6,7 @@ import {
   Sparkles,
   Megaphone,
   Wand2,
+  Ticket,
   Tag,
   FolderKanban,
   BarChart3,
@@ -20,6 +21,7 @@ import {
   CreditCard,
   Settings,
   ShieldCheck,
+  Store,
 } from "lucide-react";
 
 export interface NavItem {
@@ -60,6 +62,7 @@ export const navGroups: NavGroup[] = [
     label: "Dashboard",
     items: [
       { label: "Dashboard", to: "/app", icon: LayoutDashboard, gate: 2, end: true, hint: "What to do today" },
+      { label: "Vista en vivo", to: "/app/live-view", icon: Store, gate: 2, hint: "Tu tienda como la ven los clientes" },
     ],
   },
   {
@@ -75,6 +78,7 @@ export const navGroups: NavGroup[] = [
   {
     label: "Create",
     items: [
+      { label: "Crear anuncio", to: "/app/create-ad", icon: Ticket, gate: 3, hint: "Nombre → descuento → código → evento" },
       { label: "Promotion Builder", to: "/app/promotion-builder", icon: Wand2, gate: 3, hint: "Event → offer → advertisement" },
       { label: "Offers", to: "/app/offers", icon: Tag, gate: 3, hint: "Reusable commercial benefits" },
       { label: "Templates", to: "/app/templates", icon: LayoutTemplate, gate: 3, hint: "Reusable structures" },

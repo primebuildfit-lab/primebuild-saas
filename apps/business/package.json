@@ -34,6 +34,7 @@
     "@eventra/config": "*",
     "@eventra/entitlements": "*",
     "@eventra/identity": "*",
+    "@eventra/promotions": "*",
     "@eventra/types": "*",
     "@prisma/client": "^6.16.3",
     "@react-router/dev": "^7.12.0",

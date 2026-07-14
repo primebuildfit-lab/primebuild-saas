@@ -69,7 +69,7 @@ export default function MemoryRoute() {
                 <div className="flex items-center gap-2">
                   <Link
                     to={`/app/campaigns?c=${c.id}`}
-                    className="truncate text-sm font-semibold text-ink hover:text-white"
+                    className="truncate text-sm font-semibold text-ink hover:text-brand-700"
                   >
                     {c.name}
                   </Link>

@@ -363,7 +363,7 @@ export default function DashboardRoute() {
                     <Megaphone className="h-4 w-4 shrink-0 text-ink-faint" aria-hidden />
                     <div className="min-w-0 flex-1">
                       <p className="truncate text-sm text-ink">
-                        <Link to={`/app/campaigns?c=${c.id}`} className="hover:text-white">
+                        <Link to={`/app/campaigns?c=${c.id}`} className="hover:text-brand-700">
                           {c.name}
                         </Link>
                       </p>

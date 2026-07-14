@@ -175,7 +175,7 @@ function CatalogProviderInner({
   const [preferences, setPreferences] = useState<StorePreference>(() => ({
     ...(initial?.bundle.preferences ?? {
       ...demoStorePreference,
-      accent: "indigo",
+      accent: "violet",
       density: "comfortable",
     }),
   }));

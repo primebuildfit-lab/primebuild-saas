@@ -31,6 +31,8 @@ export interface Offer {
   type: OfferType;
   /** numeric value where it applies (percent, price, amount) */
   value?: number;
+  /** discount code shoppers enter — merchant types it or generates one */
+  code?: string;
   /** free-text condition (e.g. "orders over $50") */
   condition?: string;
   productRefs: string[];

@@ -21,6 +21,7 @@ import { useData } from "~/context/DataContext";
 import { templateToCampaignInput } from "~/lib/campaigns";
 import { CategoryBadge } from "~/features/events/eventDisplay";
 import { TemplateFormModal } from "~/features/templates/TemplateFormModal";
+import { PromotionTemplates } from "~/features/templates/PromotionTemplates";
 
 export default function TemplatesRoute() {
   const { templates, deleteTemplate, createCampaign } = useData();
@@ -101,6 +102,8 @@ export default function TemplatesRoute() {
           ))}
         </div>
       )}
+
+      <PromotionTemplates />
 
       <TemplateFormModal open={createOpen} onClose={() => setCreateOpen(false)} />
 

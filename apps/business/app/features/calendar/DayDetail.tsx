@@ -1,7 +1,9 @@
-import { useNavigate } from "react-router";
-import { Plus, EyeOff, ExternalLink, Tag, CalendarPlus } from "lucide-react";
-import { Drawer, Button, Badge, ColorDot, StatusPill, EmptyState } from "~/components/ui";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router";
+import { Plus, EyeOff, ExternalLink, Tag, CalendarPlus, Megaphone, Check } from "lucide-react";
+import { Drawer, Button, Badge, ColorDot, StatusPill, EmptyState, Select } from "~/components/ui";
 import { useData } from "~/context/DataContext";
+import { useAdvertising } from "~/context/AdvertisingContext";
 import type { GlobalEvent } from "~/types/domain";
 import { entriesForYear, entriesOnDay } from "~/lib/planning";
 import { formatDate } from "~/lib/dates";
@@ -31,6 +33,26 @@ export function DayDetail({
     eventPreferences,
     hideEvent,
   } = useData();
+  const { advertisements, updateAdvertisement } = useAdvertising();
+
+  // "Apply an existing ad" per event — the easy path: click an event, pick a ready ad.
+  const [pickFor, setPickFor] = useState<string | null>(null);
+  const [pickAd, setPickAd] = useState("");
+  const [appliedFor, setAppliedFor] = useState<string | null>(null);
+
+  const applyAd = (event: GlobalEvent, dateISO: string) => {
+    if (!pickAd) return;
+    updateAdvertisement(pickAd, {
+      eventId: event.id,
+      startDate: dateISO,
+      endDate: dateISO,
+      status: "scheduled",
+    });
+    setAppliedFor(event.id);
+    setPickFor(null);
+    setPickAd("");
+    setTimeout(() => setAppliedFor((cur) => (cur === event.id ? null : cur)), 2500);
+  };
 
   if (!date) {
     return (
@@ -100,12 +122,23 @@ export function DayDetail({
                       {event.description}
                     </p>
                   ) : null}
-                  <div className="mt-2 flex gap-2">
+                  <div className="mt-2 flex flex-wrap gap-2">
                     <Button
                       size="sm"
                       onClick={() => onCreateForEvent(event, year)}
                     >
                       Create campaign
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="secondary"
+                      onClick={() => {
+                        setPickFor(pickFor === event.id ? null : event.id);
+                        setPickAd("");
+                      }}
+                    >
+                      <Megaphone className="h-4 w-4" />
+                      Aplicar anuncio
                     </Button>
                     <Button
                       size="sm"
@@ -116,6 +149,49 @@ export function DayDetail({
                       Hide
                     </Button>
                   </div>
+
+                  {appliedFor === event.id ? (
+                    <p className="mt-2 flex items-center gap-1.5 text-xs font-medium text-ok">
+                      <Check className="h-3.5 w-3.5" /> Anuncio aplicado a {event.name}
+                    </p>
+                  ) : null}
+
+                  {pickFor === event.id ? (
+                    <div className="mt-2 rounded-lg border border-line bg-surface-2 p-2.5">
+                      {advertisements.length === 0 ? (
+                        <p className="text-xs text-ink-muted">
+                          No tienes anuncios todavía.{" "}
+                          <Link to="/app/create-ad" className="font-medium text-brand-700 hover:text-brand-800">
+                            Crear anuncio
+                          </Link>
+                          .
+                        </p>
+                      ) : (
+                        <div className="flex flex-col gap-2">
+                          <Select
+                            aria-label="Elegir anuncio"
+                            value={pickAd}
+                            onChange={(e) => setPickAd(e.target.value)}
+                          >
+                            <option value="">Elegir un anuncio ya hecho…</option>
+                            {advertisements.map((ad) => (
+                              <option key={ad.id} value={ad.id}>
+                                {ad.name || ad.title || "Anuncio"}
+                              </option>
+                            ))}
+                          </Select>
+                          <div className="flex gap-2">
+                            <Button size="sm" onClick={() => applyAd(event, dateISO)} disabled={!pickAd}>
+                              Aplicar
+                            </Button>
+                            <Button size="sm" variant="ghost" onClick={() => setPickFor(null)}>
+                              Cancelar
+                            </Button>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  ) : null}
                 </li>
               );
             }
