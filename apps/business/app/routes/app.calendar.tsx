@@ -11,7 +11,7 @@ import {
   type CalendarFilters,
   type CalendarView,
 } from "~/features/calendar/CalendarToolbar";
-import { YearView } from "~/features/calendar/YearView";
+import { YearHeatmap } from "~/features/calendar/YearHeatmap";
 import { MonthView } from "~/features/calendar/MonthView";
 import { DayDetail } from "~/features/calendar/DayDetail";
 import { CampaignFormModal } from "~/features/campaigns/CampaignFormModal";
@@ -31,6 +31,10 @@ function applyFilters(
     if (e.kind === "event" && !filters.events) return false;
     if (e.kind === "campaign" && !filters.campaigns) return false;
     if (e.kind === "custom" && !filters.custom) return false;
+    // Importance filter applies to dated events/customs (campaigns carry none).
+    if (filters.importance && e.kind !== "campaign") {
+      if (e.importance !== filters.importance) return false;
+    }
     if (filters.country && e.kind !== "custom") {
       return e.countryCodes?.includes(filters.country) ?? true;
     }
@@ -49,7 +53,8 @@ export default function CalendarRoute() {
   } = useData();
 
   const [params, setParams] = useSearchParams();
-  const view = (params.get("view") as CalendarView) || preferences.calendarFormat;
+  // Annual view is the default landing — the company plans in years.
+  const view = (params.get("view") as CalendarView) || preferences.calendarFormat || "year";
   const year = Number(params.get("y")) || now.getFullYear();
   const month = Number(params.get("m")) || now.getMonth() + 1; // 1–12
   const monthDate = new Date(year, month - 1, 1);
@@ -163,11 +168,10 @@ export default function CalendarRoute() {
       />
 
       {view === "year" ? (
-        <YearView
+        <YearHeatmap
           year={year}
           entries={entries}
           weekStartsOn={preferences.weekStartsOn}
-          onSelectMonth={(d) => setMonth(d.getMonth() + 1, d.getFullYear())}
           onSelectDay={openDay}
         />
       ) : (

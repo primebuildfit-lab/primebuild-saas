@@ -34,7 +34,7 @@ export function Drawer({
       {open ? (
         <div className="fixed inset-0 z-50">
           <motion.div
-            className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
+            className="absolute inset-0 bg-surface-2/40 backdrop-blur-sm"
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -50,7 +50,7 @@ export function Drawer({
             aria-label={title ? undefined : "Dialog"}
             aria-describedby={description ? descId : undefined}
             className={cn(
-              "absolute inset-y-0 right-0 flex w-full flex-col bg-white shadow-xl focus:outline-none",
+              "absolute inset-y-0 right-0 flex w-full flex-col bg-surface shadow-xl focus:outline-none",
               widthClassName,
             )}
             initial={{ x: "100%" }}
@@ -58,12 +58,12 @@ export function Drawer({
             exit={{ x: "100%" }}
             transition={{ type: "tween", duration: 0.22 }}
           >
-            <div className="flex items-start justify-between gap-3 border-b border-gray-100 px-5 py-4">
+            <div className="flex items-start justify-between gap-3 border-b border-line px-5 py-4">
               <div className="min-w-0">
                 {title ? (
                   <h2
                     id={titleId}
-                    className="truncate text-base font-semibold text-gray-900"
+                    className="truncate text-base font-semibold text-ink"
                   >
                     {title}
                   </h2>
@@ -71,7 +71,7 @@ export function Drawer({
                 {description ? (
                   <p
                     id={descId}
-                    className="mt-0.5 truncate text-sm text-gray-500"
+                    className="mt-0.5 truncate text-sm text-ink-muted"
                   >
                     {description}
                   </p>
@@ -80,7 +80,7 @@ export function Drawer({
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-md p-1.5 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+                className="rounded-md p-1.5 text-ink-faint hover:bg-surface-2 hover:text-ink-muted"
                 aria-label="Close"
               >
                 <X className="h-5 w-5" />
@@ -90,7 +90,7 @@ export function Drawer({
             <div className="flex-1 overflow-y-auto px-5 py-4">{children}</div>
 
             {footer ? (
-              <div className="flex justify-end gap-2 border-t border-gray-100 px-5 py-3">
+              <div className="flex justify-end gap-2 border-t border-line px-5 py-3">
                 {footer}
               </div>
             ) : null}

@@ -95,7 +95,7 @@ export default function SearchRoute() {
       />
 
       <div className="relative mb-5">
-        <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" />
+        <SearchIcon className="pointer-events-none absolute left-3.5 top-1/2 h-5 w-5 -translate-y-1/2 text-ink-faint" />
         <TextInput
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -131,26 +131,26 @@ export default function SearchRoute() {
               <Card key={group.kind}>
                 <CardHeader>
                   <CardTitle>{group.label}</CardTitle>
-                  <span className="text-xs text-gray-400">
+                  <span className="text-xs text-ink-faint">
                     {group.results.length}
                   </span>
                 </CardHeader>
                 <CardContent className="p-0">
-                  <ul className="divide-y divide-gray-100">
+                  <ul className="divide-y divide-line">
                     {group.results.map((r) => (
                       <li key={`${r.kind}:${r.id}`}>
                         <Link
                           to={r.to}
-                          className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-gray-50"
+                          className="flex items-center gap-3 px-5 py-3 transition-colors hover:bg-surface-2"
                         >
-                          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-gray-100 text-gray-500">
+                          <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-surface-2 text-ink-muted">
                             <Icon className="h-4 w-4" />
                           </span>
                           <span className="min-w-0">
-                            <span className="block truncate text-sm font-medium text-gray-900">
+                            <span className="block truncate text-sm font-medium text-ink">
                               {r.title}
                             </span>
-                            <span className="block truncate text-xs text-gray-500">
+                            <span className="block truncate text-xs text-ink-muted">
                               {r.subtitle}
                             </span>
                           </span>

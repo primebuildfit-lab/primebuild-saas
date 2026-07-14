@@ -122,8 +122,8 @@ export function PwaRuntime() {
       ) : null}
 
       {installEvent ? (
-        <div className="fixed inset-x-3 bottom-3 z-[60] mx-auto flex max-w-md items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm shadow-lg sm:left-auto sm:right-4">
-          <span className="text-gray-700">Install Eventra for quick access on your device.</span>
+        <div className="fixed inset-x-3 bottom-3 z-[60] mx-auto flex max-w-md items-center justify-between gap-3 rounded-xl border border-line bg-surface px-4 py-3 text-sm shadow-lg sm:left-auto sm:right-4">
+          <span className="text-ink">Install Eventra for quick access on your device.</span>
           <span className="flex shrink-0 gap-2">
             <button
               type="button"
@@ -136,7 +136,7 @@ export function PwaRuntime() {
               type="button"
               onClick={() => setInstallEvent(null)}
               aria-label="Dismiss"
-              className="rounded-lg px-2 py-1.5 text-gray-500 hover:bg-gray-100"
+              className="rounded-lg px-2 py-1.5 text-ink-muted hover:bg-surface-2"
             >
               ✕
             </button>
@@ -145,15 +145,15 @@ export function PwaRuntime() {
       ) : null}
 
       {showIosTip ? (
-        <div className="fixed inset-x-3 bottom-3 z-[60] mx-auto flex max-w-md items-center justify-between gap-3 rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm shadow-lg">
-          <span className="text-gray-700">
+        <div className="fixed inset-x-3 bottom-3 z-[60] mx-auto flex max-w-md items-center justify-between gap-3 rounded-xl border border-line bg-surface px-4 py-3 text-sm shadow-lg">
+          <span className="text-ink">
             To install: tap <strong>Share</strong> then <strong>Add to Home Screen</strong>.
           </span>
           <button
             type="button"
             onClick={dismissIosTip}
             aria-label="Dismiss"
-            className="rounded-lg px-2 py-1.5 text-gray-500 hover:bg-gray-100"
+            className="rounded-lg px-2 py-1.5 text-ink-muted hover:bg-surface-2"
           >
             ✕
           </button>

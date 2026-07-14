@@ -21,7 +21,7 @@ export function ColorDot({ importance, color, className }: ColorDotProps) {
       className={cn(
         "inline-block h-2.5 w-2.5 shrink-0 rounded-full",
         !color && importance && importanceColor[importance],
-        !color && !importance && "bg-gray-300",
+        !color && !importance && "bg-line-strong",
         className,
       )}
       style={color ? { backgroundColor: color } : undefined}

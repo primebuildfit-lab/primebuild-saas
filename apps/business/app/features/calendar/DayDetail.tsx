@@ -86,17 +86,17 @@ export function DayDetail({
               return (
                 <li
                   key={entry.key}
-                  className="rounded-lg border border-gray-200 p-3"
+                  className="rounded-lg border border-line p-3"
                 >
                   <div className="flex items-center gap-2">
                     <ColorDot importance={event.importance} />
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-sm font-medium text-ink">
                       {event.name}
                     </span>
                     <CategoryBadge category={event.category} />
                   </div>
                   {event.description ? (
-                    <p className="mt-1 text-xs text-gray-500">
+                    <p className="mt-1 text-xs text-ink-muted">
                       {event.description}
                     </p>
                   ) : null}
@@ -125,10 +125,10 @@ export function DayDetail({
               return (
                 <li
                   key={entry.key}
-                  className="rounded-lg border border-gray-200 p-3"
+                  className="rounded-lg border border-line p-3"
                 >
                   <div className="flex items-center justify-between gap-2">
-                    <span className="text-sm font-medium text-gray-900">
+                    <span className="text-sm font-medium text-ink">
                       {campaign.name}
                     </span>
                     <StatusPill status={campaign.status} />
@@ -158,16 +158,16 @@ export function DayDetail({
             const custom = customEvents.find((e) => e.id === entry.refId);
             if (!custom) return null;
             return (
-              <li key={entry.key} className="rounded-lg border border-gray-200 p-3">
+              <li key={entry.key} className="rounded-lg border border-line p-3">
                 <div className="flex items-center gap-2">
                   {custom.color ? <ColorDot color={custom.color} /> : null}
-                  <span className="text-sm font-medium text-gray-900">
+                  <span className="text-sm font-medium text-ink">
                     {custom.name}
                   </span>
                   <CategoryBadge category={custom.category} />
                 </div>
                 {custom.description ? (
-                  <p className="mt-1 text-xs text-gray-500">{custom.description}</p>
+                  <p className="mt-1 text-xs text-ink-muted">{custom.description}</p>
                 ) : null}
                 <div className="mt-2">
                   <Button

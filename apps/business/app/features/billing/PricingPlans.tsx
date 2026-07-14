@@ -16,18 +16,18 @@ export function PricingPlans() {
           <div
             key={plan.id}
             className={cn(
-              "flex flex-col rounded-xl border bg-white p-5 shadow-sm",
-              current ? "border-brand-400 ring-1 ring-brand-200" : "border-gray-200",
+              "flex flex-col rounded-xl border bg-surface p-5 shadow-sm",
+              current ? "border-brand-400 ring-1 ring-brand-500/30" : "border-line",
             )}
           >
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-gray-900">{plan.name}</h3>
+              <h3 className="text-sm font-semibold text-ink">{plan.name}</h3>
               {current ? <Badge tone="brand">Current</Badge> : null}
             </div>
-            <p className="mt-2 text-2xl font-semibold tracking-tight text-gray-900">
+            <p className="mt-2 text-2xl font-semibold tracking-tight text-ink">
               {formatPrice(plan.priceMonthly)}
             </p>
-            <p className="mt-1 flex items-center gap-1 text-xs text-gray-500">
+            <p className="mt-1 flex items-center gap-1 text-xs text-ink-muted">
               <Globe className="h-3.5 w-3.5" />
               {formatLimitValue(plan.countryLimit)}{" "}
               {plan.countryLimit === 1 ? "country" : "countries"}
@@ -35,7 +35,7 @@ export function PricingPlans() {
 
             <ul className="mt-4 flex-1 space-y-2">
               {plan.features.map((feature) => (
-                <li key={feature} className="flex items-start gap-2 text-sm text-gray-600">
+                <li key={feature} className="flex items-start gap-2 text-sm text-ink-muted">
                   <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-500" />
                   {feature}
                 </li>

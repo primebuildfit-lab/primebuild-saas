@@ -2,10 +2,13 @@
 
 > **Read this first.** This is the single source of truth for project state. Chat history is no longer
 > authoritative. When this file conflicts with older docs, this file + `DECISIONS.md` win. Keep it
-> updated when state changes. Last updated: 2026-07-13 · branch `local-install-phase` · **Phase 7 complete
-> in code** — Internal OS (Nivel A) + offer engine built on top of Phase 6 (Business frozen). Three strictly
-> separated levels: A Internal OS (`apps/admin`), B Business, C Personal. See
-> `docs/INTERNAL_OS_INFORMATION_ARCHITECTURE.md`, `docs/OFFER_ENGINE.md`, `docs/FINAL_CERTIFICATION_CHECKLIST.md`.
+> updated when state changes. Last updated: 2026-07-13 · branch `local-install-phase` · **Phase 8 complete
+> in code** — Business (Nivel B) UI reorganized around **opportunities**, not the calendar (ordered by the
+> user, superseding the Phase-6 Business freeze; presentation + read-model only, LIVE Supabase untouched).
+> Phase 7 (Internal OS Nivel A + offer engine) remains in code. Three strictly separated levels: A Internal
+> OS (`apps/admin`), B Business, C Personal. See `docs/BUSINESS_INFORMATION_ARCHITECTURE.md`,
+> `docs/INTERNAL_OS_INFORMATION_ARCHITECTURE.md`, `docs/OFFER_ENGINE.md`,
+> `docs/FINAL_CERTIFICATION_CHECKLIST.md`.
 
 ---
 

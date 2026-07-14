@@ -194,7 +194,7 @@ export function CampaignDetail({
       >
         <div className="space-y-5">
           {readOnly ? (
-            <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm text-amber-800">
+            <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-500/15 px-3 py-2.5 text-sm text-amber-800">
               <p className="flex-1">
                 This campaign is <strong>read-only</strong> because it’s over your{" "}
                 {plan.name} plan’s saved-campaign limit. Your data is kept safe —
@@ -207,7 +207,7 @@ export function CampaignDetail({
           ) : null}
 
           {flash ? (
-            <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
+            <p className="rounded-lg bg-emerald-500/15 px-3 py-2 text-sm text-emerald-300">
               {flash}
             </p>
           ) : null}
@@ -217,13 +217,13 @@ export function CampaignDetail({
             <div className="mb-2 flex items-center gap-2">
               <StatusPill status={campaign.status} />
               {country ? (
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-ink-muted">
                   {country.flag} {country.name}
                 </span>
               ) : null}
             </div>
             {readOnly ? (
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-ink-muted">
                 Status changes are disabled while this campaign is read-only.
               </p>
             ) : (
@@ -241,7 +241,7 @@ export function CampaignDetail({
             {event ? <Fact label="Linked event" value={event.name} /> : null}
             {campaign.offer ? (
               <div>
-                <p className="text-xs font-medium text-gray-400">Offer</p>
+                <p className="text-xs font-medium text-ink-faint">Offer</p>
                 <Badge tone="green">
                   <Tag className="h-3 w-3" />
                   {campaign.offer}
@@ -252,12 +252,12 @@ export function CampaignDetail({
 
           {campaign.objective ? (
             <Section title="Objective">
-              <p className="text-sm text-gray-600">{campaign.objective}</p>
+              <p className="text-sm text-ink-muted">{campaign.objective}</p>
             </Section>
           ) : null}
           {campaign.description ? (
             <Section title="Strategy">
-              <p className="whitespace-pre-line text-sm text-gray-600">
+              <p className="whitespace-pre-line text-sm text-ink-muted">
                 {campaign.description}
               </p>
             </Section>
@@ -276,14 +276,14 @@ export function CampaignDetail({
                       type="button"
                       onClick={() => toggleAction(action.id)}
                       disabled={readOnly}
-                      className="flex items-center gap-2 text-sm text-gray-700 disabled:cursor-not-allowed"
+                      className="flex items-center gap-2 text-sm text-ink disabled:cursor-not-allowed"
                     >
                       {action.done ? (
                         <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                       ) : (
-                        <Circle className="h-4 w-4 text-gray-300" />
+                        <Circle className="h-4 w-4 text-ink-faint" />
                       )}
-                      <span className={action.done ? "line-through text-gray-400" : ""}>
+                      <span className={action.done ? "line-through text-ink-faint" : ""}>
                         {action.label}
                       </span>
                     </button>
@@ -295,11 +295,28 @@ export function CampaignDetail({
 
           {campaign.notes ? (
             <Section title="Notes">
-              <p className="whitespace-pre-line text-sm text-gray-600">
+              <p className="whitespace-pre-line text-sm text-ink-muted">
                 {campaign.notes}
               </p>
             </Section>
           ) : null}
+
+          {/* Results & lessons — honest: no performance data is invented. */}
+          <Section title="Results & lessons">
+            <div className="grid grid-cols-3 gap-2">
+              {["Revenue", "Conversions", "CTR"].map((m) => (
+                <div key={m} className="rounded-lg border border-line bg-surface-2 p-2.5 text-center">
+                  <p className="text-sm font-semibold text-ink-faint">—</p>
+                  <p className="text-[11px] text-ink-faint">{m}</p>
+                </div>
+              ))}
+            </div>
+            <p className="mt-2 text-xs text-ink-muted">
+              {campaign.status === "completed"
+                ? "No results registered yet. Performance metrics connect when analytics is wired — Eventra never shows invented numbers."
+                : "Results appear here once the campaign finishes and performance data is connected. Capture lessons in Notes as you go."}
+            </p>
+          </Section>
 
           {/* Memory / lineage */}
           {(reusedFrom || reusedInto.length > 0) && (
@@ -309,7 +326,7 @@ export function CampaignDetail({
                   <button
                     type="button"
                     onClick={() => onOpenOther(reusedFrom.id)}
-                    className="flex items-center gap-2 text-brand-600 hover:text-brand-700"
+                    className="flex items-center gap-2 text-brand-300 hover:text-brand-300"
                   >
                     <GitBranch className="h-4 w-4" />
                     Reused from “{reusedFrom.name}”
@@ -320,9 +337,9 @@ export function CampaignDetail({
                     key={c.id}
                     type="button"
                     onClick={() => onOpenOther(c.id)}
-                    className="flex items-center gap-2 text-gray-600 hover:text-gray-900"
+                    className="flex items-center gap-2 text-ink-muted hover:text-ink"
                   >
-                    <GitBranch className="h-4 w-4 text-gray-400" />
+                    <GitBranch className="h-4 w-4 text-ink-faint" />
                     Reused into “{c.name}”
                   </button>
                 ))}
@@ -350,7 +367,7 @@ export function CampaignDetail({
                 Delete
               </Button>
             </div>
-            <p className="mt-2 text-xs text-gray-400">
+            <p className="mt-2 text-xs text-ink-faint">
               Reuse always creates a new record — your history is never overwritten.
             </p>
           </Section>
@@ -375,8 +392,8 @@ export function CampaignDetail({
 function Fact({ label, value }: { label: string; value: string }) {
   return (
     <div>
-      <p className="text-xs font-medium text-gray-400">{label}</p>
-      <p className="text-sm text-gray-800">{value}</p>
+      <p className="text-xs font-medium text-ink-faint">{label}</p>
+      <p className="text-sm text-ink">{value}</p>
     </div>
   );
 }
@@ -384,7 +401,7 @@ function Fact({ label, value }: { label: string; value: string }) {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section>
-      <h3 className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-gray-400">
+      <h3 className="mb-1.5 text-xs font-semibold uppercase tracking-wide text-ink-faint">
         {title}
       </h3>
       {children}

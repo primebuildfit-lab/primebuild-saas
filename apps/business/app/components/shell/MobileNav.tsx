@@ -16,7 +16,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
       {open ? (
         <div className="lg:hidden">
           <motion.div
-            className="fixed inset-0 z-40 bg-gray-900/40 backdrop-blur-sm"
+            className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm"
             onClick={onClose}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -26,7 +26,7 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
           <motion.aside
             ref={dialogRef}
             tabIndex={-1}
-            className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col bg-white shadow-xl focus:outline-none"
+            className="fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-line bg-surface shadow-2xl focus:outline-none"
             initial={{ x: "-100%" }}
             animate={{ x: 0 }}
             exit={{ x: "-100%" }}
@@ -35,12 +35,12 @@ export function MobileNav({ open, onClose }: MobileNavProps) {
             aria-modal="true"
             aria-label="Navigation"
           >
-            <div className="flex h-16 items-center justify-between border-b border-gray-100 px-5">
+            <div className="flex h-16 items-center justify-between border-b border-line px-5">
               <Brand />
               <button
                 type="button"
                 onClick={onClose}
-                className="rounded-md p-2 text-gray-500 hover:bg-gray-100"
+                className="rounded-md p-2 text-ink-muted hover:bg-surface-2 hover:text-ink"
                 aria-label="Close navigation"
               >
                 <X className="h-5 w-5" />

@@ -39,14 +39,14 @@ export function CampaignCard({
           : undefined
       }
       className={cn(
-        "rounded-xl border border-gray-200 bg-white p-4 shadow-sm transition-colors",
+        "rounded-xl border border-line bg-surface p-4 shadow-sm transition-colors",
         interactive &&
-          "cursor-pointer hover:border-brand-200 hover:bg-brand-50/30 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
+          "cursor-pointer hover:border-brand-200 hover:bg-brand-500/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
         className,
       )}
     >
       <div className="flex items-start justify-between gap-2">
-        <h3 className="min-w-0 truncate text-sm font-semibold text-gray-900">
+        <h3 className="min-w-0 truncate text-sm font-semibold text-ink">
           {campaign.name}
         </h3>
         <div className="flex shrink-0 items-center gap-1.5">
@@ -60,7 +60,7 @@ export function CampaignCard({
         </div>
       </div>
 
-      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-gray-500">
+      <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-ink-muted">
         <span className="inline-flex items-center gap-1">
           <CalendarRange className="h-3.5 w-3.5" />
           {formatDateRange(campaign.startDate, campaign.endDate)}
@@ -82,7 +82,7 @@ export function CampaignCard({
       ) : null}
 
       {campaign.objective ? (
-        <p className="mt-2 line-clamp-2 text-xs text-gray-500">
+        <p className="mt-2 line-clamp-2 text-xs text-ink-muted">
           {campaign.objective}
         </p>
       ) : null}

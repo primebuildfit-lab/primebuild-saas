@@ -74,7 +74,7 @@ export function CalendarSettings() {
       </CardHeader>
       <CardContent className="space-y-5">
         <div className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-gray-700">Week starts on</span>
+          <span className="text-sm font-medium text-ink">Week starts on</span>
           <SegmentedControl<"0" | "1">
             aria-label="Week starts on"
             segments={[
@@ -89,7 +89,7 @@ export function CalendarSettings() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-gray-700">Default view</span>
+          <span className="text-sm font-medium text-ink">Default view</span>
           <SegmentedControl<"month" | "year">
             aria-label="Default calendar view"
             segments={[
@@ -102,22 +102,22 @@ export function CalendarSettings() {
         </div>
 
         <div className="flex flex-col gap-2">
-          <span className="flex items-center gap-1.5 text-sm font-medium text-gray-700">
-            <Bell className="h-4 w-4 text-gray-400" />
+          <span className="flex items-center gap-1.5 text-sm font-medium text-ink">
+            <Bell className="h-4 w-4 text-ink-faint" />
             Reminder milestones (days before)
           </span>
           <div className="flex flex-wrap items-center gap-1.5">
             {reminders.map((r) => (
               <span
                 key={r}
-                className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700"
+                className="inline-flex items-center gap-1 rounded-full bg-brand-500/15 px-2.5 py-1 text-xs font-medium text-brand-300"
               >
                 {r} days
                 <button
                   type="button"
                   onClick={() => removeReminder(r)}
                   aria-label={`Remove ${r} day reminder`}
-                  className="text-brand-400 hover:text-brand-700"
+                  className="text-brand-400 hover:text-brand-300"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -138,7 +138,7 @@ export function CalendarSettings() {
               </Button>
             </div>
           </div>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-ink-faint">
             In-app prep reminders only — no email/push automation in V1.
           </p>
         </div>
@@ -160,7 +160,7 @@ export function AppearanceSettings() {
       </CardHeader>
       <CardContent className="space-y-5">
         <div className="flex flex-col gap-2">
-          <span className="text-sm font-medium text-gray-700">Accent color</span>
+          <span className="text-sm font-medium text-ink">Accent color</span>
           <div className="flex flex-wrap gap-2">
             {ACCENT_OPTIONS.map((option) => {
               const active = option.value === accent;
@@ -175,8 +175,8 @@ export function AppearanceSettings() {
                   className={cn(
                     "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors",
                     active
-                      ? "border-gray-900 bg-gray-50"
-                      : "border-gray-200 hover:bg-gray-50",
+                      ? "border-brand-500 bg-surface-2 ring-1 ring-inset ring-brand-500/40"
+                      : "border-line hover:bg-surface-2",
                   )}
                 >
                   <span
@@ -188,13 +188,13 @@ export function AppearanceSettings() {
               );
             })}
           </div>
-          <p className="text-xs text-gray-400">
+          <p className="text-xs text-ink-faint">
             The accent re-tints buttons, links, and highlights across the app.
           </p>
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-gray-700">Calendar density</span>
+          <span className="text-sm font-medium text-ink">Calendar density</span>
           <SegmentedControl<Density>
             aria-label="Calendar density"
             segments={[

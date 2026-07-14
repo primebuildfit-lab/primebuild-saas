@@ -25,16 +25,16 @@ export function Field({
     <div className={cn("flex flex-col gap-1.5", className)}>
       <label
         htmlFor={htmlFor}
-        className="text-sm font-medium text-gray-700"
+        className="text-sm font-medium text-ink"
       >
         {label}
         {required ? <span className="ml-0.5 text-red-500">*</span> : null}
       </label>
       {children}
       {error ? (
-        <p className="text-xs text-red-600">{error}</p>
+        <p className="text-xs text-red-400">{error}</p>
       ) : hint ? (
-        <p className="text-xs text-gray-500">{hint}</p>
+        <p className="text-xs text-ink-muted">{hint}</p>
       ) : null}
     </div>
   );

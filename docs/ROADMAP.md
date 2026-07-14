@@ -5,6 +5,12 @@
 
 ## Done (in code, verified green — not deployed)
 
+- **Phase 8 (Business UI reorg):** Business (Nivel B) re-centered on **opportunities → campaigns → content →
+  results → memory → reuse**. Opportunity engine, opportunity-first navigation, control-center dashboard,
+  Analytics builder, and new architecture modules (Content/Audiences/Media/Sources/Integrations/Automations/
+  Jobs/AI/Team/Account). Presentation + read-model only; LIVE Supabase untouched. See
+  `BUSINESS_INFORMATION_ARCHITECTURE.md`. **Follow-ups:** full annual-engine Calendar; Settings 8-section
+  split; persisting new-module data (needs schema → later gate).
 - **Phase 1–4:** Business product, mock-driven (dashboard, calendar, campaigns, memory, templates, …).
 - **MM3–MM5:** monorepo; org/workspace persistence + RLS (designed); pre-install readiness.
 - **Stabilization:** canonical plans (`@eventra/config`) + roles/permissions (`@eventra/identity`) with

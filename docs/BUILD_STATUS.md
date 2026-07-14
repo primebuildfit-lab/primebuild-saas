@@ -10,6 +10,49 @@ approval still pending from the user)._
 
 ---
 
+## PHASE 10 — Master Spec: opportunity OS + Promotion Builder (2026-07-13) 🟨 PARTIAL
+
+Frontend/design-only; no backend touched. **Done:** master-spec navigation; decision-center **dashboard** with
+country scope; **annual calendar heatmap** + inline month accordion; **Promotion Builder** (6-step wizard →
+saves a real campaign); explainable opportunity **ScoreBreakdown**; Campaign Library reuse loop; new
+`CountrySelector`. **Verified:** typecheck ✅ · lint ✅ · **191 tests** ✅ · build ✅ · preview 200 on `/app`,
+`/app/promotion-builder`, `/app/calendar?view=year`, `/app/campaign-library`. **Remaining (themed, not
+restructured):** Content/Templates/Analytics/Countries/Sources/Audiences/AI/Integrations/Team/Billing/Settings;
+Promotions/Advertisements as distinct entities + real analytics = backend (V2). Report:
+`docs/EVENTRA_BUSINESS_PRODUCT_REDESIGN_REPORT.md`.
+
+## PHASE 9 — Business DARK commercial redesign (2026-07-13) 🟨 PARTIAL
+
+Frontend/design-only. Dark commercial identity across the Business app (owner decision; breaks the pre-cert
+freeze — must be re-verified). **Done:** dark token system (`app.css`), re-themed shell + all `components/ui`
+primitives, 5-group commercial nav, flagship "what-to-do-today" **dashboard**, new **`/app/memory`** module,
+`ScoreBreakdown` primitive. **Verified:** typecheck ✅ · lint ✅ (0 err) · **189 tests** ✅ · build ✅ · preview
+`/app` 200 dark. **Remaining:** deep restructuring of calendar/opportunities-detail/campaigns-depth/content/
+analytics/audiences/templates/media/sources/countries (re-themed only), responsive re-check, axe audit,
+Shopify re-cert. Full report: `docs/EVENTRA_BUSINESS_PRODUCT_REDESIGN_REPORT.md`.
+
+## PHASE 8 — Business UI reorg: opportunity-first product (2026-07-13) 🟦
+
+Re-centers Business (Nivel B) on **opportunities → campaigns → content → results → memory → reuse**.
+Ordered directly by the user; supersedes the Phase-6 Business freeze (CLAUDE.md §1). **Presentation +
+read-model only** — LIVE Supabase project, migrations, and the persistence seam are untouched (no
+schema/deploy/irreversible step). See `docs/BUSINESS_INFORMATION_ARCHITECTURE.md`.
+
+- **Opportunity engine** (`app/lib/opportunities.ts`, pure + tested): score 0–100, lifecycle state (derived,
+  never invented), priority/difficulty/reliability; discovery-signal overlay in `app/data`.
+- **Navigation**: 4 definitive groups + Platform track (`app/lib/nav.ts`, grouped `NavLinks`).
+- **Dashboard**: control center — 4 clickable `MetricCard`s that link into their modules.
+- **Opportunities** (`/app/opportunities`): flagship scored/filtered/sortable surface; reuses campaign modal.
+- **Analytics**: report **builder** (dimension × measure × period), computed live.
+- **New modules** (architecture, data-driven, no live connections): Content, Audiences, Media, Sources,
+  Integrations, Automations, Jobs, AI, Team, Account; Countries coverage/insights view.
+- **Reusable UI**: `MetricCard`, `ScoreBadge`, `DataTable`, `Toolbar`, `FilterChips`.
+- **Deferred (follow-ups, non-blocking):** full annual-engine Calendar rebuild; Settings 8-section split;
+  wiring new-module data into the persistence seam (needs schema → a later gate).
+- **Verified**: typecheck ✅ · lint ✅ (0 errors) · tests ✅ **184** (business; +34) · build ✅ (180 modules).
+
+---
+
 ## PHASE 7 — Internal OS + Offer Engine + visual redesign (2026-07-13) 🟦
 
 Built the private platform admin console (Nivel A), strictly separated from Business (B) / Personal (C).

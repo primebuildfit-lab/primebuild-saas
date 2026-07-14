@@ -1,10 +1,18 @@
 @import "tailwindcss";
 
-/* ---- Eventra design tokens ----
-   Single source of brand color (see CLAUDE.md §3). Rebranding = change these.
-   Semantic colors reuse Tailwind defaults: emerald=success/high, amber=medium,
-   red=low/danger, gray=neutral surfaces. */
+/* ============================================================================
+   EVENTRA BUSINESS — DARK COMMERCIAL DESIGN SYSTEM  (redesign 2026-07-13)
+   ----------------------------------------------------------------------------
+   A dark, premium, information-dense system for the Business app. Single source
+   of brand + surface tokens; rebranding = change these. Semantic status tones
+   (ok/warn/err/info) are dark-friendly. Indigo/violet stays the accent.
+   Tailwind v4 generates utilities from every `--color-*` token below, so
+   `bg-canvas`, `bg-surface`, `text-ink`, `border-line`, `text-accent`, etc. are
+   all available. Screens compose the shared primitives, which use these tokens,
+   so the whole app themes from here.
+   ========================================================================== */
 @theme {
+  /* Brand / accent — indigo→violet, Eventra's own identity (not Shopify's). */
   --color-brand-50: #eef2ff;
   --color-brand-100: #e0e7ff;
   --color-brand-200: #c7d2fe;
@@ -16,17 +24,39 @@
   --color-brand-800: #3730a3;
   --color-brand-900: #312e81;
 
+  /* Surfaces — deep slate canvas rising to elevated popovers. */
+  --color-canvas: #0b0f17; /* app background */
+  --color-surface: #111827; /* cards / panels */
+  --color-surface-2: #0e1521; /* insets, table stripes */
+  --color-elevated: #18212f; /* drawers, popovers, menus */
+  --color-line: #1f2a3a; /* default border */
+  --color-line-strong: #2b3a4f; /* hover / emphasized border */
+
+  /* Ink — text on dark. */
+  --color-ink: #e6eaf2; /* primary text */
+  --color-ink-muted: #9aa7bd; /* secondary text */
+  --color-ink-faint: #64748b; /* tertiary / hints */
+
+  /* Accent alias so components can say text-accent / bg-accent. */
+  --color-accent: #818cf8;
+
+  /* Semantic status — chosen to read on dark surfaces. */
+  --color-ok: #34d399; /* success / high */
+  --color-warn: #fbbf24; /* warning / medium */
+  --color-err: #f87171; /* danger / cancellation */
+  --color-info: #38bdf8; /* information */
+
   --font-sans: "Inter", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
     Roboto, Helvetica, Arial, sans-serif;
 }
 
 html {
-  color-scheme: light;
+  color-scheme: dark;
 }
 
 body {
-  background-color: #f9fafb; /* gray-50 */
-  color: #111827; /* gray-900 */
+  background-color: var(--color-canvas);
+  color: var(--color-ink);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -35,5 +65,17 @@ body {
 /* Thin, unobtrusive scrollbars for a dashboard feel. */
 * {
   scrollbar-width: thin;
-  scrollbar-color: #d1d5db transparent;
+  scrollbar-color: var(--color-line-strong) transparent;
+}
+
+/* Respect reduced-motion globally (accessibility). */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
 }

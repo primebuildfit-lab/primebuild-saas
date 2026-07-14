@@ -1,47 +1,43 @@
-# This file stores configurations for your Shopify app.
-# `client_id` is populated by `shopify app config link` when the app is created
-# on a Shopify Partner org (Phase 5). Left blank for the Phase 1 foundation.
+# Learn more about configuring your app at https://shopify.dev/docs/apps/tools/cli/configuration
+
 name = "eventra"
-client_id = ""
+client_id = "416fc6e270de506565ca1f79517832ba"
+application_url = "https://eventrabusiness-production.up.railway.app"
+embedded = true
 
 [access_scopes]
-# Minimal footprint for the private pilot: Eventra reads products/collections only
-# when a merchant attaches them to a campaign. It never writes to the store
-# (V1 actions are visual-only, D7), so no write scopes are requested.
+# Learn more at https://shopify.dev/docs/apps/tools/cli/configuration#access_scopes
 scopes = "read_products"
 
 [webhooks]
-api_version = "2025-10"
+api_version = "2026-10"
 
-  # Handled by: /app/routes/webhooks.app.uninstalled.tsx
   [[webhooks.subscriptions]]
   uri = "/webhooks/app/uninstalled"
-  topics = ["app/uninstalled"]
+  topics = [ "app/uninstalled" ]
 
-  # Handled by: /app/routes/webhooks.app.scopes_update.tsx
   [[webhooks.subscriptions]]
-  topics = [ "app/scopes_update" ]
   uri = "/webhooks/app/scopes_update"
+  topics = [ "app/scopes_update" ]
 
-  # Webhooks can have filters
-  # Only receive webhooks for product updates with a product price >= 10.00
-  # See: https://shopify.dev/docs/apps/build/webhooks/customize/filters
-  # [[webhooks.subscriptions]]
-  # topics = ["products/update"]
-  # uri = "/webhooks/products/update"
-  # filter = "variants.price:>=10.00"
-
-  # Mandatory compliance topics for public apps.
-  # Handlers: /app/routes/webhooks.customers.data_request.tsx, .redact.tsx, shop.redact.tsx
-  # See: https://shopify.dev/docs/apps/build/privacy-law-compliance
   [[webhooks.subscriptions]]
   uri = "/webhooks/customers/data_request"
-  compliance_topics = ["customers/data_request"]
+  compliance_topics = [ "customers/data_request" ]
 
   [[webhooks.subscriptions]]
   uri = "/webhooks/customers/redact"
-  compliance_topics = ["customers/redact"]
+  compliance_topics = [ "customers/redact" ]
 
   [[webhooks.subscriptions]]
   uri = "/webhooks/shop/redact"
-  compliance_topics = ["shop/redact"]
+  compliance_topics = [ "shop/redact" ]
+
+[auth]
+redirect_urls = [
+  "https://eventrabusiness-production.up.railway.app/auth/callback",
+  "https://eventrabusiness-production.up.railway.app/auth/shopify/callback",
+  "https://eventrabusiness-production.up.railway.app/api/auth"
+]
+
+[build]
+automatically_update_urls_on_dev = true

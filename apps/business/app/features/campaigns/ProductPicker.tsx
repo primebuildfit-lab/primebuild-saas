@@ -7,7 +7,7 @@ import { cn } from "~/lib/cn";
 /** Read-only chips showing attached products/collections. */
 export function AttachedRefs({ ids }: { ids: string[] }) {
   if (ids.length === 0) {
-    return <p className="text-sm text-gray-400">No products or collections attached.</p>;
+    return <p className="text-sm text-ink-faint">No products or collections attached.</p>;
   }
   return (
     <div className="flex flex-wrap gap-1.5">
@@ -90,8 +90,8 @@ export function ProductPicker({
               className={cn(
                 "flex w-full items-center gap-3 rounded-lg border px-3 py-2 text-left transition-colors",
                 isSelected
-                  ? "border-brand-200 bg-brand-50"
-                  : "border-transparent hover:bg-gray-50",
+                  ? "border-brand-200 bg-brand-500/15"
+                  : "border-transparent hover:bg-surface-2",
               )}
             >
               <span
@@ -99,7 +99,7 @@ export function ProductPicker({
                   "flex h-8 w-8 items-center justify-center rounded-md",
                   ref.kind === "collection"
                     ? "bg-sky-100 text-sky-600"
-                    : "bg-gray-100 text-gray-500",
+                    : "bg-surface-2 text-ink-muted",
                 )}
               >
                 {ref.kind === "collection" ? (
@@ -109,23 +109,23 @@ export function ProductPicker({
                 )}
               </span>
               <span className="min-w-0 flex-1">
-                <span className="block truncate text-sm font-medium text-gray-900">
+                <span className="block truncate text-sm font-medium text-ink">
                   {ref.title}
                 </span>
-                <span className="block text-xs text-gray-400">
+                <span className="block text-xs text-ink-faint">
                   {ref.kind === "collection"
                     ? `${ref.productCount} products`
                     : `$${ref.price} · ${ref.inventory} in stock`}
                 </span>
               </span>
               {isSelected ? (
-                <Check className="h-4 w-4 shrink-0 text-brand-600" />
+                <Check className="h-4 w-4 shrink-0 text-brand-300" />
               ) : null}
             </button>
           );
         })}
         {results.length === 0 ? (
-          <p className="px-3 py-6 text-center text-sm text-gray-400">
+          <p className="px-3 py-6 text-center text-sm text-ink-faint">
             No matches for “{query}”.
           </p>
         ) : null}

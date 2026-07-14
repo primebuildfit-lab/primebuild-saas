@@ -53,19 +53,19 @@ function DayCell({
     <div
       ref={setNodeRef}
       className={cn(
-        "flex flex-col gap-0.5 border-b border-r border-gray-100 p-1",
+        "flex flex-col gap-0.5 border-b border-r border-line p-1",
         compact ? "min-h-16" : "min-h-24",
-        !inMonth && "bg-gray-50/60",
-        isOver && "bg-brand-50 ring-2 ring-inset ring-brand-300",
+        !inMonth && "bg-surface-2/60",
+        isOver && "bg-brand-500/15 ring-2 ring-inset ring-brand-300",
       )}
     >
       <button
         type="button"
         onClick={() => onSelectDay(date)}
         className={cn(
-          "mb-0.5 flex h-6 w-6 items-center justify-center self-start rounded-full text-xs font-medium transition-colors hover:bg-gray-100",
-          today ? "bg-brand-600 text-white hover:bg-brand-700" : "text-gray-500",
-          !inMonth && "text-gray-300",
+          "mb-0.5 flex h-6 w-6 items-center justify-center self-start rounded-full text-xs font-medium transition-colors hover:bg-surface-2",
+          today ? "bg-brand-600 text-white hover:bg-brand-700" : "text-ink-muted",
+          !inMonth && "text-ink-faint",
         )}
         aria-label={`Open ${iso}`}
       >
@@ -83,7 +83,7 @@ function DayCell({
           <button
             type="button"
             onClick={() => onSelectDay(date)}
-            className="px-1 text-left text-[11px] font-medium text-gray-400 hover:text-gray-600"
+            className="px-1 text-left text-[11px] font-medium text-ink-faint hover:text-ink-muted"
           >
             +{entries.length - max} more
           </button>
@@ -147,12 +147,12 @@ export function MonthView({
       onDragStart={onDragStart}
       onDragEnd={onDragEnd}
     >
-      <div className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm">
-        <div className="grid grid-cols-7 border-b border-gray-200 bg-gray-50">
+      <div className="overflow-hidden rounded-xl border border-line bg-surface shadow-sm">
+        <div className="grid grid-cols-7 border-b border-line bg-surface-2">
           {weekdayLabels(weekStartsOn).map((label) => (
             <div
               key={label}
-              className="border-r border-gray-100 px-2 py-1.5 text-center text-[11px] font-semibold uppercase tracking-wide text-gray-400 last:border-r-0"
+              className="border-r border-line px-2 py-1.5 text-center text-[11px] font-semibold uppercase tracking-wide text-ink-faint last:border-r-0"
             >
               {label}
             </div>

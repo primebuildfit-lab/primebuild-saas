@@ -6,7 +6,7 @@ import { cn } from "~/lib/cn";
 export function Spinner({ className }: { className?: string }) {
   return (
     <Loader2
-      className={cn("h-4 w-4 animate-spin text-gray-400", className)}
+      className={cn("h-4 w-4 animate-spin text-ink-faint", className)}
       aria-hidden
     />
   );
@@ -16,7 +16,7 @@ export function Spinner({ className }: { className?: string }) {
 export function Skeleton({ className }: { className?: string }) {
   return (
     <div
-      className={cn("animate-pulse rounded-md bg-gray-200/70", className)}
+      className={cn("animate-pulse rounded-md bg-line/70", className)}
       aria-hidden
     />
   );
@@ -26,7 +26,7 @@ export function Skeleton({ className }: { className?: string }) {
 export function LoadingState({ label = "Loading…" }: { label?: string }) {
   return (
     <div
-      className="flex items-center justify-center gap-2 rounded-xl border border-gray-200 bg-white px-6 py-16 text-sm text-gray-500"
+      className="flex items-center justify-center gap-2 rounded-xl border border-line bg-surface px-6 py-16 text-sm text-ink-muted"
       role="status"
       aria-live="polite"
     >
@@ -47,13 +47,13 @@ export function ErrorState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-red-200 bg-red-50/60 px-6 py-14 text-center">
-      <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-red-100 text-red-600">
+    <div className="flex flex-col items-center justify-center rounded-xl border border-red-500/30 bg-red-500/10 px-6 py-14 text-center">
+      <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-red-500/20 text-red-400">
         <AlertTriangle className="h-5 w-5" />
       </div>
-      <h3 className="text-sm font-semibold text-gray-900">{title}</h3>
+      <h3 className="text-sm font-semibold text-ink">{title}</h3>
       {description ? (
-        <p className="mt-1 max-w-md text-sm text-gray-500">{description}</p>
+        <p className="mt-1 max-w-md text-sm text-ink-muted">{description}</p>
       ) : null}
       {action ? <div className="mt-5">{action}</div> : null}
     </div>

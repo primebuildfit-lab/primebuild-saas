@@ -113,7 +113,7 @@ export function CustomEventFormModal({
     >
       <div className="space-y-4">
         {error ? (
-          <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
+          <p className="rounded-lg bg-red-500/15 px-3 py-2 text-sm text-red-400">
             {error}
           </p>
         ) : null}
@@ -168,7 +168,7 @@ export function CustomEventFormModal({
               type="color"
               value={values.color || "#6366f1"}
               onChange={(e) => patch({ color: e.target.value })}
-              className="h-10 w-full cursor-pointer rounded-lg border border-gray-300 bg-white p-1"
+              className="h-10 w-full cursor-pointer rounded-lg border border-line-strong bg-surface p-1"
             />
           </Field>
         </div>
@@ -182,10 +182,10 @@ export function CustomEventFormModal({
           />
         </Field>
 
-        <div className="flex items-center justify-between rounded-lg border border-gray-200 px-3 py-2.5">
+        <div className="flex items-center justify-between rounded-lg border border-line px-3 py-2.5">
           <div>
-            <p className="text-sm font-medium text-gray-800">Repeat next year</p>
-            <p className="text-xs text-gray-500">
+            <p className="text-sm font-medium text-ink">Repeat next year</p>
+            <p className="text-xs text-ink-muted">
               Recurring events default to on; you can turn this off.
             </p>
           </div>

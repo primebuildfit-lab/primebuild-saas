@@ -44,7 +44,7 @@ export function CustomEventList({ onEdit, onCreate }: CustomEventListProps) {
             <div className="min-w-0">
               <div className="flex flex-wrap items-center gap-2">
                 {event.color ? <ColorDot color={event.color} /> : null}
-                <h3 className="text-sm font-semibold text-gray-900">
+                <h3 className="text-sm font-semibold text-ink">
                   {event.name}
                 </h3>
                 <CategoryBadge category={event.category} />
@@ -55,11 +55,11 @@ export function CustomEventList({ onEdit, onCreate }: CustomEventListProps) {
                   </Badge>
                 ) : null}
               </div>
-              <p className="mt-1 text-xs text-gray-500">
+              <p className="mt-1 text-xs text-ink-muted">
                 {formatDateRange(event.startDate, event.endDate ?? event.startDate)}
               </p>
               {event.description ? (
-                <p className="mt-1 text-sm text-gray-600">{event.description}</p>
+                <p className="mt-1 text-sm text-ink-muted">{event.description}</p>
               ) : null}
             </div>
             <div className="flex shrink-0 items-center gap-1">

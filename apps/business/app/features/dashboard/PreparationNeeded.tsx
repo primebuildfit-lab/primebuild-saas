@@ -22,7 +22,7 @@ export function PreparationNeeded({ items, onPrepare }: PreparationNeededProps) 
       </CardHeader>
       <CardContent>
         {items.length === 0 ? (
-          <div className="flex items-center gap-2 py-4 text-sm text-gray-500">
+          <div className="flex items-center gap-2 py-4 text-sm text-ink-muted">
             <CheckCircle2 className="h-4 w-4 text-emerald-500" />
             You’re on track — nothing needs prep right now.
           </div>
@@ -34,10 +34,10 @@ export function PreparationNeeded({ items, onPrepare }: PreparationNeededProps) 
                 className="flex items-center justify-between gap-3"
               >
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-medium text-gray-900">
+                  <p className="truncate text-sm font-medium text-ink">
                     {op.event.name}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-ink-muted">
                     {op.event.countryCodes
                       .map((c) => getCountry(c)?.flag ?? c)
                       .join(" ")}{" "}

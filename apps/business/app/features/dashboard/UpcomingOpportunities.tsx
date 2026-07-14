@@ -31,7 +31,7 @@ export function UpcomingOpportunities({
         <CardTitle>Upcoming opportunities</CardTitle>
         <Link
           to="/app/events"
-          className="text-sm font-medium text-brand-600 hover:text-brand-700"
+          className="text-sm font-medium text-brand-300 hover:text-brand-300"
         >
           View all
         </Link>
@@ -45,7 +45,7 @@ export function UpcomingOpportunities({
             className="m-4 border-0 bg-transparent py-10"
           />
         ) : (
-          <ul className="divide-y divide-gray-100">
+          <ul className="divide-y divide-line">
             {opportunities.map((op) => (
               <li
                 key={`${op.event.id}:${op.year}`}
@@ -54,17 +54,17 @@ export function UpcomingOpportunities({
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
                     <ColorDot importance={op.event.importance} />
-                    <p className="truncate text-sm font-medium text-gray-900">
+                    <p className="truncate text-sm font-medium text-ink">
                       {op.event.name}
                     </p>
                     <PrepStatusBadge status={op.prepStatus} />
                   </div>
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-ink-muted">
                     {op.event.countryCodes
                       .map((c) => getCountry(c)?.flag ?? c)
                       .join(" ")}{" "}
                     · {formatDate(op.occurrence.startISO)} ·{" "}
-                    <span className="font-medium text-gray-600">
+                    <span className="font-medium text-ink-muted">
                       {relativeDays(op.occurrence.startISO)}
                     </span>
                   </p>

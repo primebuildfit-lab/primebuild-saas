@@ -3,6 +3,101 @@
 All notable milestones. Dates are absolute. This file summarizes; `docs/DECISIONS.md` is authoritative for
 decisions and `docs/BUILD_STATUS.md` for per-module status.
 
+## Phase 10 — Master Spec: opportunity OS + Promotion Builder — 2026-07-13
+
+Executes the 4-part **Eventra Product Master Specification**: reposition the Business app from a calendar into
+an **opportunity operating system** (discover → evaluate → promote → publish → measure → remember → reuse).
+Frontend/design phase — **no backend touched** (live Supabase, migrations, persistence seam, business rules
+unchanged; no deploy/OAuth/Shopify install). Full report: `docs/EVENTRA_BUSINESS_PRODUCT_REDESIGN_REPORT.md`.
+
+### Added
+- **Promotion Builder** (`routes/app.promotion-builder.tsx`, "the heart") — a real multi-step wizard
+  (Opportunity → Template → Products → Offer & text → Schedule → Preview) that turns an opportunity into a
+  campaign/advertisement. Saves a genuine record (optimistic + server seam); honest note that a dedicated
+  Promotion schema is future backend work. Reuses `ProductPicker`.
+- **Annual calendar heatmap** (`features/calendar/YearHeatmap.tsx`) — default view is the year as an
+  importance heatmap (legend, no per-day labels); clicking a month **expands inline** (accordion, reuses
+  `MonthView`) so the year context is never lost.
+- **`CountrySelector`** primitive + dashboard **country scope** — narrows the dashboard to one market.
+- Richer **`scoreFactors()`** (relevance/potential/urgency/reach/ease/reliability) with an honest note that
+  competition & historical success are not faked (need real performance data).
+
+### Changed
+- **Navigation** → the master-spec structure: Dashboard · Planning (Calendar, Opportunities, Campaigns,
+  Promotion Builder, Campaign Library) · Content (Content, Templates, Media) · Knowledge (Audiences,
+  Analytics, Countries, Sources) · Company (Team, Billing, Settings). `nav.test.ts` updated.
+
+### Verified
+- typecheck ✅ · lint ✅ (0 err) · **191 tests** ✅ · `react-router build` ✅ · preview serves `/app`,
+  `/app/promotion-builder`, `/app/calendar?view=year`, `/app/campaign-library` all **200**.
+
+### Not done (honest — see report §Remaining)
+- Deep restructuring of Content (4 workspaces), Templates (versioning), Analytics (query builder), Sources,
+  Countries, Audiences, AI, Integrations, Team, Billing, Settings — re-themed dark, not rebuilt to spec.
+- Promotions/Advertisements as **distinct entities** need a schema change (backend — out of this phase's scope).
+
+## Phase 9 — Business DARK commercial redesign — 2026-07-13
+
+A frontend/design-only phase that gives the Business app a **dark, premium commercial identity** and deepens
+the opportunity-first product. Ordered directly by the owner, superseding the Phase-6 Business pre-cert freeze
+(must be re-verified). **No backend touched** — live Supabase, migrations, persistence seam, and business rules
+are unchanged; no deploy, OAuth, or irreversible step. Full report: `docs/EVENTRA_BUSINESS_PRODUCT_REDESIGN_REPORT.md`.
+
+### Added
+- **Dark design system** in `apps/business/app/app.css` — semantic tokens (`canvas`/`surface`/`elevated`/
+  `line`/`ink*`/`accent` + `ok/warn/err/info`), `color-scheme: dark`, global reduced-motion guard. Tailwind v4
+  utilities (`bg-surface`, `text-ink`, `border-line`…) consumed by the shell + every shared primitive.
+- **`ScoreBreakdown`** primitive + `scoreFactors()` helper — explains an opportunity score with its REAL
+  weighted signals (relevance/category/reach/reliability), no invented dimensions.
+- **`/app/memory`** route — reusable record of completed campaigns + learnings + reuse chains; honest empty state.
+- Enhanced **Topbar** (workspace + connection status, quick-create, notifications, help) and a commercial
+  **5-group nav** (Planning / Create / Knowledge / Resources / Company); Internal/admin surfaces removed from
+  the Business nav.
+- **Dashboard** rebuilt around "what should this business do today": contextual summary, primary actions,
+  real KPI cards, Needs-attention, Recommended-today (labelled rules-based, not fake AI), 30–90 day timeline,
+  recent activity — all real data with honest empty states.
+
+### Changed
+- Re-themed the shell + all `components/ui/*` primitives and every Business screen to the dark tokens.
+
+### Verified
+- typecheck ✅ · lint ✅ (0 errors) · **189 tests** ✅ · `react-router build` ✅ · preview server serves `/app` 200
+  with dark canvas + honest states.
+
+## Phase 8 — Business UI reorg: opportunity-first product — 2026-07-13
+
+Re-centers the Business (Nivel B) surface on **opportunities → campaigns → content → results → memory →
+reuse** instead of the calendar. Ordered directly by the user, superseding the Phase-6 Business freeze
+(CLAUDE.md §1). Presentation + read-model only — the LIVE Supabase project, migrations, and persistence seam
+are untouched (no schema/deploy/irreversible step). See `docs/BUSINESS_INFORMATION_ARCHITECTURE.md`.
+
+### Added
+- **Opportunity engine** (`apps/business/app/lib/opportunities.ts`, pure + tested): `buildOpportunities`
+  (score 0–100 from importance + category + urgency + reach × reliability), lifecycle state (verified/new/
+  modified/cancelled/archived — derived from real hide-prefs + dates + a signal overlay, never invented),
+  priority, difficulty, reliability; `sortOpportunities`, `countByState`, `urgentOpportunities`. Tests +11.
+- **Discovery-signal overlay** (`app/data/mockOpportunitySignals.ts`): typed `app/data` overlay keyed by
+  existing `globalEvents` ids (source/reliability/state/first-seen/revisions); verified default.
+- **Opportunities screen** (`/app/opportunities`) — the new flagship: KPI strip, search + status chips +
+  sort, scored table; "Create campaign" reuses the existing campaign modal.
+- **Definitive navigation** (`app/lib/nav.ts`): 4 groups (General/Management/Operations/Configuration) +
+  separate Platform track; grouped `NavLinks`. Tests +6.
+- **Dashboard control center**: 4 clickable `MetricCard`s (Countries/Opportunities/Campaigns/Plan) with
+  sub-metrics linking into each module.
+- **Analytics builder** (`app/lib/analyticsBuilder.ts` + `AnalyticsBuilder`): choose dimension (X) +
+  measure (Y) + period; series computed live. Tests +5.
+- **New modules** (real, data-driven, no live connections): Content, Audiences, Media, Sources, Integrations,
+  Automations, Jobs, AI, Team, Account. Countries gains a coverage/insights view. Typed `app/data` mocks for
+  each (demo store only, never PrimeBuild). Module smoke tests +12.
+- **Reusable UI**: `MetricCard`, `ScoreBadge`, `DataTable` (responsive), `Toolbar`, `FilterChips`.
+- **Docs**: new `BUSINESS_INFORMATION_ARCHITECTURE.md`; CHANGELOG/BUILD_STATUS/PROJECT_CONTEXT/ARCHITECTURE/
+  ROADMAP/DESIGN_SYSTEM updated.
+
+### Verified
+typecheck ✅ · lint ✅ (0 errors) · tests ✅ **184** (business; +34) · build ✅ (180 modules).
+
+---
+
 ## Phase 7 — Internal OS, visual redesign, offer engine — 2026-07-13
 
 Builds the private platform admin console (Nivel A), strictly separated from Business (B) and Personal (C).

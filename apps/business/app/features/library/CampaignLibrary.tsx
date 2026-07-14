@@ -128,7 +128,7 @@ export function CampaignLibrary() {
               </Badge>
             </CardHeader>
             <CardContent className="p-0">
-              <ul className="divide-y divide-gray-100">
+              <ul className="divide-y divide-line">
                 {group.items.map((c) => (
                   <li
                     key={c.id}
@@ -136,7 +136,7 @@ export function CampaignLibrary() {
                   >
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <p className="truncate text-sm font-medium text-gray-900">
+                        <p className="truncate text-sm font-medium text-ink">
                           {c.name}
                         </p>
                         <StatusPill status={c.status} />
@@ -147,7 +147,7 @@ export function CampaignLibrary() {
                           </Badge>
                         ) : null}
                       </div>
-                      <p className="mt-0.5 text-xs text-gray-500">
+                      <p className="mt-0.5 text-xs text-ink-muted">
                         {formatDateRange(c.startDate, c.endDate)}
                         {c.offer ? ` · ${c.offer}` : ""}
                       </p>

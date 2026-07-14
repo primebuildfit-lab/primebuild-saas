@@ -38,10 +38,10 @@ export function CountryManager() {
       <Card>
         <CardContent className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p className="text-sm font-medium text-gray-900">
+            <p className="text-sm font-medium text-ink">
               {enabledCount} of {formatLimitValue(limit)} countries enabled
             </p>
-            <p className="text-xs text-gray-500">
+            <p className="text-xs text-ink-muted">
               Your {plan.name} plan includes {formatLimitValue(limit)}{" "}
               {limit === 1 ? "country" : "countries"}.
             </p>
@@ -58,7 +58,7 @@ export function CountryManager() {
       </Card>
 
       {overLimit ? (
-        <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <div className="flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-500/15 px-4 py-3 text-sm text-amber-800">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
           <p>
             You have more countries enabled than your current plan allows.
@@ -79,8 +79,8 @@ export function CountryManager() {
             <div
               key={country.code}
               className={cn(
-                "flex items-center justify-between gap-3 rounded-xl border bg-white p-4 shadow-sm",
-                enabled ? "border-brand-200" : "border-gray-200",
+                "flex items-center justify-between gap-3 rounded-xl border bg-surface p-4 shadow-sm",
+                enabled ? "border-brand-200" : "border-line",
               )}
             >
               <div className="flex items-center gap-3">
@@ -88,10 +88,10 @@ export function CountryManager() {
                   {country.flag}
                 </span>
                 <div>
-                  <p className="text-sm font-medium text-gray-900">
+                  <p className="text-sm font-medium text-ink">
                     {country.name}
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-ink-muted">
                     {eventsForCountry(country.code)} official events
                   </p>
                 </div>
@@ -106,7 +106,7 @@ export function CountryManager() {
                   label={`Enable ${country.name}`}
                 />
                 {blockEnable ? (
-                  <span className="text-[11px] text-gray-400">Upgrade to add</span>
+                  <span className="text-[11px] text-ink-faint">Upgrade to add</span>
                 ) : null}
               </div>
             </div>
@@ -114,7 +114,7 @@ export function CountryManager() {
         })}
       </div>
 
-      <p className="flex items-center gap-1.5 text-xs text-gray-400">
+      <p className="flex items-center gap-1.5 text-xs text-ink-faint">
         <Globe className="h-3.5 w-3.5" />
         More countries are added only after their event catalog is researched and
         validated (quality over quantity).

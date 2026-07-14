@@ -170,7 +170,7 @@ export function CampaignForm({
       </div>
 
       <Field label="Products & collections" hint="Attach items this campaign promotes (optional)">
-        <div className="rounded-lg border border-gray-200 p-3">
+        <div className="rounded-lg border border-line p-3">
           <AttachedRefs ids={values.productRefs} />
           <div className="mt-3">
             <Button
@@ -205,7 +205,7 @@ export function CampaignForm({
               <button
                 type="button"
                 onClick={() => removeAction(action.id)}
-                className="rounded-md p-2 text-gray-400 hover:bg-gray-100 hover:text-red-600"
+                className="rounded-md p-2 text-ink-faint hover:bg-surface-2 hover:text-red-400"
                 aria-label="Remove item"
               >
                 <Trash2 className="h-4 w-4" />

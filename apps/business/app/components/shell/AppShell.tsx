@@ -14,7 +14,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   const style = accentVars(preferences.accent) as CSSProperties;
 
   return (
-    <div className="min-h-screen bg-gray-50" style={style}>
+    <div className="min-h-screen bg-canvas text-ink" style={style}>
       <Sidebar />
 
       <div className="lg:pl-64">

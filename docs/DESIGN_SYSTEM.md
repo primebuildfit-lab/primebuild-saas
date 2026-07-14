@@ -35,3 +35,37 @@ tables scroll safely on mobile. Formal audit pending (Playwright/axe) — docume
 
 Implemented **inside `apps/admin`** now. Extraction to `@eventra/ui` (so Partnera/Nexus consume the same
 kit) is the next design-system step — not done this phase.
+
+## Business (Nivel B) surface — DARK commercial redesign (2026-07-13)
+
+> **Supersedes the light-SaaS note below.** By owner decision (2026-07-13), the Business app now uses the
+> **dark, premium commercial identity** — deep slate canvas + indigo/violet accent — matching the Internal OS
+> family. Trade-off acknowledged and accepted: inside Shopify Admin's light chrome the dark app is visually
+> distinct; it is designed primarily for the standalone/PWA commercial experience. The Shopify pre-cert freeze
+> is intentionally broken and must be re-verified.
+
+**Tokens** live in `apps/business/app/app.css` `@theme` and Tailwind v4 generates utilities from them:
+`--color-canvas #0b0f17` (app bg), `--color-surface #111827` (cards), `--color-surface-2`, `--color-elevated`,
+`--color-line` / `--color-line-strong` (borders), `--color-ink` / `--color-ink-muted` / `--color-ink-faint`
+(text), `--color-accent` (indigo), and status tones `--color-ok/warn/err/info`. `color-scheme: dark` +
+global `prefers-reduced-motion` guard. Every shared primitive and the shell consume these tokens, so screens
+theme from one place. Nav is reorganised into five commercial groups (Planning / Create / Knowledge /
+Resources / Company); the calendar is one tool inside an opportunity-first product.
+
+### Legacy note (pre-2026-07-13, historical)
+
+The Business app previously kept a **light, professional SaaS** system (CLAUDE.md §3): white surfaces, brand accent
+tokens, clean borders, moderate radius. The opportunity-first reorg **did not change** colors, branding, or
+typography — only organization, hierarchy, and priority. It added reusable primitives to
+`apps/business/app/components/ui` that all modules compose (no duplicates):
+
+- **`MetricCard`** — clickable KPI card with sub-metrics + optional footer; the dashboard's doorway cards.
+- **`ScoreBadge`** — 0–100 opportunity-score chip; **solid** color bands, deliberately distinct from the
+  ring-style importance `Badge` tones so score ≠ importance (D11).
+- **`DataTable`** — generic table wrapped in `overflow-x-auto`; columns can `hideOnMobile` so tables stay
+  usable on phones.
+- **`Toolbar`** — responsive search/filter ↔ sort/actions row for list surfaces.
+- **`FilterChips`** — single-select chips with counts + an "All" reset (null = unfiltered).
+
+Responsive contract preserved: desktop → tablet → mobile; wide content scrolls within its own container, the
+page body never scrolls horizontally.

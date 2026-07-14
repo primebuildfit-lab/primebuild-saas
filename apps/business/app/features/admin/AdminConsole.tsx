@@ -34,7 +34,7 @@ export function AdminConsole() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-start gap-2 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-800">
+      <div className="flex items-start gap-2 rounded-xl border border-brand-200 bg-brand-500/15 px-4 py-3 text-sm text-brand-800">
         <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
         <p>
           Platform admin — the country and official-event catalog is shared by
@@ -58,7 +58,7 @@ export function AdminConsole() {
             <CardTitle>Official event catalog</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <ul className="divide-y divide-gray-100">
+            <ul className="divide-y divide-line">
               {globalEvents.map((event) => {
                 const active = !inactive.has(event.id);
                 return (
@@ -69,7 +69,7 @@ export function AdminConsole() {
                     <div className="min-w-0">
                       <div className="flex flex-wrap items-center gap-2">
                         <ColorDot importance={event.importance} />
-                        <span className="text-sm font-medium text-gray-900">
+                        <span className="text-sm font-medium text-ink">
                           {event.name}
                         </span>
                         <CategoryBadge category={event.category} />
@@ -77,7 +77,7 @@ export function AdminConsole() {
                           <Badge tone="blue">Recurring</Badge>
                         ) : null}
                       </div>
-                      <p className="mt-0.5 text-xs text-gray-500">
+                      <p className="mt-0.5 text-xs text-ink-muted">
                         {event.countryCodes
                           .map((c) => getCountry(c)?.flag ?? c)
                           .join(" ")}{" "}
@@ -88,7 +88,7 @@ export function AdminConsole() {
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-ink-faint">
                         {active ? "Active" : "Inactive"}
                       </span>
                       <Toggle
@@ -109,7 +109,7 @@ export function AdminConsole() {
             <CardTitle>Country catalog</CardTitle>
           </CardHeader>
           <CardContent className="p-0">
-            <ul className="divide-y divide-gray-100">
+            <ul className="divide-y divide-line">
               {countries.map((country) => {
                 const eventCount = globalEvents.filter((e) =>
                   e.countryCodes.includes(country.code),
@@ -122,10 +122,10 @@ export function AdminConsole() {
                     <div className="flex items-center gap-3">
                       <span className="text-2xl">{country.flag}</span>
                       <div>
-                        <p className="text-sm font-medium text-gray-900">
+                        <p className="text-sm font-medium text-ink">
                           {country.name}
                         </p>
-                        <p className="text-xs text-gray-400">{country.code}</p>
+                        <p className="text-xs text-ink-faint">{country.code}</p>
                       </div>
                     </div>
                     <Badge tone="gray">{eventCount} events</Badge>
@@ -137,7 +137,7 @@ export function AdminConsole() {
         </Card>
       )}
 
-      <p className="flex items-center gap-1.5 text-xs text-gray-400">
+      <p className="flex items-center gap-1.5 text-xs text-ink-faint">
         <Info className="h-3.5 w-3.5" />
         Full catalog editing and persistence are delivered with the admin backend
         in Phase 5.

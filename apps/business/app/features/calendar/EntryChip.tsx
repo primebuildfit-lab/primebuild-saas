@@ -9,11 +9,11 @@ const importanceBorder: Record<string, string> = {
 };
 
 const statusBg: Record<string, string> = {
-  draft: "bg-gray-100 text-gray-700",
+  draft: "bg-surface-2 text-ink",
   scheduled: "bg-sky-100 text-sky-800",
-  active: "bg-emerald-100 text-emerald-800",
-  completed: "bg-brand-100 text-brand-800",
-  archived: "bg-gray-100 text-gray-500",
+  active: "bg-emerald-500/20 text-emerald-800",
+  completed: "bg-brand-500/25 text-brand-800",
+  archived: "bg-surface-2 text-ink-muted",
 };
 
 function chipClasses(entry: CalendarEntry): string {
@@ -22,11 +22,11 @@ function chipClasses(entry: CalendarEntry): string {
   }
   if (entry.kind === "event") {
     return cn(
-      "border-l-2 bg-white text-gray-700",
+      "border-l-2 bg-surface text-ink",
       importanceBorder[entry.importance ?? "low"],
     );
   }
-  return "border-l-2 border-l-gray-300 bg-gray-50 text-gray-700";
+  return "border-l-2 border-l-gray-300 bg-surface-2 text-ink";
 }
 
 interface EntryChipProps {

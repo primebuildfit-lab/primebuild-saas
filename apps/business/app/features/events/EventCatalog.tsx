@@ -146,7 +146,7 @@ export function EventCatalog({ onCreateCampaign }: EventCatalogProps) {
             <button
               type="button"
               onClick={() => setShowHidden((s) => !s)}
-              className="inline-flex w-fit items-center gap-1.5 text-xs font-medium text-gray-500 hover:text-gray-700"
+              className="inline-flex w-fit items-center gap-1.5 text-xs font-medium text-ink-muted hover:text-ink"
             >
               {showHidden ? (
                 <Eye className="h-3.5 w-3.5" />
@@ -174,15 +174,15 @@ export function EventCatalog({ onCreateCampaign }: EventCatalogProps) {
             return (
               <div
                 key={event.id}
-                className={`rounded-xl border bg-white p-4 shadow-sm ${
-                  hidden ? "border-gray-200 opacity-60" : "border-gray-200"
+                className={`rounded-xl border bg-surface p-4 shadow-sm ${
+                  hidden ? "border-line opacity-60" : "border-line"
                 }`}
               >
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                   <div className="min-w-0">
                     <div className="flex flex-wrap items-center gap-2">
                       <ColorDot importance={event.importance} />
-                      <h3 className="text-sm font-semibold text-gray-900">
+                      <h3 className="text-sm font-semibold text-ink">
                         {event.name}
                       </h3>
                       <CategoryBadge category={event.category} />
@@ -190,7 +190,7 @@ export function EventCatalog({ onCreateCampaign }: EventCatalogProps) {
                         <PrepStatusBadge status={prep} />
                       )}
                     </div>
-                    <p className="mt-1.5 text-xs text-gray-500">
+                    <p className="mt-1.5 text-xs text-ink-muted">
                       {event.countryCodes
                         .map((c) => getCountry(c)?.flag ?? c)
                         .join(" ")}{" "}
@@ -201,7 +201,7 @@ export function EventCatalog({ onCreateCampaign }: EventCatalogProps) {
                         : ""}
                     </p>
                     {event.description ? (
-                      <p className="mt-1.5 text-sm text-gray-600">
+                      <p className="mt-1.5 text-sm text-ink-muted">
                         {event.description}
                       </p>
                     ) : null}

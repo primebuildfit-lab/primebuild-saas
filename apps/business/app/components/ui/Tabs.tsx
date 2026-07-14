@@ -15,7 +15,7 @@ interface TabsProps {
 export function Tabs({ tabs, value, onValueChange, className }: TabsProps) {
   return (
     <div
-      className={cn("flex gap-1 border-b border-gray-200", className)}
+      className={cn("flex gap-1 border-b border-line", className)}
       role="tablist"
     >
       {tabs.map((tab) => {
@@ -30,8 +30,8 @@ export function Tabs({ tabs, value, onValueChange, className }: TabsProps) {
             className={cn(
               "-mb-px border-b-2 px-3 py-2 text-sm font-medium transition-colors",
               active
-                ? "border-brand-600 text-brand-700"
-                : "border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700",
+                ? "border-brand-600 text-brand-300"
+                : "border-transparent text-ink-muted hover:border-line-strong hover:text-ink",
             )}
           >
             {tab.label}

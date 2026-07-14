@@ -63,10 +63,10 @@ export default function TemplatesRoute() {
             <Card key={t.id}>
               <CardContent className="flex h-full flex-col">
                 <div className="flex items-start justify-between gap-2">
-                  <h3 className="text-sm font-semibold text-gray-900">{t.name}</h3>
+                  <h3 className="text-sm font-semibold text-ink">{t.name}</h3>
                   <CategoryBadge category={t.category} />
                 </div>
-                <div className="mt-2 flex flex-wrap gap-1.5 text-xs text-gray-500">
+                <div className="mt-2 flex flex-wrap gap-1.5 text-xs text-ink-muted">
                   <Badge tone="gray">
                     <Clock className="h-3 w-3" />
                     {t.defaultDurationDays}-day run
@@ -80,9 +80,9 @@ export default function TemplatesRoute() {
                   ) : null}
                 </div>
                 {t.notes ? (
-                  <p className="mt-2 line-clamp-2 text-xs text-gray-500">{t.notes}</p>
+                  <p className="mt-2 line-clamp-2 text-xs text-ink-muted">{t.notes}</p>
                 ) : null}
-                <div className="mt-4 flex items-center gap-2 border-t border-gray-100 pt-3">
+                <div className="mt-4 flex items-center gap-2 border-t border-line pt-3">
                   <Button size="sm" onClick={() => applyTemplate(t.id)}>
                     <Sparkles className="h-4 w-4" />
                     Use template

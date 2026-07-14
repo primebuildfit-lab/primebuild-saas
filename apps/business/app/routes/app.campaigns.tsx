@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router";
 import { Plus, Megaphone, AlertTriangle } from "lucide-react";
 import { PageHeader, Button, EmptyState, LinkButton } from "~/components/ui";
@@ -25,6 +25,16 @@ export default function CampaignsRoute() {
   const [createOpen, setCreateOpen] = useState(false);
   const [editId, setEditId] = useState<string | undefined>(undefined);
   const [editOpen, setEditOpen] = useState(false);
+
+  // Quick-create from the global topbar: /app/campaigns?create=1 opens the form.
+  useEffect(() => {
+    if (params.get("create") === "1") {
+      setCreateOpen(true);
+      params.delete("create");
+      setParams(params, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const openDetail = (id: string) => {
     params.set("c", id);
@@ -79,7 +89,7 @@ export default function CampaignsRoute() {
       />
 
       {atLimit ? (
-        <div className="mb-4 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-800">
+        <div className="mb-4 flex items-start gap-3 rounded-xl border border-amber-200 bg-amber-500/15 px-4 py-3 text-sm text-amber-800">
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0" />
           <p className="flex-1">
             You’ve reached your plan’s saved-campaign limit. Existing campaigns

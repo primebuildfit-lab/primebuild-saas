@@ -5,7 +5,7 @@ export function Card({ className, ...props }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
       className={cn(
-        "rounded-xl border border-gray-200 bg-white shadow-sm",
+        "rounded-xl border border-line bg-surface shadow-sm",
         className,
       )}
       {...props}
@@ -20,7 +20,7 @@ export function CardHeader({
   return (
     <div
       className={cn(
-        "flex items-start justify-between gap-3 border-b border-gray-100 px-5 py-4",
+        "flex items-start justify-between gap-3 border-b border-line px-5 py-4",
         className,
       )}
       {...props}
@@ -36,7 +36,7 @@ export function CardTitle({
     // Passthrough heading wrapper; content is always provided by callers.
     // eslint-disable-next-line jsx-a11y/heading-has-content
     <h3
-      className={cn("text-sm font-semibold text-gray-900", className)}
+      className={cn("text-sm font-semibold text-ink", className)}
       {...props}
     />
   );
@@ -47,7 +47,7 @@ export function CardDescription({
   ...props
 }: HTMLAttributes<HTMLParagraphElement>) {
   return (
-    <p className={cn("mt-0.5 text-sm text-gray-500", className)} {...props} />
+    <p className={cn("mt-0.5 text-sm text-ink-muted", className)} {...props} />
   );
 }
 
@@ -64,7 +64,7 @@ export function CardFooter({
 }: HTMLAttributes<HTMLDivElement>) {
   return (
     <div
-      className={cn("border-t border-gray-100 px-5 py-3", className)}
+      className={cn("border-t border-line px-5 py-3", className)}
       {...props}
     />
   );

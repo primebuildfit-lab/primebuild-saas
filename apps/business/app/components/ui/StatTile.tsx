@@ -19,18 +19,18 @@ export function StatTile({
   return (
     <div
       className={cn(
-        "rounded-xl border border-gray-200 bg-white p-4 shadow-sm",
+        "rounded-xl border border-line bg-surface p-4 shadow-sm",
         className,
       )}
     >
       <div className="flex items-center justify-between">
-        <p className="text-sm font-medium text-gray-500">{label}</p>
-        {Icon ? <Icon className="h-4 w-4 text-gray-400" /> : null}
+        <p className="text-sm font-medium text-ink-muted">{label}</p>
+        {Icon ? <Icon className="h-4 w-4 text-ink-faint" /> : null}
       </div>
-      <p className="mt-2 text-2xl font-semibold tracking-tight text-gray-900">
+      <p className="mt-2 text-2xl font-semibold tracking-tight text-ink">
         {value}
       </p>
-      {hint ? <p className="mt-1 text-xs text-gray-500">{hint}</p> : null}
+      {hint ? <p className="mt-1 text-xs text-ink-muted">{hint}</p> : null}
     </div>
   );
 }

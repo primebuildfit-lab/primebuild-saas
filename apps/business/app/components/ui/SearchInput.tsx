@@ -21,7 +21,7 @@ export function SearchInput({
 }: SearchInputProps) {
   return (
     <div className={cn("relative", className)}>
-      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400" />
+      <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-ink-faint" />
       <TextInput
         value={value}
         onChange={(e) => onValueChange(e.target.value)}

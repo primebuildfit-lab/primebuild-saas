@@ -28,7 +28,7 @@ export function Modal({
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-gray-900/40 backdrop-blur-sm"
+        className="absolute inset-0 bg-surface-2/40 backdrop-blur-sm"
         onClick={onClose}
         aria-hidden
       />
@@ -40,19 +40,19 @@ export function Modal({
         aria-labelledby={title ? titleId : undefined}
         aria-label={title ? undefined : "Dialog"}
         className={cn(
-          "relative z-10 w-full max-w-lg rounded-xl border border-gray-200 bg-white shadow-xl focus:outline-none",
+          "relative z-10 w-full max-w-lg rounded-xl border border-line bg-surface shadow-xl focus:outline-none",
           className,
         )}
       >
         {title ? (
-          <div className="flex items-center justify-between border-b border-gray-100 px-5 py-4">
-            <h2 id={titleId} className="text-sm font-semibold text-gray-900">
+          <div className="flex items-center justify-between border-b border-line px-5 py-4">
+            <h2 id={titleId} className="text-sm font-semibold text-ink">
               {title}
             </h2>
             <button
               type="button"
               onClick={onClose}
-              className="rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-600"
+              className="rounded-md p-1 text-ink-faint hover:bg-surface-2 hover:text-ink-muted"
               aria-label="Close"
             >
               <X className="h-4 w-4" />
@@ -61,7 +61,7 @@ export function Modal({
         ) : null}
         <div className="px-5 py-4">{children}</div>
         {footer ? (
-          <div className="flex justify-end gap-2 border-t border-gray-100 px-5 py-3">
+          <div className="flex justify-end gap-2 border-t border-line px-5 py-3">
             {footer}
           </div>
         ) : null}

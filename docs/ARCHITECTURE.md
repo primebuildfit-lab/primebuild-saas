@@ -1,6 +1,8 @@
 # Eventra Architecture (`ARCHITECTURE.md`)
 
-> Phase 7 consolidated view. Detailed docs: `PLATFORM_ARCHITECTURE.md`, `DATA_MODEL.md`,
+> Phase 8 consolidated view. Detailed docs: `BUSINESS_INFORMATION_ARCHITECTURE.md` (Business Nivel B is now
+> reorganized around **opportunities** — engine in `apps/business/app/lib/opportunities.ts`, pure/tested,
+> shared by dashboard/opportunities/countries/analytics), `PLATFORM_ARCHITECTURE.md`, `DATA_MODEL.md`,
 > `INTERNAL_OS_INFORMATION_ARCHITECTURE.md`, `OFFER_ENGINE.md`.
 
 ## Monorepo (npm workspaces, 13)

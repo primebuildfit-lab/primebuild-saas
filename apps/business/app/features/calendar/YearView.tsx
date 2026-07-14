@@ -34,17 +34,17 @@ function MiniMonth({
 }) {
   const days = monthGridDays(monthDate, weekStartsOn);
   return (
-    <div className="rounded-xl border border-gray-200 bg-white p-3 shadow-sm">
+    <div className="rounded-xl border border-line bg-surface p-3 shadow-sm">
       <button
         type="button"
         onClick={() => onSelectMonth(monthDate)}
-        className="mb-2 text-sm font-semibold text-gray-900 hover:text-brand-700"
+        className="mb-2 text-sm font-semibold text-ink hover:text-brand-300"
       >
         {format(monthDate, "MMMM")}
       </button>
       <div className="grid grid-cols-7 gap-0.5">
         {weekdayLabels(weekStartsOn).map((l) => (
-          <div key={l} className="text-center text-[9px] font-medium text-gray-300">
+          <div key={l} className="text-center text-[9px] font-medium text-ink-faint">
             {l[0]}
           </div>
         ))}
@@ -58,8 +58,8 @@ function MiniMonth({
               type="button"
               onClick={() => onSelectDay(date)}
               className={cn(
-                "relative flex h-6 items-center justify-center rounded text-[10px] transition-colors hover:bg-gray-100",
-                inMonth ? "text-gray-600" : "text-gray-300",
+                "relative flex h-6 items-center justify-center rounded text-[10px] transition-colors hover:bg-surface-2",
+                inMonth ? "text-ink-muted" : "text-ink-faint",
                 today && "bg-brand-600 font-semibold text-white hover:bg-brand-700",
               )}
             >

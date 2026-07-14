@@ -31,14 +31,14 @@ export function BillingSummary() {
         <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <div className="flex items-center gap-2">
-              <h2 className="text-base font-semibold text-gray-900">
+              <h2 className="text-base font-semibold text-ink">
                 {plan.name} plan
               </h2>
               <Badge tone={subscription.status === "active" ? "green" : "amber"}>
                 {subscription.status}
               </Badge>
             </div>
-            <p className="mt-0.5 text-sm text-gray-500">
+            <p className="mt-0.5 text-sm text-ink-muted">
               {formatPrice(plan.priceMonthly)} · working price (no live billing in V1)
             </p>
           </div>
@@ -47,11 +47,11 @@ export function BillingSummary() {
               const Icon = item.icon;
               return (
                 <div key={item.label} className="text-center sm:text-right">
-                  <p className="flex items-center justify-center gap-1 text-xs text-gray-400 sm:justify-end">
+                  <p className="flex items-center justify-center gap-1 text-xs text-ink-faint sm:justify-end">
                     <Icon className="h-3.5 w-3.5" />
                     {item.label}
                   </p>
-                  <p className="mt-0.5 text-sm font-semibold text-gray-900">
+                  <p className="mt-0.5 text-sm font-semibold text-ink">
                     {item.value}
                   </p>
                 </div>

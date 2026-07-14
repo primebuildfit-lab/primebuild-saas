@@ -45,9 +45,13 @@ export const demoStorePreference: StorePreference = {
   reminderDefaults: [30, 14, 7, 1],
 };
 
-/** Demo store is on Growth for a realistic mid-tier preview. */
+/**
+ * New stores start on **Free** (product decision): no charge until the merchant
+ * chooses a paid plan, which then begins a 45-day free trial. Preview/tests can
+ * switch plans from the Billing screen.
+ */
 export const demoSubscription: Subscription = {
   storeId: DEMO_STORE_ID,
-  planId: "growth",
+  planId: "free",
   status: "active",
 };
