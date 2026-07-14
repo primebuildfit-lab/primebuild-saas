@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Eventra">
+  <!-- Full-bleed background for maskable safe zone (no rounded corners; the OS mask handles shape). -->
+  <rect width="64" height="64" fill="#4f46e5"/>
+  <!-- Logo kept within the ~66% central safe circle. -->
+  <g transform="translate(32 32) scale(0.62) translate(-32 -32)">
+    <rect x="14" y="16" width="36" height="34" rx="5" fill="#ffffff"/>
+    <rect x="14" y="16" width="36" height="9" rx="5" fill="#c7d2fe"/>
+    <rect x="22" y="10" width="2" height="8" rx="1" fill="#312e81"/>
+    <rect x="40" y="10" width="2" height="8" rx="1" fill="#312e81"/>
+    <circle cx="32" cy="37" r="7" fill="#4f46e5"/>
+    <path d="M29 37.5l2.2 2.2L36 34.8" fill="none" stroke="#ffffff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+</svg>
