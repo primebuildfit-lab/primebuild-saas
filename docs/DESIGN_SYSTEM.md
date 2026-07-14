@@ -69,3 +69,21 @@ typography — only organization, hierarchy, and priority. It added reusable pri
 
 Responsive contract preserved: desktop → tablet → mobile; wide content scrolls within its own container, the
 page body never scrolls horizontally.
+
+## Internal OS — dark command-center recreation (2026-07-14)
+
+The Nivel-A admin panel (`apps/admin/src/os`) was rebuilt to the "Eventra Internal OS"
+specification: deeper blue-black palette (`--background #07111f`, violet brand
+`--brand-primary #7c4dff`, lime/sky/amber/red/magenta status), `Inter` typography,
+228px sidebar + 64px topbar, and an information-dense component kit (`MetricCard`,
+`MetricTrend`, `ChartCard`, `Donut`, `DataTable`, `ActivityFeed`, `StatusBadge`,
+`PriorityBadge`, `EmptyState`, `ErrorState`, `LoadingSkeleton`, `DateRangePicker`,
+`FilterDropdown`, `SystemStatusIndicator`, `QuickActionButton`). 18 branches in two
+sections (operational + CONFIGURACIONES). **Data discipline:** DEV fixtures (badged)
+for entities, derivations from real fixture state for activity/progress, and explicit
+empty states for every measured outcome with no real source — nothing fabricated.
+Separate identity from Business (Nivel B, light). Details:
+[EVENTRA_INTERNAL_OS_DESIGN](EVENTRA_INTERNAL_OS_DESIGN.md) ·
+[NAVIGATION](EVENTRA_INTERNAL_OS_NAVIGATION.md) ·
+[DASHBOARD](EVENTRA_INTERNAL_OS_DASHBOARD.md) ·
+[DATA_SOURCES](EVENTRA_INTERNAL_OS_DATA_SOURCES.md).

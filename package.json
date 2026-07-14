@@ -26,6 +26,8 @@
     "verify:persistence": "node scripts/verify-file-persistence.mjs",
     "preinstall:check": "node scripts/preinstall-check.mjs",
     "start:local": "node scripts/eventra-local.mjs",
+    "start:admin": "node scripts/eventra-admin.mjs",
+    "start:mobile": "node scripts/eventra-mobile.mjs",
     "reset:local": "node scripts/reset-local.mjs",
     "update:local": "node scripts/update-local.mjs",
     "shortcuts:install": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/windows/install-shortcuts.ps1",

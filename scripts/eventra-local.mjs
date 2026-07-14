@@ -35,8 +35,61 @@ function banner(lines) {
   console.log(`\n${bar}\n${lines.map((l) => "  " + l).join("\n")}\n${bar}\n`);
 }
 
+/**
+ * Locate a Chromium browser (Edge or Chrome) so Eventra can open in its OWN
+ * app window (`--app=`) instead of a lost tab in the default browser. Edge ships
+ * with Windows 11, so this path is reliable; Chrome is tried next.
+ */
+function findAppBrowser() {
+  if (process.platform !== "win32") return null;
+  const pf = process.env["ProgramFiles"] || "C:/Program Files";
+  const pfx86 = process.env["ProgramFiles(x86)"] || "C:/Program Files (x86)";
+  const local = process.env["LOCALAPPDATA"] || join(process.env.USERPROFILE || "", "AppData/Local");
+  const candidates = [
+    join(pfx86, "Microsoft/Edge/Application/msedge.exe"),
+    join(pf, "Microsoft/Edge/Application/msedge.exe"),
+    join(pf, "Google/Chrome/Application/chrome.exe"),
+    join(pfx86, "Google/Chrome/Application/chrome.exe"),
+    join(local, "Google/Chrome/Application/chrome.exe"),
+  ];
+  return candidates.find((p) => existsSync(p)) || null;
+}
+
 function openBrowser(target) {
   if (noOpen) return;
+
+  // Preferred: a dedicated, chromeless APP window so Eventra behaves like a real
+  // desktop app (its own window + taskbar entry, Eventra favicon, no tab clutter).
+  // A dedicated --user-data-dir is essential: it stops Edge/Chrome from merging
+  // the window into an already-open browser instance, so Eventra ALWAYS opens as
+  // its own separate app window (and keeps its own local state).
+  const browser = findAppBrowser();
+  if (browser) {
+    const profileDir = join(
+      process.env["LOCALAPPDATA"] || join(process.env.USERPROFILE || root, "AppData/Local"),
+      "Eventra",
+      "AppWindow",
+    );
+    const win = spawn(
+      browser,
+      [
+        `--app=${target}`,
+        `--user-data-dir=${profileDir}`,
+        "--window-size=1360,900",
+        "--no-first-run",
+        "--no-default-browser-check",
+      ],
+      { detached: true, stdio: "ignore" },
+    );
+    win.on("error", () => openInDefaultBrowser(target));
+    win.unref();
+    return;
+  }
+  openInDefaultBrowser(target);
+}
+
+/** Fallback: open the URL in whatever the OS default browser is. */
+function openInDefaultBrowser(target) {
   const cmd =
     process.platform === "win32"
       ? `start "" "${target}"`
