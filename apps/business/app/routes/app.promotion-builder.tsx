@@ -22,6 +22,7 @@ import {
 } from "~/components/ui";
 import { TextInput, Textarea, Select } from "~/components/ui/FormControls";
 import { useData } from "~/context/DataContext";
+import { useAdvertising } from "~/context/AdvertisingContext";
 import { buildOpportunities, type ScoredOpportunity } from "~/lib/opportunities";
 import { ProductPicker, AttachedRefs } from "~/features/campaigns/ProductPicker";
 import { getCountry } from "~/data";
@@ -92,8 +93,8 @@ export default function PromotionBuilderRoute() {
     campaigns,
     plan,
     templates,
-    createCampaign,
   } = useData();
+  const { createAdvertisement } = useAdvertising();
   const navigate = useNavigate();
   const [params] = useSearchParams();
 
@@ -137,29 +138,26 @@ export default function PromotionBuilderRoute() {
 
   const save = (publish: boolean) => {
     if (!canSave) return;
-    const notesParts = [
-      draft.title && `Title: ${draft.title}`,
-      draft.subtitle && `Subtitle: ${draft.subtitle}`,
-      draft.cta && `CTA: ${draft.cta}`,
-      draft.liquid && `Liquid:\n${draft.liquid}`,
-    ].filter(Boolean);
-    const campaign = createCampaign({
+    // The builder produces a real ADVERTISEMENT (a marketing piece), not a campaign.
+    createAdvertisement({
       name: draft.name.trim(),
-      globalEventId: draft.opportunityId
+      eventId: draft.opportunityId
         ? opportunities.find((o) => o.id === draft.opportunityId)?.event.id
         : undefined,
+      templateId: draft.templateId ?? undefined,
       country: draft.country || undefined,
-      objective: draft.subtitle.trim() || undefined,
+      placement: "banner",
+      title: draft.title.trim() || undefined,
+      subtitle: draft.subtitle.trim() || undefined,
       description: draft.description.trim() || undefined,
-      offer: draft.offer.trim() || undefined,
-      notes: notesParts.join("\n") || undefined,
+      cta: draft.cta.trim() || undefined,
+      liquid: draft.liquid.trim() || undefined,
+      productRefs: draft.productRefs,
       startDate: draft.startDate,
       endDate: draft.endDate,
       status: publish ? "scheduled" : "draft",
-      productRefs: draft.productRefs,
-      actions: [],
     });
-    navigate(`/app/campaigns?c=${campaign.id}`);
+    navigate("/app/advertisements");
   };
 
   const selectedOpp = opportunities.find((o) => o.id === draft.opportunityId) ?? null;
@@ -168,7 +166,7 @@ export default function PromotionBuilderRoute() {
     <div>
       <PageHeader
         title="Promotion Builder"
-        description="Turn an opportunity into ready-to-publish marketing: pick an opportunity, choose a template and products, write your offer, and schedule it. Saving creates a real campaign you can reuse next year."
+        description="Turn an event or opportunity into ready-to-publish marketing: pick an opportunity, choose an offer, a template and products, then schedule it. Saving creates a real advertisement you can reuse next year."
       />
 
       {/* Stepper */}
@@ -185,7 +183,7 @@ export default function PromotionBuilderRoute() {
                 className={cn(
                   "flex items-center gap-2 rounded-lg border px-3 py-1.5 text-sm transition-colors",
                   active
-                    ? "border-brand-500/50 bg-brand-500/15 text-white"
+                    ? "border-brand-300 bg-brand-50 text-brand-700"
                     : done
                       ? "border-line bg-surface text-ink-muted hover:text-ink"
                       : "border-line bg-surface text-ink-faint hover:text-ink-muted",
@@ -228,8 +226,8 @@ export default function PromotionBuilderRoute() {
                     className={cn(
                       "flex flex-col gap-2 rounded-lg border p-3 text-left transition-colors",
                       chosen
-                        ? "border-brand-500/60 bg-brand-500/10 ring-1 ring-inset ring-brand-500/30"
-                        : "border-line bg-surface-2 hover:border-brand-500/40",
+                        ? "border-brand-400 bg-brand-50 ring-1 ring-inset ring-brand-200"
+                        : "border-line bg-surface-2 hover:border-brand-300",
                     )}
                   >
                     <div className="flex items-start justify-between gap-2">
@@ -260,7 +258,7 @@ export default function PromotionBuilderRoute() {
                 className={cn(
                   "rounded-lg border p-3 text-left text-sm transition-colors",
                   draft.templateId === null
-                    ? "border-brand-500/60 bg-brand-500/10 text-white"
+                    ? "border-brand-400 bg-brand-50 text-brand-700"
                     : "border-line bg-surface-2 text-ink-muted hover:text-ink",
                 )}
               >
@@ -274,8 +272,8 @@ export default function PromotionBuilderRoute() {
                   className={cn(
                     "rounded-lg border p-3 text-left transition-colors",
                     draft.templateId === t.id
-                      ? "border-brand-500/60 bg-brand-500/10"
-                      : "border-line bg-surface-2 hover:border-brand-500/40",
+                      ? "border-brand-400 bg-brand-50"
+                      : "border-line bg-surface-2 hover:border-brand-300",
                   )}
                 >
                   <span className="block truncate text-sm font-medium text-ink">{t.name}</span>

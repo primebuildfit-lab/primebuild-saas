@@ -5,11 +5,11 @@ export type BadgeTone = "gray" | "brand" | "green" | "amber" | "red" | "blue";
 
 const tones: Record<BadgeTone, string> = {
   gray: "bg-surface-2 text-ink ring-line",
-  brand: "bg-brand-500/15 text-brand-300 ring-brand-500/30",
-  green: "bg-emerald-500/15 text-emerald-300 ring-emerald-500/30",
-  amber: "bg-amber-500/15 text-amber-300 ring-amber-500/30",
-  red: "bg-red-500/15 text-red-300 ring-red-500/30",
-  blue: "bg-sky-500/15 text-sky-300 ring-sky-500/30",
+  brand: "bg-brand-50 text-brand-700 ring-brand-200",
+  green: "bg-emerald-50 text-emerald-700 ring-emerald-200",
+  amber: "bg-amber-50 text-amber-700 ring-amber-200",
+  red: "bg-red-50 text-red-700 ring-red-200",
+  blue: "bg-sky-50 text-sky-700 ring-sky-200",
 };
 
 export interface BadgeProps extends HTMLAttributes<HTMLSpanElement> {

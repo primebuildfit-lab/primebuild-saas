@@ -62,7 +62,7 @@ function FilterChip({
       className={
         "rounded-full border px-2.5 py-1 text-xs font-medium transition-colors " +
         (active
-          ? "border-brand-200 bg-brand-500/15 text-brand-300"
+          ? "border-brand-200 bg-brand-50 text-brand-700"
           : "border-line bg-surface text-ink-faint hover:text-ink-muted")
       }
     >

@@ -83,14 +83,14 @@ function MiniMonth({
     <div
       className={cn(
         "rounded-xl border bg-surface p-3 transition-colors",
-        expanded ? "border-brand-500/50 ring-1 ring-inset ring-brand-500/30" : "border-line",
+        expanded ? "border-brand-300 ring-1 ring-inset ring-brand-200" : "border-line",
       )}
     >
       <button
         type="button"
         onClick={onToggle}
         aria-expanded={expanded}
-        className="mb-2 flex w-full items-center justify-between text-sm font-semibold text-ink hover:text-brand-300"
+        className="mb-2 flex w-full items-center justify-between text-sm font-semibold text-ink hover:text-brand-700"
       >
         <span>{monthLabel(monthDate).split(" ")[0]}</span>
         <span className="flex items-center gap-1.5 text-[11px] font-normal text-ink-faint">
@@ -175,7 +175,7 @@ export function YearHeatmap({
               />
               {isOpen ? (
                 <div className="sm:col-span-2 lg:col-span-3 xl:col-span-4">
-                  <div className="rounded-xl border border-brand-500/40 bg-surface p-4">
+                  <div className="rounded-xl border border-brand-300 bg-surface p-4">
                     <MonthView
                       monthDate={monthDate}
                       entries={entries}

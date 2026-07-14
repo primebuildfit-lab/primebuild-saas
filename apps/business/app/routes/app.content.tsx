@@ -135,7 +135,7 @@ export default function ContentRoute() {
             return (
               <div
                 key={c.id}
-                className="group flex flex-col overflow-hidden rounded-xl border border-line bg-surface transition-colors hover:border-brand-500/40"
+                className="group flex flex-col overflow-hidden rounded-xl border border-line bg-surface transition-colors hover:border-brand-300"
               >
                 <div className="flex h-24 items-center justify-center bg-surface-2 text-ink-faint">
                   <Icon className="h-7 w-7" />
@@ -150,7 +150,7 @@ export default function ContentRoute() {
                   {cname ? (
                     <Link
                       to={`/app/campaigns?c=${c.campaignId}`}
-                      className="mt-2 truncate text-xs text-brand-300 hover:underline"
+                      className="mt-2 truncate text-xs text-brand-700 hover:underline"
                     >
                       {cname}
                     </Link>

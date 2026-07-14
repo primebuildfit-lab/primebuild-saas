@@ -91,7 +91,7 @@ export default function SourcesRoute() {
       align: "right",
       cell: (s) =>
         s.errors > 0 ? (
-          <span className="font-medium text-red-400">{s.errors}</span>
+          <span className="font-medium text-red-600">{s.errors}</span>
         ) : (
           <span className="text-ink-faint">0</span>
         ),

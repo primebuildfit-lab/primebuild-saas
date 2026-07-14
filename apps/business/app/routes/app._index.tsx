@@ -314,7 +314,7 @@ export default function DashboardRoute() {
                       className={cn(
                         "flex h-9 w-9 shrink-0 flex-col items-center justify-center rounded-lg text-[10px] font-semibold",
                         t.kind === "campaign"
-                          ? "bg-brand-500/15 text-brand-300"
+                          ? "bg-brand-50 text-brand-700"
                           : "bg-surface-2 text-ink-muted",
                       )}
                     >
@@ -394,8 +394,8 @@ function ActionTile({
   label: string;
 }) {
   const inner = (
-    <span className="flex h-full flex-col items-start gap-2 rounded-xl border border-line bg-surface p-3 text-left transition-colors hover:border-brand-500/40 hover:bg-surface-2">
-      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-500/15 text-brand-300">
+    <span className="flex h-full flex-col items-start gap-2 rounded-xl border border-line bg-surface p-3 text-left transition-colors hover:border-brand-300 hover:bg-surface-2">
+      <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-brand-50 text-brand-700">
         <Icon className="h-4 w-4" />
       </span>
       <span className="text-xs font-medium text-ink">{label}</span>
@@ -425,11 +425,11 @@ function Kpi({
   return (
     <Link
       to={to}
-      className="group flex flex-col rounded-xl border border-line bg-surface p-4 transition-colors hover:border-brand-500/40"
+      className="group flex flex-col rounded-xl border border-line bg-surface p-4 transition-colors hover:border-brand-300"
     >
       <div className="flex items-center justify-between">
         <p className="text-sm font-medium text-ink-muted">{label}</p>
-        <ChevronRight className="h-4 w-4 text-ink-faint transition-colors group-hover:text-brand-300" />
+        <ChevronRight className="h-4 w-4 text-ink-faint transition-colors group-hover:text-brand-700" />
       </div>
       <p className="mt-1.5 text-2xl font-semibold tracking-tight text-ink">{value}</p>
       <dl className="mt-3 flex flex-wrap gap-x-4 gap-y-1 text-xs">

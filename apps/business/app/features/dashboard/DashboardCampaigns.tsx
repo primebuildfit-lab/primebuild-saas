@@ -30,7 +30,7 @@ export function ActiveCampaigns({ onCreate }: { onCreate: () => void }) {
         <CardTitle>Active &amp; scheduled campaigns</CardTitle>
         <Link
           to="/app/campaigns"
-          className="text-sm font-medium text-brand-300 hover:text-brand-300"
+          className="text-sm font-medium text-brand-700 hover:text-brand-700"
         >
           All campaigns
         </Link>
@@ -72,7 +72,7 @@ export function RecentCampaigns() {
         <CardTitle>Recent campaigns</CardTitle>
         <Link
           to="/app/campaign-library"
-          className="text-sm font-medium text-brand-300 hover:text-brand-300"
+          className="text-sm font-medium text-brand-700 hover:text-brand-700"
         >
           Campaign library
         </Link>

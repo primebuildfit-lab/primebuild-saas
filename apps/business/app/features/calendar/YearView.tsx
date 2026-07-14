@@ -38,7 +38,7 @@ function MiniMonth({
       <button
         type="button"
         onClick={() => onSelectMonth(monthDate)}
-        className="mb-2 text-sm font-semibold text-ink hover:text-brand-300"
+        className="mb-2 text-sm font-semibold text-ink hover:text-brand-700"
       >
         {format(monthDate, "MMMM")}
       </button>

@@ -110,14 +110,14 @@ export function CalendarSettings() {
             {reminders.map((r) => (
               <span
                 key={r}
-                className="inline-flex items-center gap-1 rounded-full bg-brand-500/15 px-2.5 py-1 text-xs font-medium text-brand-300"
+                className="inline-flex items-center gap-1 rounded-full bg-brand-50 px-2.5 py-1 text-xs font-medium text-brand-700"
               >
                 {r} days
                 <button
                   type="button"
                   onClick={() => removeReminder(r)}
                   aria-label={`Remove ${r} day reminder`}
-                  className="text-brand-400 hover:text-brand-300"
+                  className="text-brand-400 hover:text-brand-700"
                 >
                   <X className="h-3 w-3" />
                 </button>
@@ -175,7 +175,7 @@ export function AppearanceSettings() {
                   className={cn(
                     "flex items-center gap-2 rounded-lg border px-3 py-2 text-sm transition-colors",
                     active
-                      ? "border-brand-500 bg-surface-2 ring-1 ring-inset ring-brand-500/40"
+                      ? "border-brand-500 bg-surface-2 ring-1 ring-inset ring-brand-300"
                       : "border-line hover:bg-surface-2",
                   )}
                 >

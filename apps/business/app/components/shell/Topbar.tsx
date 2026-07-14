@@ -42,7 +42,7 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
           onChange={(e) => setQ(e.target.value)}
           placeholder="Search opportunities, campaigns, content…"
           aria-label="Search"
-          className="h-9 w-full rounded-lg border border-line bg-surface-2 pl-9 pr-3 text-sm text-ink placeholder:text-ink-faint focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-500/30"
+          className="h-9 w-full rounded-lg border border-line bg-surface-2 pl-9 pr-3 text-sm text-ink placeholder:text-ink-faint focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-200"
         />
       </form>
 

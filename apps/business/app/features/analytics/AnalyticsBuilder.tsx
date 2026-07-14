@@ -108,7 +108,7 @@ export function AnalyticsBuilder({
         </div>
 
         {!applies ? (
-          <p className="text-xs text-amber-400">
+          <p className="text-xs text-amber-600">
             Average score needs an opportunity dimension — showing counts instead.
           </p>
         ) : null}

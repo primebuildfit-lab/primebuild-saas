@@ -90,7 +90,7 @@ export function ProductPicker({
               className={cn(
                 "flex w-full items-center gap-3 rounded-lg border px-3 py-2 text-left transition-colors",
                 isSelected
-                  ? "border-brand-200 bg-brand-500/15"
+                  ? "border-brand-200 bg-brand-50"
                   : "border-transparent hover:bg-surface-2",
               )}
             >
@@ -119,7 +119,7 @@ export function ProductPicker({
                 </span>
               </span>
               {isSelected ? (
-                <Check className="h-4 w-4 shrink-0 text-brand-300" />
+                <Check className="h-4 w-4 shrink-0 text-brand-700" />
               ) : null}
             </button>
           );

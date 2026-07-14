@@ -47,8 +47,8 @@ export function ErrorState({
   action?: ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center justify-center rounded-xl border border-red-500/30 bg-red-500/10 px-6 py-14 text-center">
-      <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-red-500/20 text-red-400">
+    <div className="flex flex-col items-center justify-center rounded-xl border border-red-300 bg-red-50 px-6 py-14 text-center">
+      <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-full bg-red-100 text-red-600">
         <AlertTriangle className="h-5 w-5" />
       </div>
       <h3 className="text-sm font-semibold text-ink">{title}</h3>

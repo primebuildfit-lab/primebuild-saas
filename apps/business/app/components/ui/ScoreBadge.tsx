@@ -21,7 +21,7 @@ export function ScoreBadge({ score, size = "md", className }: ScoreBadgeProps) {
         ? "bg-brand-600 text-white"
         : score >= 40
           ? "bg-amber-500 text-white"
-          : "bg-slate-500 text-white";
+          : "bg-gray-400 text-white";
   return (
     <span
       className={cn(

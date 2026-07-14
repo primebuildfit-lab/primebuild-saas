@@ -56,7 +56,7 @@ function DayCell({
         "flex flex-col gap-0.5 border-b border-r border-line p-1",
         compact ? "min-h-16" : "min-h-24",
         !inMonth && "bg-surface-2/60",
-        isOver && "bg-brand-500/15 ring-2 ring-inset ring-brand-300",
+        isOver && "bg-brand-50 ring-2 ring-inset ring-brand-300",
       )}
     >
       <button

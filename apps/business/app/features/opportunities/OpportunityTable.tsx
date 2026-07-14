@@ -112,7 +112,7 @@ export function OpportunityTable({
       align: "right",
       cell: (o) =>
         o.hasCampaign ? (
-          <span className="text-xs font-medium text-emerald-400">Planned</span>
+          <span className="text-xs font-medium text-emerald-600">Planned</span>
         ) : o.state === "cancelled" || o.state === "archived" ? (
           <span className="text-xs text-ink-faint">—</span>
         ) : (

@@ -41,7 +41,7 @@ export function CampaignCard({
       className={cn(
         "rounded-xl border border-line bg-surface p-4 shadow-sm transition-colors",
         interactive &&
-          "cursor-pointer hover:border-brand-200 hover:bg-brand-500/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
+          "cursor-pointer hover:border-brand-200 hover:bg-brand-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500",
         className,
       )}
     >

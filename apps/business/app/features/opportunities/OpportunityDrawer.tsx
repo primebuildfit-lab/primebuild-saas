@@ -62,8 +62,8 @@ export function OpportunityDrawer({
       {o ? (
         <div className="flex flex-col gap-6">
           {/* Should I act? */}
-          <div className="rounded-xl border border-brand-500/30 bg-brand-500/10 p-4">
-            <p className="text-xs font-semibold uppercase tracking-wide text-brand-300">
+          <div className="rounded-xl border border-brand-200 bg-brand-50 p-4">
+            <p className="text-xs font-semibold uppercase tracking-wide text-brand-700">
               Recommended action
             </p>
             <p className="mt-1 text-sm text-ink">{recommendation(o)}</p>

@@ -34,7 +34,7 @@ export function AdminConsole() {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-start gap-2 rounded-xl border border-brand-200 bg-brand-500/15 px-4 py-3 text-sm text-brand-800">
+      <div className="flex items-start gap-2 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3 text-sm text-brand-800">
         <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0" />
         <p>
           Platform admin — the country and official-event catalog is shared by

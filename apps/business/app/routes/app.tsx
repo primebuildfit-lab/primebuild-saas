@@ -73,7 +73,7 @@ function PreviewBanner({ mode }: { mode: string }) {
   return (
     <div
       role="status"
-      className="mb-4 flex items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/15 px-4 py-2 text-sm text-amber-200"
+      className="mb-4 flex items-center gap-2 rounded-lg border border-amber-300 bg-amber-50 px-4 py-2 text-sm text-amber-800"
     >
       <span aria-hidden>🔍</span>
       <span>
@@ -96,7 +96,7 @@ function PersistErrorBanner({
   return (
     <div
       role="alert"
-      className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-red-500/30 bg-red-500/15 px-4 py-2 text-sm text-red-200"
+      className="mb-4 flex items-center justify-between gap-3 rounded-lg border border-red-300 bg-red-50 px-4 py-2 text-sm text-red-800"
     >
       <span>{message}</span>
       <span className="flex gap-2">

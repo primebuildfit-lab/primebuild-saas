@@ -194,7 +194,7 @@ export function CampaignDetail({
       >
         <div className="space-y-5">
           {readOnly ? (
-            <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-500/15 px-3 py-2.5 text-sm text-amber-800">
+            <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm text-amber-800">
               <p className="flex-1">
                 This campaign is <strong>read-only</strong> because it’s over your{" "}
                 {plan.name} plan’s saved-campaign limit. Your data is kept safe —
@@ -207,7 +207,7 @@ export function CampaignDetail({
           ) : null}
 
           {flash ? (
-            <p className="rounded-lg bg-emerald-500/15 px-3 py-2 text-sm text-emerald-300">
+            <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">
               {flash}
             </p>
           ) : null}
@@ -326,7 +326,7 @@ export function CampaignDetail({
                   <button
                     type="button"
                     onClick={() => onOpenOther(reusedFrom.id)}
-                    className="flex items-center gap-2 text-brand-300 hover:text-brand-300"
+                    className="flex items-center gap-2 text-brand-700 hover:text-brand-700"
                   >
                     <GitBranch className="h-4 w-4" />
                     Reused from “{reusedFrom.name}”

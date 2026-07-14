@@ -18,8 +18,8 @@ export default function BillingRoute() {
       <div className="space-y-6">
         {/* Trial / free-plan status — honest: no charge happens in this version. */}
         {isFree ? (
-          <div className="flex items-start gap-3 rounded-xl border border-brand-500/30 bg-brand-500/10 px-4 py-3">
-            <Gift className="mt-0.5 h-5 w-5 shrink-0 text-brand-300" />
+          <div className="flex items-start gap-3 rounded-xl border border-brand-200 bg-brand-50 px-4 py-3">
+            <Gift className="mt-0.5 h-5 w-5 shrink-0 text-brand-700" />
             <div className="text-sm">
               <p className="font-semibold text-ink">You’re on the Free plan</p>
               <p className="mt-0.5 text-ink-muted">
@@ -30,7 +30,7 @@ export default function BillingRoute() {
           </div>
         ) : (
           <div className="flex items-start gap-3 rounded-xl border border-emerald-500/30 bg-emerald-500/10 px-4 py-3">
-            <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-emerald-300" />
+            <Sparkles className="mt-0.5 h-5 w-5 shrink-0 text-emerald-700" />
             <div className="text-sm">
               <p className="font-semibold text-ink">45-day free trial on the {plan.name} plan</p>
               <p className="mt-0.5 text-ink-muted">

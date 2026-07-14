@@ -17,7 +17,7 @@ export function PricingPlans() {
             key={plan.id}
             className={cn(
               "flex flex-col rounded-xl border bg-surface p-5 shadow-sm",
-              current ? "border-brand-400 ring-1 ring-brand-500/30" : "border-line",
+              current ? "border-brand-400 ring-1 ring-brand-200" : "border-line",
             )}
           >
             <div className="flex items-center justify-between">

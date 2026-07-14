@@ -31,7 +31,7 @@ export function UpcomingOpportunities({
         <CardTitle>Upcoming opportunities</CardTitle>
         <Link
           to="/app/events"
-          className="text-sm font-medium text-brand-300 hover:text-brand-300"
+          className="text-sm font-medium text-brand-700 hover:text-brand-700"
         >
           View all
         </Link>

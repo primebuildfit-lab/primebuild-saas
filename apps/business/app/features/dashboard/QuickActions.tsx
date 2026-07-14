@@ -22,25 +22,25 @@ export function QuickActions({ onCreateCampaign }: QuickActionsProps) {
       label: "Create campaign",
       icon: Plus,
       onClick: onCreateCampaign,
-      tone: "bg-brand-500/15 text-brand-300",
+      tone: "bg-brand-50 text-brand-700",
     },
     {
       label: "Open calendar",
       icon: Calendar,
       onClick: () => navigate("/app/calendar"),
-      tone: "bg-sky-500/15 text-sky-600",
+      tone: "bg-sky-50 text-sky-600",
     },
     {
       label: "Manage countries",
       icon: Globe,
       onClick: () => navigate("/app/countries"),
-      tone: "bg-emerald-500/15 text-emerald-400",
+      tone: "bg-emerald-50 text-emerald-600",
     },
     {
       label: "Review saved",
       icon: Library,
       onClick: () => navigate("/app/campaign-library"),
-      tone: "bg-amber-500/15 text-amber-400",
+      tone: "bg-amber-50 text-amber-600",
     },
   ];
 
@@ -57,7 +57,7 @@ export function QuickActions({ onCreateCampaign }: QuickActionsProps) {
               key={action.label}
               type="button"
               onClick={action.onClick}
-              className="flex items-center gap-3 rounded-lg border border-line p-3 text-left transition-colors hover:border-brand-200 hover:bg-brand-500/15/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
+              className="flex items-center gap-3 rounded-lg border border-line p-3 text-left transition-colors hover:border-brand-200 hover:bg-brand-50/40 focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-500"
             >
               <span
                 className={cn(

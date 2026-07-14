@@ -34,7 +34,7 @@ export function FilterChips<T extends string>({
     cn(
       "inline-flex items-center gap-1.5 rounded-full border px-3 py-1 text-xs font-medium transition-colors",
       active
-        ? "border-brand-500/40 bg-brand-500/15 text-brand-300"
+        ? "border-brand-300 bg-brand-50 text-brand-700"
         : "border-line bg-surface text-ink-muted hover:bg-surface-2",
     );
 
@@ -62,7 +62,7 @@ export function FilterChips<T extends string>({
             <span
               className={cn(
                 "rounded-full px-1.5 text-[10px] font-semibold tabular-nums",
-                value === c.value ? "bg-brand-500/25 text-brand-300" : "bg-surface-2 text-ink-muted",
+                value === c.value ? "bg-brand-100 text-brand-700" : "bg-surface-2 text-ink-muted",
               )}
             >
               {c.count}

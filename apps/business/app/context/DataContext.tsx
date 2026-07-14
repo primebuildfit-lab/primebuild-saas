@@ -41,6 +41,7 @@ import {
 import { getPlan, canAddCountry as canAddCountryFor } from "~/lib/planEntitlements";
 import { createId } from "~/lib/id";
 import { duplicateCampaign } from "~/lib/campaigns";
+import { AdvertisingProvider } from "./AdvertisingContext";
 import type { Catalog, StoreBundle } from "~/db/repository";
 import type { DataIntent } from "~/db/dataActions";
 
@@ -478,7 +479,7 @@ export function DataProvider({
       <PlanProviderInner initial={initialData} onPersist={onPersist}>
         <CatalogProviderInner initial={initialData} onPersist={onPersist}>
           <CampaignsProviderInner initial={initialData} onPersist={onPersist}>
-            {children}
+            <AdvertisingProvider>{children}</AdvertisingProvider>
           </CampaignsProviderInner>
         </CatalogProviderInner>
       </PlanProviderInner>

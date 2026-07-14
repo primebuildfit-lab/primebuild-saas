@@ -13,7 +13,7 @@ function Item({ item, onNavigate }: { item: NavItem; onNavigate?: () => void }) 
         cn(
           "group flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors",
           isActive
-            ? "bg-brand-500/15 text-white ring-1 ring-inset ring-brand-500/30"
+            ? "bg-brand-50 text-brand-700 ring-1 ring-inset ring-brand-200"
             : "text-ink-muted hover:bg-surface-2 hover:text-ink",
         )
       }

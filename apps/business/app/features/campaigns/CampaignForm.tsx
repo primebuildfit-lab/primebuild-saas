@@ -205,7 +205,7 @@ export function CampaignForm({
               <button
                 type="button"
                 onClick={() => removeAction(action.id)}
-                className="rounded-md p-2 text-ink-faint hover:bg-surface-2 hover:text-red-400"
+                className="rounded-md p-2 text-ink-faint hover:bg-surface-2 hover:text-red-600"
                 aria-label="Remove item"
               >
                 <Trash2 className="h-4 w-4" />

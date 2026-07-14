@@ -89,7 +89,7 @@ export default function IntegrationsRoute() {
       align: "right",
       cell: (i) =>
         i.errors > 0 ? (
-          <span className="font-medium text-red-400">{i.errors}</span>
+          <span className="font-medium text-red-600">{i.errors}</span>
         ) : (
           <span className="text-ink-faint">0</span>
         ),

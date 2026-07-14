@@ -116,7 +116,7 @@ export default function AiRoute() {
         description="Eventra's AI workbench — models, prompts, tasks, cost, and accuracy. Architecture only; no live model is connected in V1."
       />
 
-      <div className="mb-4 flex items-start gap-2 rounded-lg border border-sky-500/30 bg-sky-500/15 px-4 py-2 text-sm text-sky-200">
+      <div className="mb-4 flex items-start gap-2 rounded-lg border border-sky-300 bg-sky-50 px-4 py-2 text-sm text-sky-800">
         <span aria-hidden>ℹ️</span>
         <span>
           <strong>Preview architecture.</strong> These figures show how the AI module is structured; no real model runs against your store yet.

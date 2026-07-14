@@ -27,10 +27,10 @@ interface MetricCardProps {
 
 const toneText: Record<NonNullable<MetricStat["tone"]>, string> = {
   gray: "text-ink-muted",
-  green: "text-emerald-400",
-  amber: "text-amber-400",
-  red: "text-red-400",
-  brand: "text-brand-300",
+  green: "text-emerald-600",
+  amber: "text-amber-600",
+  red: "text-red-600",
+  brand: "text-brand-700",
 };
 
 /**
@@ -53,7 +53,7 @@ export function MetricCard({
     <div
       className={cn(
         "group flex h-full flex-col rounded-xl border border-line bg-surface p-4 shadow-sm transition-colors",
-        to && "hover:border-brand-500/40 hover:bg-brand-500/10",
+        to && "hover:border-brand-300 hover:bg-brand-50",
         className,
       )}
     >
