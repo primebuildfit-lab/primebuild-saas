@@ -23,6 +23,8 @@ import {
 import { isCampaignReadOnly } from "~/lib/planLimits";
 import { savedCampaignLimitReached } from "~/lib/planEntitlements";
 import { useData } from "~/context/DataContext";
+import { useAdvertising } from "~/context/AdvertisingContext";
+import { AD_STATUS_LABEL, AD_STATUS_TONE } from "~/features/advertising/advertisingLabels";
 import { getCountry } from "~/data";
 import { formatDate, formatDateRange } from "~/lib/dates";
 import { differenceInCalendarDays, parseISO } from "date-fns";
@@ -54,6 +56,7 @@ export function CampaignDetail({
     setCampaignStatus,
     addTemplate,
   } = useData();
+  const { advertisements } = useAdvertising();
   const [confirmDelete, setConfirmDelete] = useState(false);
   const [flash, setFlash] = useState("");
 
@@ -265,6 +268,36 @@ export function CampaignDetail({
 
           <Section title="Products & collections">
             <AttachedRefs ids={campaign.productRefs ?? []} />
+          </Section>
+
+          <Section title="Advertisements">
+            {(() => {
+              const ads = advertisements.filter((a) => a.campaignId === campaign.id);
+              if (ads.length === 0) {
+                return (
+                  <p className="text-sm text-ink-muted">
+                    No advertisements grouped in this campaign yet. Build one in the{" "}
+                    <a href="/app/promotion-builder" className="text-brand-700 hover:underline">
+                      Promotion Builder
+                    </a>{" "}
+                    and add it here.
+                  </p>
+                );
+              }
+              return (
+                <ul className="flex flex-col gap-1.5">
+                  {ads.map((a) => (
+                    <li
+                      key={a.id}
+                      className="flex items-center justify-between gap-2 rounded-lg border border-line bg-surface-2 px-3 py-2"
+                    >
+                      <span className="truncate text-sm font-medium text-ink">{a.name}</span>
+                      <Badge tone={AD_STATUS_TONE[a.status]}>{AD_STATUS_LABEL[a.status]}</Badge>
+                    </li>
+                  ))}
+                </ul>
+              );
+            })()}
           </Section>
 
           {campaign.actions && campaign.actions.length > 0 ? (
