@@ -26,6 +26,7 @@ import { useAdvertising } from "~/context/AdvertisingContext";
 import { buildOpportunities, type ScoredOpportunity } from "~/lib/opportunities";
 import { ProductPicker, AttachedRefs } from "~/features/campaigns/ProductPicker";
 import { getCountry } from "~/data";
+import { validateLiquid } from "~/lib/liquid";
 import { cn } from "~/lib/cn";
 
 const countryName = (code: string): string => getCountry(code)?.name ?? code;
@@ -124,6 +125,7 @@ export default function PromotionBuilderRoute() {
     return d;
   });
   const [pickerOpen, setPickerOpen] = useState(false);
+  const [device, setDevice] = useState<"desktop" | "mobile">("desktop");
   const set = (patch: Partial<PromotionDraft>) => setDraft((d) => ({ ...d, ...patch }));
 
   const selectOpportunity = (o: ScoredOpportunity) => {
@@ -352,12 +354,13 @@ export default function PromotionBuilderRoute() {
             </Field>
             <Field label="Liquid block (optional)" className="sm:col-span-2" hint="Advanced: paste a Shopify Liquid snippet to reuse.">
               <Textarea
-                rows={3}
+                rows={4}
                 value={draft.liquid}
                 onChange={(e) => set({ liquid: e.target.value })}
                 className="font-mono text-xs"
                 placeholder="{% if product.available %} … {% endif %}"
               />
+              {draft.liquid.trim() ? <LiquidFeedback source={draft.liquid} /> : null}
             </Field>
           </div>
         ) : null}
@@ -389,21 +392,40 @@ export default function PromotionBuilderRoute() {
         {step === 5 ? (
           <div className="grid gap-5 lg:grid-cols-2">
             <div>
-              <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-ink-faint">Preview</p>
-              <div className="overflow-hidden rounded-xl border border-line bg-surface-2">
-                <div className="flex h-28 items-center justify-center bg-gradient-to-br from-brand-600/40 to-brand-800/40 text-center">
-                  <div className="px-4">
-                    <p className="text-lg font-bold text-white">{draft.title || draft.name || "Your headline"}</p>
-                    {draft.subtitle ? <p className="text-sm text-brand-100">{draft.subtitle}</p> : null}
-                  </div>
+              <div className="mb-2 flex items-center justify-between">
+                <p className="text-xs font-semibold uppercase tracking-wide text-ink-faint">Preview</p>
+                <div className="flex items-center rounded-lg border border-line bg-surface-2 p-0.5 text-xs">
+                  {(["desktop", "mobile"] as const).map((d) => (
+                    <button
+                      key={d}
+                      type="button"
+                      onClick={() => setDevice(d)}
+                      className={cn(
+                        "rounded-md px-2 py-1 font-medium capitalize transition-colors",
+                        device === d ? "bg-surface text-ink shadow-sm" : "text-ink-muted hover:text-ink",
+                      )}
+                    >
+                      {d}
+                    </button>
+                  ))}
                 </div>
-                <div className="p-4">
-                  <p className="text-sm text-ink">{draft.description || "Promotion description will appear here."}</p>
-                  {draft.offer ? <Badge tone="green" className="mt-2">{draft.offer}</Badge> : null}
-                  <div className="mt-3">
-                    <span className="inline-flex rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-semibold text-white">
-                      {draft.cta || "Shop now"}
-                    </span>
+              </div>
+              <div className={cn("mx-auto", device === "mobile" ? "max-w-[320px]" : "w-full")}>
+                <div className="overflow-hidden rounded-xl border border-line bg-surface-2">
+                  <div className="flex h-28 items-center justify-center bg-gradient-to-br from-brand-600 to-brand-800 text-center">
+                    <div className="px-4">
+                      <p className="text-lg font-bold text-white">{draft.title || draft.name || "Your headline"}</p>
+                      {draft.subtitle ? <p className="text-sm text-brand-100">{draft.subtitle}</p> : null}
+                    </div>
+                  </div>
+                  <div className="p-4">
+                    <p className="text-sm text-ink">{draft.description || "Promotion description will appear here."}</p>
+                    {draft.offer ? <Badge tone="green" className="mt-2">{draft.offer}</Badge> : null}
+                    <div className="mt-3">
+                      <span className="inline-flex rounded-lg bg-brand-600 px-3 py-1.5 text-sm font-semibold text-white">
+                        {draft.cta || "Shop now"}
+                      </span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -464,6 +486,28 @@ function SummaryRow({ label, value }: { label: string; value: string }) {
       <span className="text-ink-faint">{label}</span>
       <span className="truncate font-medium text-ink">{value}</span>
     </div>
+  );
+}
+
+/** Inline Liquid validation feedback under the editor. */
+function LiquidFeedback({ source }: { source: string }) {
+  const check = validateLiquid(source);
+  if (check.ok && check.warnings.length === 0) {
+    return <p className="mt-1.5 text-xs text-ok">Looks balanced.</p>;
+  }
+  return (
+    <ul className="mt-1.5 flex flex-col gap-1 text-xs">
+      {check.errors.map((e, i) => (
+        <li key={`e${i}`} className="text-err">
+          ✕ {e}
+        </li>
+      ))}
+      {check.warnings.map((w, i) => (
+        <li key={`w${i}`} className="text-warn">
+          ⚠ {w}
+        </li>
+      ))}
+    </ul>
   );
 }
 

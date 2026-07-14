@@ -81,6 +81,29 @@ export default function AnalyticsRoute() {
         />
       </div>
 
+      {/* Conversions — honest: no tracking source connected yet */}
+      <div className="mt-6 rounded-xl border border-line bg-surface p-5">
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <h2 className="text-sm font-semibold text-ink">Conversions & revenue</h2>
+          <span className="rounded-full bg-surface-2 px-2 py-0.5 text-xs font-medium text-ink-muted">
+            Not connected
+          </span>
+        </div>
+        <p className="mt-2 max-w-2xl text-sm text-ink-muted">
+          No conversion source is connected yet, so Eventra doesn&apos;t show CTR, conversion rate, sales or
+          revenue — it never invents them. Connect Shopify Analytics to measure how your advertisements and
+          campaigns perform.
+        </p>
+        <div className="mt-3 grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {["Conversions", "Conversion rate", "Sales", "Revenue"].map((m) => (
+            <div key={m} className="rounded-lg border border-dashed border-line bg-surface-2 px-3 py-2.5">
+              <p className="text-xs text-ink-faint">{m}</p>
+              <p className="mt-0.5 text-sm font-semibold text-ink-faint">—</p>
+            </div>
+          ))}
+        </div>
+      </div>
+
       <div className="mt-6 space-y-4">
         <h2 className="text-sm font-semibold text-ink">Report builder</h2>
         <AnalyticsBuilder
