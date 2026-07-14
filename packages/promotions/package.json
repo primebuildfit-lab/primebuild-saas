@@ -1,0 +1,15 @@
+{
+  "name": "@eventra/promotions",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Shared promo template catalog + safe Liquid preview renderer. Pure data + string processing; no app/UI/state deps. Used by Admin (stats) and Business (templates).",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "types": "./src/index.ts",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  }
+}
