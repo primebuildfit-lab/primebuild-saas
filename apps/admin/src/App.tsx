@@ -3,22 +3,22 @@ import { isAdminPrincipal, PLATFORM_ROLES } from "@eventra/identity";
 import type { Principal } from "@eventra/types";
 import { Shell } from "./os/Shell";
 import { HomePage } from "./os/home";
+import { CalendarPage } from "./os/calendar";
 import {
-  CalendarPage, CampaignsPage, OffersPage, ContentPage, TasksPage, AnalyticsPage, AudiencesPage,
-  TemplatesPage, MediaPage, IntegrationsPage, GeneralPage, MembershipsPage, TeamsPage, ChannelsPage,
-  LabelsPage, AutomationsPage, BillingPage, ModulePlaceholder, MOCK_PLATFORM_ROLE,
+  MembershipsPage, TemplatesPage, AudiencesPage, ChannelsPage, IntegrationsPage,
+  AutomationsPage, TeamsPage, GeneralPage, ModulePlaceholder, MOCK_PLATFORM_ROLE,
 } from "./os/pages";
-import { StudioPage } from "./os/studio";
-import { EventsPage, OpportunitiesPage, AdsPage, SourcesPage, CountriesPage } from "./os/branches";
+import { SourcesPage, CountriesPage } from "./os/branches";
+import { MetricsOverviewPage, MobileMetricsPage, BusinessMetricsPage, ComparePage, RoiPage } from "./os/metrics";
 import {
-  MobileHomePage, MobilePublicationsPage, MobileNotificationsPage, MobileUsersPage,
-  MobileReleasesPage, MobileAnalyticsPage, MobileSettingsPage,
-} from "./os/mobile";
+  PublicationsPage, CompaniesPage, UsersPage, AlertsPage, ParametersPage,
+  BusinessOpsPage, MobileOpsPage, AiModelsPage, ReleasesPage, AuditPage, HealthPage,
+} from "./os/control";
 
 /**
- * Eventra Internal OS (Nivel A). Private platform-admin console — SEPARATE from
- * the Business app (Nivel B) and Personal app (Nivel C). Access requires an admin
- * principal with a platform role; here the boundary is mocked (no live privileged
+ * Eventra Internal OS (Nivel A) — platform control centre. SEPARATE from the
+ * Business app (Nivel B) and Personal app (Nivel C). Access requires an admin
+ * principal with a platform role; the boundary is mocked here (no live privileged
  * access, no real mutations). Brian = platform_owner.
  */
 const MOCK_PLATFORM_PRINCIPAL: Principal = {
@@ -41,43 +41,41 @@ export function App() {
   }
 
   return (
-    <Shell principalName="Brian Almeida" principalRole="Owner" workspace="Eventra Inc.">
+    <Shell principalName="Brian Almeida" principalRole="Owner" workspace="Eventra Platform">
       <Routes>
-        {/* ── Operación ── */}
+        {/* ── General ── */}
         <Route path="/" element={<HomePage />} />
         <Route path="/calendar" element={<CalendarPage />} />
-        <Route path="/events" element={<EventsPage />} />
-        <Route path="/opportunities" element={<OpportunitiesPage />} />
-        <Route path="/campaigns" element={<CampaignsPage />} />
-        <Route path="/offers" element={<OffersPage />} />
-        <Route path="/ads" element={<AdsPage />} />
-        <Route path="/studio" element={<StudioPage />} />
-        <Route path="/content" element={<ContentPage />} />
-        <Route path="/tasks" element={<TasksPage />} />
-        {/* ── Datos y análisis ── */}
-        <Route path="/analytics" element={<AnalyticsPage />} />
-        <Route path="/audiences" element={<AudiencesPage />} />
-        <Route path="/templates" element={<TemplatesPage />} />
-        <Route path="/media" element={<MediaPage />} />
+        <Route path="/publications" element={<PublicationsPage />} />
+        <Route path="/companies" element={<CompaniesPage />} />
+        <Route path="/users" element={<UsersPage />} />
+        <Route path="/alerts" element={<AlertsPage />} />
+        {/* ── Métricas ── */}
+        <Route path="/metrics" element={<MetricsOverviewPage />} />
+        <Route path="/metrics/mobile" element={<MobileMetricsPage />} />
+        <Route path="/metrics/business" element={<BusinessMetricsPage />} />
+        <Route path="/metrics/compare" element={<ComparePage />} />
+        <Route path="/metrics/roi" element={<RoiPage />} />
+        {/* ── Datos y configuración ── */}
         <Route path="/sources" element={<SourcesPage />} />
         <Route path="/countries" element={<CountriesPage />} />
-        {/* ── Mobile Operations ── */}
-        <Route path="/mobile" element={<MobileHomePage />} />
-        <Route path="/mobile/publications" element={<MobilePublicationsPage />} />
-        <Route path="/mobile/notifications" element={<MobileNotificationsPage />} />
-        <Route path="/mobile/users" element={<MobileUsersPage />} />
-        <Route path="/mobile/releases" element={<MobileReleasesPage />} />
-        <Route path="/mobile/analytics" element={<MobileAnalyticsPage />} />
-        <Route path="/mobile/settings" element={<MobileSettingsPage />} />
-        {/* ── Configuración ── */}
-        <Route path="/general" element={<GeneralPage />} />
-        <Route path="/memberships" element={<MembershipsPage />} />
-        <Route path="/teams" element={<TeamsPage />} />
+        <Route path="/parameters" element={<ParametersPage />} />
+        <Route path="/plans" element={<MembershipsPage />} />
+        <Route path="/templates" element={<TemplatesPage />} />
+        <Route path="/audiences" element={<AudiencesPage />} />
+        <Route path="/channels" element={<ChannelsPage />} />
+        {/* ── Operaciones de producto ── */}
+        <Route path="/business" element={<BusinessOpsPage />} />
+        <Route path="/mobile" element={<MobileOpsPage />} />
         <Route path="/integrations" element={<IntegrationsPage />} />
         <Route path="/automations" element={<AutomationsPage />} />
-        <Route path="/channels" element={<ChannelsPage />} />
-        <Route path="/labels" element={<LabelsPage />} />
-        <Route path="/billing" element={<BillingPage />} />
+        <Route path="/ai" element={<AiModelsPage />} />
+        <Route path="/releases" element={<ReleasesPage />} />
+        {/* ── Control ── */}
+        <Route path="/teams" element={<TeamsPage />} />
+        <Route path="/audit" element={<AuditPage />} />
+        <Route path="/health" element={<HealthPage />} />
+        <Route path="/settings" element={<GeneralPage />} />
         <Route path="*" element={<ModulePlaceholder title="No encontrado" note="Ruta desconocida." />} />
       </Routes>
     </Shell>

@@ -1,33 +1,33 @@
 /**
- * Internal OS navigation — DEFINITIVE information architecture (Eventra Principal).
+ * Internal OS navigation — PLATFORM-CONTROL structure (correction phase).
  *
- * Four sections, aligned to the ecosystem master spec (the 21 platform branches +
- * a Mobile Operations centre that lives INSIDE apps/admin, never as a 4th app):
- *   operacion  — the daily operational core (Inicio → Tareas)
- *   datos      — analysis & global catalogs (Analítica → Países)
- *   mobile     — Mobile Operations: administer Eventra Mobile from the PC
- *   config     — platform configuration (General → Facturación)
+ * The admin is a platform control centre, NOT a copy of Eventra Business. Daily
+ * operational entities (campañas, ofertas, anuncios, estudio, contenido, medios,
+ * eventos, oportunidades) are no longer top-level branches — they live as
+ * supervision tabs inside Eventra Business / Eventra Mobile / Publicaciones.
  *
- * Labels are Spanish (the console's language); icons come from the local set.
- * Global data belongs to this console; Business/Mobile only consume it.
+ * Five groups: General · Métricas · Datos y configuración · Operaciones de
+ * producto · Control. Labels are Spanish; icons come from the local set.
  */
 import type { ComponentType, SVGProps } from "react";
 import {
-  IconHome, IconCalendar, IconInbox, IconTrendUp, IconMegaphone, IconTag, IconSpeaker,
-  IconCode, IconContent, IconChecklist, IconBarChart, IconUsers, IconLayout, IconImage,
-  IconRss, IconGlobe, IconSmartphone, IconSend, IconBell, IconGroup, IconRocket, IconActivity,
-  IconGear, IconCard, IconNodes, IconWorkflow, IconSliders, IconHash, IconWallet,
+  IconHome, IconCalendar, IconSend, IconCard, IconGroup, IconAlert,
+  IconActivity, IconSmartphone, IconBarChart, IconTrendUp, IconWallet,
+  IconRss, IconGlobe, IconSliders, IconLayout, IconUsers, IconNodes,
+  IconMegaphone, IconPlug, IconWorkflow, IconCode, IconRocket,
+  IconContent, IconGear,
 } from "./icons";
 
 export type IconCmp = ComponentType<SVGProps<SVGSVGElement> & { size?: number }>;
-export type NavSection = "operacion" | "datos" | "mobile" | "config";
+export type NavSection = "general" | "metricas" | "datos" | "producto" | "control";
 
 /** Sidebar sections, rendered top-to-bottom. `label: null` = no group header. */
 export const NAV_SECTIONS: { id: NavSection; label: string | null }[] = [
-  { id: "operacion", label: null },
-  { id: "datos", label: "Datos y análisis" },
-  { id: "mobile", label: "Mobile Operations" },
-  { id: "config", label: "Configuraciones" },
+  { id: "general", label: null },
+  { id: "metricas", label: "Métricas" },
+  { id: "datos", label: "Datos y configuración" },
+  { id: "producto", label: "Operaciones de producto" },
+  { id: "control", label: "Control" },
 ];
 
 export interface OsNavItem {
@@ -40,41 +40,39 @@ export interface OsNavItem {
 }
 
 export const OS_NAV: OsNavItem[] = [
-  // ── Operación ──
-  { label: "Inicio", to: "/", icon: IconHome, section: "operacion", purpose: "¿Cómo está Eventra hoy?" },
-  { label: "Calendario", to: "/calendar", icon: IconCalendar, section: "operacion", purpose: "Calendario operacional global de Eventra" },
-  { label: "Eventos y noticias", to: "/events", icon: IconInbox, section: "operacion", purpose: "Bandeja global de eventos, noticias y temporadas por revisar" },
-  { label: "Oportunidades", to: "/opportunities", icon: IconTrendUp, section: "operacion", purpose: "Motor de oportunidades: score, país, importancia" },
-  { label: "Campañas", to: "/campaigns", icon: IconMegaphone, section: "operacion", purpose: "Campañas internas, de empresas y automáticas" },
-  { label: "Ofertas", to: "/offers", icon: IconTag, section: "operacion", purpose: "Biblioteca global de tipos de oferta" },
-  { label: "Anuncios", to: "/ads", icon: IconSpeaker, section: "operacion", purpose: "Tipos de anuncio y su estado (borrador → activo → archivado)" },
-  { label: "Estudio", to: "/studio", icon: IconCode, section: "operacion", purpose: "Composición de anuncios y personalización (JavaScript + Liquid)" },
-  { label: "Contenido", to: "/content", icon: IconContent, section: "operacion", purpose: "Base de contenido global de Eventra" },
-  { label: "Tareas", to: "/tasks", icon: IconChecklist, section: "operacion", purpose: "Trabajo interno del equipo" },
-  // ── Datos y análisis ──
-  { label: "Analítica", to: "/analytics", icon: IconBarChart, section: "datos", purpose: "Analítica global y comparaciones" },
-  { label: "Audiencia", to: "/audiences", icon: IconUsers, section: "datos", purpose: "Audiencias empresariales y personales" },
-  { label: "Plantillas", to: "/templates", icon: IconLayout, section: "datos", purpose: "Sistemas reutilizables" },
-  { label: "Medios", to: "/media", icon: IconImage, section: "datos", purpose: "Imágenes, videos, documentos, licencias" },
+  // ── General ──
+  { label: "Inicio", to: "/", icon: IconHome, section: "general", purpose: "Métricas y estado de la plataforma Eventra" },
+  { label: "Calendario global", to: "/calendar", icon: IconCalendar, section: "general", purpose: "Calendario operacional global (año/mes/semana/agenda)" },
+  { label: "Publicaciones", to: "/publications", icon: IconSend, section: "general", purpose: "Cola de publicación, oportunidades y lo publicado a Mobile" },
+  { label: "Empresas", to: "/companies", icon: IconCard, section: "general", purpose: "Supervisión global de empresas cliente (tenants)" },
+  { label: "Usuarios", to: "/users", icon: IconGroup, section: "general", purpose: "Usuarios de empresas cliente" },
+  { label: "Alertas", to: "/alerts", icon: IconAlert, section: "general", purpose: "Alertas derivadas del estado real del sistema" },
+  // ── Métricas ──
+  { label: "Resumen general", to: "/metrics", icon: IconActivity, section: "metricas", purpose: "Métricas combinadas Mobile + Business" },
+  { label: "Métricas Mobile", to: "/metrics/mobile", icon: IconSmartphone, section: "metricas", purpose: "Comportamiento real de Eventra Mobile (D/M/A)" },
+  { label: "Métricas Business", to: "/metrics/business", icon: IconBarChart, section: "metricas", purpose: "Empresas, planes e ingresos de Eventra Business (D/M/A)" },
+  { label: "Comparaciones", to: "/metrics/compare", icon: IconTrendUp, section: "metricas", purpose: "Comparador transversal Mobile/Business/plan/país/canal" },
+  { label: "Inversión y retorno", to: "/metrics/roi", icon: IconWallet, section: "metricas", purpose: "Inversión, ingreso atribuible, ROI, ROAS y costos" },
+  // ── Datos y configuración ──
   { label: "Fuentes", to: "/sources", icon: IconRss, section: "datos", purpose: "APIs, RSS y fuentes que alimentan los eventos" },
   { label: "Países", to: "/countries", icon: IconGlobe, section: "datos", purpose: "Países, regiones, idiomas y cobertura" },
-  // ── Mobile Operations ──
-  { label: "Resumen móvil", to: "/mobile", icon: IconSmartphone, section: "mobile", purpose: "Estado de la app Eventra Mobile" },
-  { label: "Publicaciones", to: "/mobile/publications", icon: IconSend, section: "mobile", purpose: "Qué se publica a los usuarios móviles" },
-  { label: "Notificaciones", to: "/mobile/notifications", icon: IconBell, section: "mobile", purpose: "Notificaciones push a la app móvil" },
-  { label: "Usuarios móviles", to: "/mobile/users", icon: IconGroup, section: "mobile", purpose: "Usuarios de la app móvil (agregado, con privacidad)" },
-  { label: "Versiones", to: "/mobile/releases", icon: IconRocket, section: "mobile", purpose: "Versiones y despliegues Android / iOS / PWA" },
-  { label: "Analítica móvil", to: "/mobile/analytics", icon: IconActivity, section: "mobile", purpose: "Retención, pantallas y uso de la app móvil" },
-  { label: "Configuración móvil", to: "/mobile/settings", icon: IconSliders, section: "mobile", purpose: "Parámetros y comportamiento de Eventra Mobile" },
-  // ── Configuración ──
-  { label: "General", to: "/general", icon: IconGear, section: "config", purpose: "Configuración general del Internal OS" },
-  { label: "Membresías", to: "/memberships", icon: IconCard, section: "config", purpose: "Planes comerciales de Eventra" },
-  { label: "Equipos", to: "/teams", icon: IconUsers, section: "config", purpose: "Operadores, empleados, permisos" },
-  { label: "Integraciones", to: "/integrations", icon: IconNodes, section: "config", purpose: "Integraciones reales y futuras" },
-  { label: "Automatizaciones", to: "/automations", icon: IconWorkflow, section: "config", purpose: "Jobs, sincronizaciones, alertas, IA" },
-  { label: "Canales", to: "/channels", icon: IconSliders, section: "config", purpose: "Canales de marketing y publicación" },
-  { label: "Etiquetas", to: "/labels", icon: IconHash, section: "config", purpose: "Taxonomía global" },
-  { label: "Facturación", to: "/billing", icon: IconWallet, section: "config", purpose: "Facturación global (administrativa, no mueve dinero)" },
+  { label: "Parámetros", to: "/parameters", icon: IconSliders, section: "datos", purpose: "Parámetros globales — única fuente de verdad" },
+  { label: "Planes y membresías", to: "/plans", icon: IconCard, section: "datos", purpose: "Planes comerciales (fuente de verdad: @eventra/config)" },
+  { label: "Plantillas oficiales", to: "/templates", icon: IconLayout, section: "datos", purpose: "Plantillas oficiales globales (no privadas de clientes)" },
+  { label: "Audiencias", to: "/audiences", icon: IconUsers, section: "datos", purpose: "Audiencias, segmentos y reglas de recomendación" },
+  { label: "Canales", to: "/channels", icon: IconNodes, section: "datos", purpose: "Canales de marketing y publicación" },
+  // ── Operaciones de producto ──
+  { label: "Eventra Business", to: "/business", icon: IconMegaphone, section: "producto", purpose: "Supervisión del producto para empresas (campañas, ofertas, anuncios…)" },
+  { label: "Eventra Mobile", to: "/mobile", icon: IconSmartphone, section: "producto", purpose: "Administración de Eventra Mobile desde la PC" },
+  { label: "Integraciones", to: "/integrations", icon: IconPlug, section: "producto", purpose: "Integraciones reales y futuras" },
+  { label: "Automatizaciones", to: "/automations", icon: IconWorkflow, section: "producto", purpose: "Jobs, sincronizaciones, alertas, IA" },
+  { label: "IA y modelos", to: "/ai", icon: IconCode, section: "producto", purpose: "Modelos de IA de la plataforma y su configuración" },
+  { label: "Versiones y publicaciones", to: "/releases", icon: IconRocket, section: "producto", purpose: "Versiones de las apps y publicaciones de plataforma" },
+  // ── Control ──
+  { label: "Equipos y permisos", to: "/teams", icon: IconGroup, section: "control", purpose: "Operadores, empleados, roles, permisos" },
+  { label: "Auditoría", to: "/audit", icon: IconContent, section: "control", purpose: "Registro de escrituras administrativas (actor/antes/después)" },
+  { label: "Salud del sistema", to: "/health", icon: IconActivity, section: "control", purpose: "Estado de servicios, entornos y colas" },
+  { label: "Configuración general", to: "/settings", icon: IconGear, section: "control", purpose: "Configuración general del Internal OS" },
 ];
 
 /** Quick-create menu opened from the topbar `+` button. */
@@ -84,14 +82,11 @@ export interface QuickAction {
   to: string;
 }
 export const QUICK_CREATE: QuickAction[] = [
-  { id: "qc-campaign", label: "Nueva campaña", to: "/campaigns?create=1" },
-  { id: "qc-ad", label: "Nuevo anuncio", to: "/ads?create=1" },
-  { id: "qc-offer", label: "Nueva oferta", to: "/offers?create=1" },
-  { id: "qc-opportunity", label: "Nueva oportunidad", to: "/opportunities?create=1" },
-  { id: "qc-event", label: "Nuevo evento", to: "/events?create=1" },
-  { id: "qc-task", label: "Nueva tarea", to: "/tasks?create=1" },
-  { id: "qc-content", label: "Nuevo contenido", to: "/content?create=1" },
-  { id: "qc-push", label: "Nueva notificación push", to: "/mobile/notifications?create=1" },
+  { id: "qc-publication", label: "Nueva publicación", to: "/publications?create=1" },
+  { id: "qc-push", label: "Nueva notificación push", to: "/mobile?create=1" },
+  { id: "qc-source", label: "Nueva fuente", to: "/sources?create=1" },
+  { id: "qc-country", label: "Nuevo país", to: "/countries?create=1" },
+  { id: "qc-template", label: "Nueva plantilla oficial", to: "/templates?create=1" },
   { id: "qc-automation", label: "Nueva automatización", to: "/automations?create=1" },
 ];
 

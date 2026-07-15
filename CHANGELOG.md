@@ -3,6 +3,43 @@
 All notable milestones. Dates are absolute. This file summarizes; `docs/DECISIONS.md` is authoritative for
 decisions and `docs/BUILD_STATUS.md` for per-module status.
 
+## Phase 12 — Internal OS: platform-control correction + real calendar + metrics — 2026-07-15
+
+Corrects the Internal OS so it is a **platform control centre**, not a copy of Eventra
+Business. Fewer operational branches; more real platform control. Mandatory audit:
+`docs/EVENTRA_INTERNAL_OS_CORRECTION_AUDIT.md`. Dark design kept. No deploy/push/merge.
+
+### Changed — navigation (28 branches, 5 groups)
+- `os/nav.ts`: **General · Métricas · Datos y configuración · Operaciones de producto ·
+  Control**. Operational entities (Campañas, Ofertas, Anuncios, Estudio, Contenido,
+  Medios, Eventos, Oportunidades, and the Mobile sub-pages) are no longer top-level —
+  they are **supervision tabs** inside Eventra Business / Eventra Mobile / Publicaciones.
+- Sidebar bottom card replaced: tenant-looking "Eventra Inc./Plan" → **platform status**
+  (entorno, versión, base de datos, última sinc.).
+
+### Added
+- **Real calendar** (`os/calendar.tsx`): Año/Mes/Semana/Agenda (default Mes), 7-col month
+  grid via `@eventra/calendar`, colour-coded by app/type, filters, detail drawer — not a list.
+- **Métricas** (`os/metrics.tsx`): Resumen general · Métricas Mobile · Métricas Business ·
+  Comparaciones · Inversión y retorno. D/M/A toggle + comparación, documented formulas,
+  per-plan cards (Free/Starter/Growth/Pro), all **honest empty states** (no billing/analytics
+  connected); every PB metric is permanently "No disponible · Integración PB futura".
+- **Platform-control pages** (`os/control.tsx`): Publicaciones, Empresas, Usuarios, Alertas,
+  Parámetros, Eventra Business (tabs), Eventra Mobile (tabs), IA y modelos, Versiones y
+  publicaciones, Auditoría, Salud del sistema.
+- **Building blocks** (`os/platform.tsx`): `PlatformPage` (header + expected source +
+  connection status + honest empty + next action — no dead links), `Tabs`, `DmaBar`,
+  `MetricPanel`/`MetricGrid`.
+- **Inicio** reworked to platform metrics (visitas/ingresos/membresías = honest empty;
+  empresas/publicaciones/alertas = real counts) + platform blocks (fuentes con incidencias,
+  publicaciones pendientes, países, planes, estado de productos).
+
+### Notes
+- Real plan names used (Free/Starter/Growth/**Pro**; spec's "VIP" = Pro).
+- Tests: admin **87 green** (5-group nav, absence of removed operational branches, per-route
+  render with no dead links, real-calendar views, separated metrics + D/M/A, PB no disponible,
+  parámetros, salud, auditoría). Typecheck + production build clean. Full suite green.
+
 ## Phase 11 — Internal OS: definitive information architecture — 2026-07-15
 
 Restructures the Internal OS (`apps/admin`) navigation to the **ecosystem master spec** (the 21 platform

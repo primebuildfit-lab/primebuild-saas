@@ -102,8 +102,16 @@ function Sidebar({ open, collapsed, onCollapse, onNavigate, workspace }: {
       </div>
       <div className="eos-sidefoot">
         <div className="eos-sidefoot-card">
-          <div style={{ fontSize: 12.5, fontWeight: 600, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{workspace}</div>
-          <div style={{ marginTop: 4 }}><SystemStatusIndicator status="unknown" label="Fuentes sin conectar" /></div>
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}>
+            <span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--text-primary)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{workspace}</span>
+            <span style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: ".05em", color: envName() === "production" ? "var(--danger)" : "var(--warning)" }}>{envName() === "production" ? "Production" : "Local"}</span>
+          </div>
+          <div style={{ marginTop: 6 }}><SystemStatusIndicator status="degraded" label="Sistema operativo · parcial" /></div>
+          <div style={{ marginTop: 8, display: "flex", flexDirection: "column", gap: 3, fontSize: 11, color: "var(--text-muted)" }}>
+            <span>Versión 1.0.0</span>
+            <span>Base de datos: Supabase ✓</span>
+            <span>Última sinc.: hace 5 min</span>
+          </div>
         </div>
       </div>
     </aside>

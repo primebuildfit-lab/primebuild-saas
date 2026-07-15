@@ -65,22 +65,29 @@ describe("Badges & states", () => {
   });
 });
 
-describe("Navigation map", () => {
-  it("has the definitive branch set across four sections", () => {
-    expect(OS_NAV).toHaveLength(31);
-    expect(OS_NAV.filter((n) => n.section === "operacion")).toHaveLength(10);
-    expect(OS_NAV.filter((n) => n.section === "datos")).toHaveLength(6);
-    expect(OS_NAV.filter((n) => n.section === "mobile")).toHaveLength(7);
-    expect(OS_NAV.filter((n) => n.section === "config")).toHaveLength(8);
+describe("Navigation map (platform-control structure)", () => {
+  it("has the corrected branch set across five groups", () => {
+    expect(OS_NAV).toHaveLength(28);
+    expect(OS_NAV.filter((n) => n.section === "general")).toHaveLength(6);
+    expect(OS_NAV.filter((n) => n.section === "metricas")).toHaveLength(5);
+    expect(OS_NAV.filter((n) => n.section === "datos")).toHaveLength(7);
+    expect(OS_NAV.filter((n) => n.section === "producto")).toHaveLength(6);
+    expect(OS_NAV.filter((n) => n.section === "control")).toHaveLength(4);
   });
-  it("includes the branches the master spec requires (events, opportunities, ads, sources, countries, mobile)", () => {
+  it("exposes the platform-control branches (métricas separadas, parámetros, salud, auditoría)", () => {
     const paths = OS_NAV.map((n) => n.to);
-    for (const p of ["/events", "/opportunities", "/ads", "/sources", "/countries", "/mobile"]) {
+    for (const p of ["/metrics", "/metrics/mobile", "/metrics/business", "/parameters", "/publications", "/companies", "/health", "/audit"]) {
       expect(paths).toContain(p);
     }
   });
+  it("no longer exposes client-operational entities as top-level branches", () => {
+    const paths = OS_NAV.map((n) => n.to);
+    for (const p of ["/events", "/opportunities", "/campaigns", "/offers", "/ads", "/studio", "/content", "/tasks"]) {
+      expect(paths).not.toContain(p);
+    }
+  });
   it("exposes quick-create actions and a command for every branch", () => {
-    expect(QUICK_CREATE).toHaveLength(9);
+    expect(QUICK_CREATE).toHaveLength(6);
     expect(OS_COMMANDS.length).toBeGreaterThanOrEqual(OS_NAV.length + QUICK_CREATE.length);
   });
 });

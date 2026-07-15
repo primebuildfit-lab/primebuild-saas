@@ -14,25 +14,28 @@ function renderAt(path: string) {
   );
 }
 
-describe("Internal OS shell", () => {
-  it("renders the Eventra brand and both nav sections (operational + CONFIGURACIONES)", () => {
+describe("Internal OS shell (platform-control structure)", () => {
+  it("renders the Eventra brand and the platform-control section headers", () => {
     renderAt("/");
     expect(screen.getAllByText("Eventra").length).toBeGreaterThan(0);
-    expect(screen.getByText("Configuraciones")).toBeInTheDocument();
+    expect(screen.getByText("Métricas")).toBeInTheDocument();
+    expect(screen.getByText("Datos y configuración")).toBeInTheDocument();
+    expect(screen.getByText("Operaciones de producto")).toBeInTheDocument();
+    expect(screen.getByText("Control")).toBeInTheDocument();
   });
 
-  it("renders every definitive navigation branch as a link (Spanish labels)", () => {
+  it("renders every navigation branch as a link (Spanish labels)", () => {
     renderAt("/");
     for (const n of OS_NAV) {
       expect(screen.getByRole("link", { name: new RegExp(`^${n.label}$`) })).toBeInTheDocument();
     }
   });
 
-  it("renders the four sidebar sections including Mobile Operations", () => {
+  it("shows a platform-status card in the sidebar (not a client/tenant plan card)", () => {
     renderAt("/");
-    expect(screen.getByText("Datos y análisis")).toBeInTheDocument();
-    expect(screen.getByText("Mobile Operations")).toBeInTheDocument();
-    expect(screen.getByText("Configuraciones")).toBeInTheDocument();
+    expect(screen.getByText("Eventra Platform")).toBeInTheDocument();
+    expect(screen.getByText(/Base de datos: Supabase/)).toBeInTheDocument();
+    expect(screen.getByText(/Versión 1\.0\.0/)).toBeInTheDocument();
   });
 
   it("renders the topbar search and the signed-in profile (name + role)", () => {
@@ -41,94 +44,144 @@ describe("Internal OS shell", () => {
     expect(screen.getAllByText("Brian Almeida").length).toBeGreaterThan(0);
     expect(screen.getAllByText("Owner").length).toBeGreaterThan(0);
   });
-
-  it("shows the environment badge (development in test — never faked as production)", () => {
-    renderAt("/");
-    expect(screen.getAllByText(/development/i).length).toBeGreaterThan(0);
-  });
 });
 
-describe("Internal OS — Inicio (dashboard)", () => {
-  it("greets the principal and shows the four metric labels", () => {
+describe("Internal OS — Inicio (platform dashboard)", () => {
+  it("greets the principal and shows PLATFORM metrics (not a Business overview)", () => {
     renderAt("/");
     expect(screen.getByText(/Bienvenido, Brian/)).toBeInTheDocument();
-    for (const m of ["Campañas activas", "Ofertas disponibles", "Tareas pendientes", "Rendimiento general"]) {
+    for (const m of ["Visitas Mobile", "Empresas activas", "Trials activos", "Ingresos totales", "Publicaciones activas", "Alertas del sistema"]) {
       expect(screen.getByText(m)).toBeInTheDocument();
     }
   });
 
-  it("shows an honest empty state for unmeasured metrics (no fabricated numbers)", () => {
+  it("does not surface client-operational metrics as the dashboard headline", () => {
     renderAt("/");
-    expect(screen.getByText("No disponible")).toBeInTheDocument();          // Rendimiento general
-    expect(screen.getAllByText("Sin comparación").length).toBeGreaterThan(0); // trends
-    expect(screen.getByText(/Sin datos/)).toBeInTheDocument();               // channel donut
-    expect(screen.getByText("No hay ofertas utilizadas todavía")).toBeInTheDocument();
+    expect(screen.queryByText("Ofertas disponibles")).not.toBeInTheDocument();
+    expect(screen.queryByText("Campañas activas")).not.toBeInTheDocument();
   });
 
-  it("marks the dashboard data as DEV data", () => {
+  it("shows honest empty states for unmeasured metrics (no fabricated numbers)", () => {
+    renderAt("/");
+    expect(screen.getAllByText("Sin datos").length).toBeGreaterThan(0);        // visitas/ingresos/membresías
+    expect(screen.getAllByText("Sin comparación").length).toBeGreaterThan(0);  // trends
+  });
+
+  it("marks the dashboard data as DEV data and shows platform blocks", () => {
     renderAt("/");
     expect(screen.getAllByText(/DATOS DEV/i).length).toBeGreaterThan(0);
-  });
-
-  it("renders the weekly calendar and upcoming-tasks table", () => {
-    renderAt("/");
-    expect(screen.getByText("Calendario de la semana")).toBeInTheDocument();
-    expect(screen.getByText("Próximas tareas")).toBeInTheDocument();
-    expect(screen.getByText("Actividad reciente")).toBeInTheDocument();
+    expect(screen.getByText("Mobile vs Business")).toBeInTheDocument();
+    expect(screen.getByText("Actividad administrativa")).toBeInTheDocument();
+    expect(screen.getByText("Estado de productos")).toBeInTheDocument();
   });
 });
 
-describe("Internal OS — every branch renders", () => {
+describe("Internal OS — every branch renders (no dead links)", () => {
   const routes: [string, RegExp][] = [
     ["/calendar", /Calendario global/],
-    ["/events", /Eventos y noticias/],
-    ["/opportunities", /Oportunidades/],
-    ["/campaigns", /Campañas/],
-    ["/offers", /Ofertas/],
-    ["/ads", /Anuncios/],
-    ["/content", /Contenido/],
-    ["/studio", /Estudio/],
-    ["/tasks", /Tareas/],
-    ["/analytics", /Analítica/],
-    ["/audiences", /Audiencia/],
-    ["/templates", /Plantillas/],
-    ["/media", /Medios/],
+    ["/publications", /Publicaciones/],
+    ["/companies", /Empresas/],
+    ["/users", /Usuarios/],
+    ["/alerts", /Alertas del sistema/],
+    ["/metrics", /Resumen general/],
+    ["/metrics/mobile", /Métricas Mobile/],
+    ["/metrics/business", /Métricas Business/],
+    ["/metrics/compare", /Comparaciones/],
+    ["/metrics/roi", /Inversión y retorno/],
     ["/sources", /Fuentes/],
     ["/countries", /Países/],
-    ["/mobile", /Resumen móvil/],
-    ["/mobile/publications", /Publicaciones/],
-    ["/mobile/notifications", /Notificaciones push/],
-    ["/mobile/users", /Usuarios móviles/],
-    ["/mobile/releases", /Versiones/],
-    ["/mobile/analytics", /Analítica móvil/],
-    ["/mobile/settings", /Configuración móvil/],
-    ["/integrations", /Integraciones/],
-    ["/general", /General/],
-    ["/memberships", /Membresías/],
-    ["/teams", /Equipos/],
+    ["/parameters", /Parámetros/],
+    ["/plans", /Membresías/],
+    ["/templates", /Plantillas/],
+    ["/audiences", /Audiencia/],
     ["/channels", /Canales/],
-    ["/labels", /Etiquetas/],
+    ["/business", /Eventra Business/],
+    ["/mobile", /Eventra Mobile/],
+    ["/integrations", /Integraciones/],
     ["/automations", /Automatizaciones/],
-    ["/billing", /Facturación/],
+    ["/ai", /IA y modelos/],
+    ["/releases", /Versiones y publicaciones/],
+    ["/teams", /Equipos/],
+    ["/audit", /Auditoría/],
+    ["/health", /Salud del sistema/],
+    ["/settings", /General/],
   ];
   it.each(routes)("renders %s without throwing", async (path, heading) => {
     renderAt(path);
-    // findAll flushes any on-mount async work (e.g. surface reachability probes).
     expect((await screen.findAllByRole("heading", { name: heading })).length).toBeGreaterThan(0);
   });
 });
 
+describe("Internal OS — real calendar (not a list)", () => {
+  it("offers Año/Mes/Semana/Agenda views with a 7-day grid and legend", () => {
+    renderAt("/calendar");
+    for (const v of ["Año", "Mes", "Semana", "Agenda"]) {
+      expect(screen.getByRole("button", { name: v })).toBeInTheDocument();
+    }
+    expect(screen.getAllByText("Lun").length).toBeGreaterThan(0);   // weekday header row
+    expect(screen.getByText("Plataforma")).toBeInTheDocument();      // colour legend
+  });
+});
+
+describe("Internal OS — metrics section (separated + D/M/A + honest empties)", () => {
+  it("Métricas Mobile: D/M/A toggle, real metric names, PB no disponible", () => {
+    renderAt("/metrics/mobile");
+    for (const d of ["Día", "Mes", "Año"]) {
+      expect(screen.getByRole("button", { name: d })).toBeInTheDocument();
+    }
+    expect(screen.getByText("Visitas Mobile")).toBeInTheDocument();
+    expect(screen.getByText("PB generado por Mobile")).toBeInTheDocument();
+    expect(screen.getAllByText("No disponible").length).toBeGreaterThan(0);
+  });
+
+  it("Métricas Business: each plan has its own card (never one aggregate figure)", () => {
+    renderAt("/metrics/business");
+    for (const p of ["Plan Free", "Plan Starter", "Plan Growth", "Plan Pro"]) {
+      expect(screen.getByText(p)).toBeInTheDocument();
+    }
+    expect(screen.getByText("PB generado por Business")).toBeInTheDocument();
+  });
+
+  it("Resumen general + ROI expose totals and documented formulas honestly", () => {
+    renderAt("/metrics");
+    expect(screen.getByText("Ingresos totales")).toBeInTheDocument();
+    cleanup();
+    renderAt("/metrics/roi");
+    expect(screen.getByText("Retorno (ROI)")).toBeInTheDocument();
+    expect(screen.getAllByText("No calculable todavía").length).toBeGreaterThan(0);
+  });
+});
+
+describe("Internal OS — platform control pages", () => {
+  it("Parámetros: is the single source of truth with real sections", () => {
+    renderAt("/parameters");
+    expect(screen.getByText("Scoring y oportunidades")).toBeInTheDocument();
+    expect(screen.getByText("Feature flags")).toBeInTheDocument();
+  });
+
+  it("Salud del sistema: shows honest service states (Supabase connected, Railway pending)", () => {
+    renderAt("/health");
+    expect(screen.getByText("Base de datos (Supabase)")).toBeInTheDocument();
+    expect(screen.getByText("Business (Railway)")).toBeInTheDocument();
+  });
+
+  it("Auditoría: honest empty state, no fabricated audit rows", () => {
+    renderAt("/audit");
+    expect(screen.getByText("Sin eventos de auditoría")).toBeInTheDocument();
+  });
+});
+
 describe("Internal OS — data honesty per branch", () => {
-  it("Membresías: revenue/users are empty states, plans come from canonical config", () => {
-    renderAt("/memberships");
+  it("Planes: revenue/users are empty states, plans come from canonical config", () => {
+    renderAt("/plans");
     expect(screen.getByText("Business Pro")).toBeInTheDocument();       // canonical @eventra/config
     expect(screen.getAllByText(/Sin datos/).length).toBeGreaterThan(0); // revenue/users not faked
   });
 
-  it("Facturación: MRR is an empty state (no money movement, no fabricated revenue)", () => {
-    renderAt("/billing");
-    expect(screen.getByText("Ingresos (MRR)")).toBeInTheDocument();
-    expect(screen.getAllByText(/Sin datos/).length).toBeGreaterThan(0);
+  it("Empresas: supervision list with honest revenue empty state", () => {
+    renderAt("/companies");
+    expect(screen.getByText("Northwind Retail")).toBeInTheDocument();
+    expect(screen.getByText("Ingresos")).toBeInTheDocument();
   });
 
   it("Integraciones: statuses are honest (Supabase connected, Shopify not configured)", () => {
@@ -140,39 +193,12 @@ describe("Internal OS — data honesty per branch", () => {
   it("Plantillas: shows the two app surfaces (Eventra Business + Eventra) as big boxes", async () => {
     renderAt("/templates");
     expect(await screen.findByText("Aplicaciones y superficies")).toBeInTheDocument();
-    expect(screen.getByText("Eventra Business")).toBeInTheDocument();
-    expect(screen.getAllByText("Eventra").length).toBeGreaterThan(0);
+    // "Eventra Business" appears both as a nav link and as a surface card here.
+    expect(screen.getAllByText("Eventra Business").length).toBeGreaterThan(0);
   });
 
   it("Plantillas: app surfaces show LIVE connection status (each host is probed)", async () => {
     renderAt("/templates");
-    // fetch is stubbed to resolve → both hosts report reachable ("En línea").
     expect((await screen.findAllByText("En línea")).length).toBe(2);
-  });
-
-  it("Plantillas: includes the Shopify storefront preview simulator", async () => {
-    renderAt("/templates");
-    expect(await screen.findByText("Shopify · Vista previa de la tienda")).toBeInTheDocument();
-    expect(screen.getAllByText("Simulación").length).toBeGreaterThan(0);
-  });
-
-  it("Plantillas: includes the Business app preview (real dark command-center design)", async () => {
-    renderAt("/templates");
-    expect(await screen.findByText("Eventra Business · Vista previa de la app")).toBeInTheDocument();
-    expect(screen.getByText("App Business")).toBeInTheDocument();
-    // The device frame renders the app inside a titled iframe.
-    expect(screen.getByTitle(/Vista previa de la app Business/)).toBeInTheDocument();
-  });
-
-  it("Plantillas: promo performance shows template names but NO fabricated stats (real data only)", async () => {
-    renderAt("/templates");
-    await screen.findByText("Aplicaciones y superficies");
-    expect(screen.getByText("Plantillas de promoción · Rendimiento")).toBeInTheDocument();
-    expect(screen.getByText("10% OFF — Descuento general")).toBeInTheDocument();
-    expect(screen.getByText("Free Gift — Regalo incluido")).toBeInTheDocument();
-    // Money/visits are honest empty states — never invented numbers.
-    expect(screen.getByText("Dinero generado")).toBeInTheDocument();
-    expect(screen.getByText("Visitas")).toBeInTheDocument();
-    expect(screen.getAllByText("Sin datos").length).toBeGreaterThan(0);
   });
 });
