@@ -3,6 +3,40 @@
 All notable milestones. Dates are absolute. This file summarizes; `docs/DECISIONS.md` is authoritative for
 decisions and `docs/BUILD_STATUS.md` for per-module status.
 
+## Phase 14 — Internal OS: Windows desktop app (Tauri 2) — 2026-07-15
+
+Packages the private **Eventra Internal OS** (`apps/admin`) as a private Windows desktop
+application via **Tauri 2**. Desktop packaging only — no redesign, no new routes/metrics, no
+changes to Business/Consumer, Shopify, Supabase or Railway. Branch `feat/eventra-admin-tauri`.
+No push / merge / deploy.
+
+### Added
+- **`apps/admin/src-tauri/`** — Tauri 2 desktop crate wrapping the unchanged Vite/React SPA
+  (Option A, static frontend; no local server needed). `tauri.conf.json` (product/window
+  **Eventra Internal OS**, id `com.eventra.internal`, 1500×950 / min 1100×700, centered,
+  NSIS+MSI targets, per-user install), `Cargo.toml`, `build.rs`, `src/main.rs`, `src/lib.rs`,
+  `capabilities/default.json`, brand icons.
+- **Runtime** (`src/lib.rs`): `tauri-plugin-window-state` (remembers size/position/maximized),
+  `tauri-plugin-log` (local secret-free logs in `%LOCALAPPDATA%\com.eventra.internal\logs`),
+  `tauri-plugin-opener`; window revealed on page-load *Finished* (no white flash) with an 8 s
+  fallback; external links open in the system default browser.
+- **Scripts**: `desktop:dev` / `desktop:build` / `desktop:icon` in `@eventra/admin`;
+  `desktop:admin:dev` / `desktop:admin:build` at the root. `@tauri-apps/cli` devDependency.
+- **Docs** `docs/desktop/`: architecture, security, Windows installation, build guide, report.
+
+### Verified
+- Prereqs present (Rust 1.97 msvc, VS Build Tools 2022, WebView2 150.x). Tauri build green →
+  **NSIS** (`Eventra Internal OS_0.1.0_x64-setup.exe`, 1.20 MB) + **MSI** (1.70 MB).
+- Install (per-user) → Start Menu entry + registered uninstaller; launch → window + WebView2
+  loads dashboard; session + window geometry persist; graceful close; reopen; external links →
+  browser; uninstall removes program/shortcut while **preserving user data**.
+- Admin typecheck / **100 tests** / build still green. `apps/business` and `apps/consumer`
+  untouched (git-verified). No frontend source (`apps/admin/src/**`) modified.
+
+### Notes
+- Pilot limitations: unsigned (SmartScreen "Unknown publisher" expected), manual updates (no
+  updater yet), CSP unset for service connectivity. Documented in `docs/desktop/`.
+
 ## Phase 13 — Internal OS: metrics-by-equation in the code panel — 2026-07-15
 
 Lets operators define metrics as EQUATIONS in the Estudio code panel, and choose them
