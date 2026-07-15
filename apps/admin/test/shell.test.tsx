@@ -96,9 +96,10 @@ describe("Internal OS — every branch renders", () => {
     ["/automations", /Automatizaciones/],
     ["/billing", /Facturación/],
   ];
-  it.each(routes)("renders %s without throwing", (path, heading) => {
+  it.each(routes)("renders %s without throwing", async (path, heading) => {
     renderAt(path);
-    expect(screen.getAllByRole("heading", { name: heading }).length).toBeGreaterThan(0);
+    // findAll flushes any on-mount async work (e.g. surface reachability probes).
+    expect((await screen.findAllByRole("heading", { name: heading })).length).toBeGreaterThan(0);
   });
 });
 
@@ -121,29 +122,36 @@ describe("Internal OS — data honesty per branch", () => {
     expect(screen.getByText("Shopify")).toBeInTheDocument();
   });
 
-  it("Plantillas: shows the two app surfaces (Eventra Business + Eventra) as big boxes", () => {
+  it("Plantillas: shows the two app surfaces (Eventra Business + Eventra) as big boxes", async () => {
     renderAt("/templates");
-    expect(screen.getByText("Aplicaciones y superficies")).toBeInTheDocument();
+    expect(await screen.findByText("Aplicaciones y superficies")).toBeInTheDocument();
     expect(screen.getByText("Eventra Business")).toBeInTheDocument();
     expect(screen.getAllByText("Eventra").length).toBeGreaterThan(0);
   });
 
-  it("Plantillas: includes the Shopify storefront preview simulator", () => {
+  it("Plantillas: app surfaces show LIVE connection status (each host is probed)", async () => {
     renderAt("/templates");
-    expect(screen.getByText("Shopify · Vista previa de la tienda")).toBeInTheDocument();
+    // fetch is stubbed to resolve → both hosts report reachable ("En línea").
+    expect((await screen.findAllByText("En línea")).length).toBe(2);
+  });
+
+  it("Plantillas: includes the Shopify storefront preview simulator", async () => {
+    renderAt("/templates");
+    expect(await screen.findByText("Shopify · Vista previa de la tienda")).toBeInTheDocument();
     expect(screen.getAllByText("Simulación").length).toBeGreaterThan(0);
   });
 
-  it("Plantillas: includes the Business app preview (real dark command-center design)", () => {
+  it("Plantillas: includes the Business app preview (real dark command-center design)", async () => {
     renderAt("/templates");
-    expect(screen.getByText("Eventra Business · Vista previa de la app")).toBeInTheDocument();
+    expect(await screen.findByText("Eventra Business · Vista previa de la app")).toBeInTheDocument();
     expect(screen.getByText("App Business")).toBeInTheDocument();
     // The device frame renders the app inside a titled iframe.
     expect(screen.getByTitle(/Vista previa de la app Business/)).toBeInTheDocument();
   });
 
-  it("Plantillas: promo performance shows template names but NO fabricated stats (real data only)", () => {
+  it("Plantillas: promo performance shows template names but NO fabricated stats (real data only)", async () => {
     renderAt("/templates");
+    await screen.findByText("Aplicaciones y superficies");
     expect(screen.getByText("Plantillas de promoción · Rendimiento")).toBeInTheDocument();
     expect(screen.getByText("10% OFF — Descuento general")).toBeInTheDocument();
     expect(screen.getByText("Free Gift — Regalo incluido")).toBeInTheDocument();

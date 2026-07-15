@@ -189,6 +189,10 @@ html, body { margin: 0; }
 
 /* ============================ Cards / panels ============================ */
 .eos-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+/* Surface boxes are clickable connections — lift + brand border on hover/focus. */
+.eos-surface-box { transition: transform .12s ease, border-color .12s ease, box-shadow .12s ease; }
+.eos-surface-box:hover { transform: translateY(-2px); border-color: var(--brand-primary); box-shadow: 0 10px 30px rgba(0, 0, 0, .35); }
+.eos-surface-box:focus-visible { outline: none; border-color: var(--brand-primary); box-shadow: 0 0 0 3px var(--brand-soft); }
 .eos-card-pad { padding: 16px 18px; }
 .eos-card-head {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
