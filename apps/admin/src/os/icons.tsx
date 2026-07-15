@@ -38,6 +38,12 @@ export const IconSliders = (p: P) => <Svg {...p}><path d="M4 6h9M17 6h3M4 12h3M1
 export const IconHash = (p: P) => <Svg {...p}><path d="M5 9h14M5 15h14M10 4 8 20M16 4l-2 16" /></Svg>;
 export const IconWorkflow = (p: P) => <Svg {...p}><rect x="3" y="4" width="6" height="5" rx="1.5" /><rect x="15" y="15" width="6" height="5" rx="1.5" /><path d="M6 9v4a3 3 0 0 0 3 3h6" /></Svg>;
 export const IconWallet = (p: P) => <Svg {...p}><rect x="3" y="6" width="18" height="13" rx="2.5" /><path d="M3 10h18" /><circle cx="17" cy="14.5" r="1.3" /></Svg>;
+export const IconSpeaker = (p: P) => <Svg {...p}><path d="M4 9v6h4l6 4V5L8 9H4Z" /><path d="M17 8.5a5 5 0 0 1 0 7" /></Svg>;
+export const IconRss = (p: P) => <Svg {...p}><circle cx="6" cy="18" r="1.6" /><path d="M4 11a9 9 0 0 1 9 9" /><path d="M4 5a15 15 0 0 1 15 15" /></Svg>;
+export const IconGlobe = (p: P) => <Svg {...p}><circle cx="12" cy="12" r="9" /><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18" /></Svg>;
+export const IconSmartphone = (p: P) => <Svg {...p}><rect x="7" y="3" width="10" height="18" rx="2.5" /><path d="M11 18h2" /></Svg>;
+export const IconSend = (p: P) => <Svg {...p}><path d="M21 3 10.5 13.5M21 3l-6.5 18-4-8-8-4Z" /></Svg>;
+export const IconRocket = (p: P) => <Svg {...p}><path d="M5 15c-1.5 1.5-2 5-2 5s3.5-.5 5-2M9 11a12 12 0 0 1 8-8c2 0 3 1 3 3a12 12 0 0 1-8 8Z" /><circle cx="14.5" cy="9.5" r="1.4" /><path d="M9 11l-3 1 2 3 1-3" /></Svg>;
 
 /* ---- Topbar / utility icons ---- */
 export const IconMenu = (p: P) => <Svg {...p}><path d="M4 7h16M4 12h16M4 17h16" /></Svg>;

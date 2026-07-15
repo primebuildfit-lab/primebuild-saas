@@ -7,7 +7,7 @@
  */
 import { useEffect, useRef, useState, type ReactNode } from "react";
 import { Link, useLocation, useNavigate } from "react-router";
-import { OS_NAV, OS_COMMANDS, QUICK_CREATE } from "./nav";
+import { OS_NAV, NAV_SECTIONS, OS_COMMANDS, QUICK_CREATE } from "./nav";
 import {
   IconMenu, IconSearch, IconPlus, IconBell, IconHelp, IconChevronDown, IconChevronLeft,
 } from "./icons";
@@ -56,13 +56,15 @@ function Sidebar({ open, collapsed, onCollapse, onNavigate, workspace }: {
   open: boolean; collapsed: boolean; onCollapse: () => void; onNavigate: () => void; workspace: string;
 }) {
   const { pathname } = useLocation();
-  const isActive = (to: string) => (to === "/" ? pathname === "/" : pathname.startsWith(to));
-  const main = OS_NAV.filter((n) => n.section === "main");
-  const config = OS_NAV.filter((n) => n.section === "config");
+  // Active = the nav item whose `to` is the LONGEST prefix of the current path, so
+  // /mobile/publications highlights Publicaciones, not the /mobile summary.
+  const activeTo = OS_NAV
+    .filter((n) => (n.to === "/" ? pathname === "/" : pathname === n.to || pathname.startsWith(n.to + "/")))
+    .sort((a, b) => b.to.length - a.to.length)[0]?.to;
 
   const renderItem = (n: (typeof OS_NAV)[number]) => {
     const Icon = n.icon;
-    const active = isActive(n.to);
+    const active = n.to === activeTo;
     return (
       <Link key={n.to} to={n.to} onClick={onNavigate} title={n.purpose}
         className={`eos-navitem${active ? " active" : ""}`} aria-current={active ? "page" : undefined}>
@@ -85,10 +87,17 @@ function Sidebar({ open, collapsed, onCollapse, onNavigate, workspace }: {
       </div>
       <div className="eos-sidebar-scroll">
         <nav aria-label="Principal">
-          {main.map(renderItem)}
-          <div className="eos-navsep" />
-          <div className="eos-navgroup">Configuraciones</div>
-          {config.map(renderItem)}
+          {NAV_SECTIONS.map((sec, i) => {
+            const items = OS_NAV.filter((n) => n.section === sec.id);
+            if (items.length === 0) return null;
+            return (
+              <div key={sec.id}>
+                {i > 0 ? <div className="eos-navsep" /> : null}
+                {sec.label ? <div className="eos-navgroup">{sec.label}</div> : null}
+                {items.map(renderItem)}
+              </div>
+            );
+          })}
         </nav>
       </div>
       <div className="eos-sidefoot">

@@ -2,6 +2,7 @@ import { describe, it, expect, afterEach } from "vitest";
 import { cleanup, render, screen } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 import { App } from "../src/App";
+import { OS_NAV } from "../src/os/nav";
 
 afterEach(cleanup);
 
@@ -20,16 +21,18 @@ describe("Internal OS shell", () => {
     expect(screen.getByText("Configuraciones")).toBeInTheDocument();
   });
 
-  it("renders all 19 navigation branches (Spanish labels)", () => {
+  it("renders every definitive navigation branch as a link (Spanish labels)", () => {
     renderAt("/");
-    const branches = [
-      "Inicio", "Calendario", "Campañas", "Ofertas", "Contenido", "Estudio", "Tareas", "Analítica",
-      "Audiencia", "Plantillas", "Medios", "Integraciones", "General", "Membresías",
-      "Equipos", "Canales", "Etiquetas", "Automatizaciones", "Facturación",
-    ];
-    for (const label of branches) {
-      expect(screen.getByRole("link", { name: new RegExp(`^${label}$`) })).toBeInTheDocument();
+    for (const n of OS_NAV) {
+      expect(screen.getByRole("link", { name: new RegExp(`^${n.label}$`) })).toBeInTheDocument();
     }
+  });
+
+  it("renders the four sidebar sections including Mobile Operations", () => {
+    renderAt("/");
+    expect(screen.getByText("Datos y análisis")).toBeInTheDocument();
+    expect(screen.getByText("Mobile Operations")).toBeInTheDocument();
+    expect(screen.getByText("Configuraciones")).toBeInTheDocument();
   });
 
   it("renders the topbar search and the signed-in profile (name + role)", () => {
@@ -78,8 +81,11 @@ describe("Internal OS — Inicio (dashboard)", () => {
 describe("Internal OS — every branch renders", () => {
   const routes: [string, RegExp][] = [
     ["/calendar", /Calendario global/],
+    ["/events", /Eventos y noticias/],
+    ["/opportunities", /Oportunidades/],
     ["/campaigns", /Campañas/],
     ["/offers", /Ofertas/],
+    ["/ads", /Anuncios/],
     ["/content", /Contenido/],
     ["/studio", /Estudio/],
     ["/tasks", /Tareas/],
@@ -87,6 +93,15 @@ describe("Internal OS — every branch renders", () => {
     ["/audiences", /Audiencia/],
     ["/templates", /Plantillas/],
     ["/media", /Medios/],
+    ["/sources", /Fuentes/],
+    ["/countries", /Países/],
+    ["/mobile", /Resumen móvil/],
+    ["/mobile/publications", /Publicaciones/],
+    ["/mobile/notifications", /Notificaciones push/],
+    ["/mobile/users", /Usuarios móviles/],
+    ["/mobile/releases", /Versiones/],
+    ["/mobile/analytics", /Analítica móvil/],
+    ["/mobile/settings", /Configuración móvil/],
     ["/integrations", /Integraciones/],
     ["/general", /General/],
     ["/memberships", /Membresías/],

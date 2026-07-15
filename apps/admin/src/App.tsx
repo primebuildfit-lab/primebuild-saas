@@ -9,6 +9,11 @@ import {
   LabelsPage, AutomationsPage, BillingPage, ModulePlaceholder, MOCK_PLATFORM_ROLE,
 } from "./os/pages";
 import { StudioPage } from "./os/studio";
+import { EventsPage, OpportunitiesPage, AdsPage, SourcesPage, CountriesPage } from "./os/branches";
+import {
+  MobileHomePage, MobilePublicationsPage, MobileNotificationsPage, MobileUsersPage,
+  MobileReleasesPage, MobileAnalyticsPage, MobileSettingsPage,
+} from "./os/mobile";
 
 /**
  * Eventra Internal OS (Nivel A). Private platform-admin console — SEPARATE from
@@ -38,24 +43,40 @@ export function App() {
   return (
     <Shell principalName="Brian Almeida" principalRole="Owner" workspace="Eventra Inc.">
       <Routes>
+        {/* ── Operación ── */}
         <Route path="/" element={<HomePage />} />
         <Route path="/calendar" element={<CalendarPage />} />
+        <Route path="/events" element={<EventsPage />} />
+        <Route path="/opportunities" element={<OpportunitiesPage />} />
         <Route path="/campaigns" element={<CampaignsPage />} />
         <Route path="/offers" element={<OffersPage />} />
-        <Route path="/content" element={<ContentPage />} />
+        <Route path="/ads" element={<AdsPage />} />
         <Route path="/studio" element={<StudioPage />} />
+        <Route path="/content" element={<ContentPage />} />
         <Route path="/tasks" element={<TasksPage />} />
+        {/* ── Datos y análisis ── */}
         <Route path="/analytics" element={<AnalyticsPage />} />
         <Route path="/audiences" element={<AudiencesPage />} />
         <Route path="/templates" element={<TemplatesPage />} />
         <Route path="/media" element={<MediaPage />} />
-        <Route path="/integrations" element={<IntegrationsPage />} />
+        <Route path="/sources" element={<SourcesPage />} />
+        <Route path="/countries" element={<CountriesPage />} />
+        {/* ── Mobile Operations ── */}
+        <Route path="/mobile" element={<MobileHomePage />} />
+        <Route path="/mobile/publications" element={<MobilePublicationsPage />} />
+        <Route path="/mobile/notifications" element={<MobileNotificationsPage />} />
+        <Route path="/mobile/users" element={<MobileUsersPage />} />
+        <Route path="/mobile/releases" element={<MobileReleasesPage />} />
+        <Route path="/mobile/analytics" element={<MobileAnalyticsPage />} />
+        <Route path="/mobile/settings" element={<MobileSettingsPage />} />
+        {/* ── Configuración ── */}
         <Route path="/general" element={<GeneralPage />} />
         <Route path="/memberships" element={<MembershipsPage />} />
         <Route path="/teams" element={<TeamsPage />} />
+        <Route path="/integrations" element={<IntegrationsPage />} />
+        <Route path="/automations" element={<AutomationsPage />} />
         <Route path="/channels" element={<ChannelsPage />} />
         <Route path="/labels" element={<LabelsPage />} />
-        <Route path="/automations" element={<AutomationsPage />} />
         <Route path="/billing" element={<BillingPage />} />
         <Route path="*" element={<ModulePlaceholder title="No encontrado" note="Ruta desconocida." />} />
       </Routes>

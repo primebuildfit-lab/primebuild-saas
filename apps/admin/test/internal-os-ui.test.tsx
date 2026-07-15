@@ -66,13 +66,21 @@ describe("Badges & states", () => {
 });
 
 describe("Navigation map", () => {
-  it("has exactly 19 branches split into main + config", () => {
-    expect(OS_NAV).toHaveLength(19);
-    expect(OS_NAV.filter((n) => n.section === "main")).toHaveLength(12);
-    expect(OS_NAV.filter((n) => n.section === "config")).toHaveLength(7);
+  it("has the definitive branch set across four sections", () => {
+    expect(OS_NAV).toHaveLength(31);
+    expect(OS_NAV.filter((n) => n.section === "operacion")).toHaveLength(10);
+    expect(OS_NAV.filter((n) => n.section === "datos")).toHaveLength(6);
+    expect(OS_NAV.filter((n) => n.section === "mobile")).toHaveLength(7);
+    expect(OS_NAV.filter((n) => n.section === "config")).toHaveLength(8);
   });
-  it("exposes 8 quick-create actions and a command for every branch", () => {
-    expect(QUICK_CREATE).toHaveLength(8);
+  it("includes the branches the master spec requires (events, opportunities, ads, sources, countries, mobile)", () => {
+    const paths = OS_NAV.map((n) => n.to);
+    for (const p of ["/events", "/opportunities", "/ads", "/sources", "/countries", "/mobile"]) {
+      expect(paths).toContain(p);
+    }
+  });
+  it("exposes quick-create actions and a command for every branch", () => {
+    expect(QUICK_CREATE).toHaveLength(9);
     expect(OS_COMMANDS.length).toBeGreaterThanOrEqual(OS_NAV.length + QUICK_CREATE.length);
   });
 });

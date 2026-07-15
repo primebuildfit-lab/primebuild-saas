@@ -3,6 +3,28 @@
 All notable milestones. Dates are absolute. This file summarizes; `docs/DECISIONS.md` is authoritative for
 decisions and `docs/BUILD_STATUS.md` for per-module status.
 
+## Phase 11 — Internal OS: definitive information architecture — 2026-07-15
+
+Restructures the Internal OS (`apps/admin`) navigation to the **ecosystem master spec** (the 21 platform
+branches + a **Mobile Operations** centre that lives inside `apps/admin`, never a 4th app), keeping the
+approved **dark command-center** design and visual density. Mandatory audit written first:
+`docs/EVENTRA_THREE_APPS_AUDIT.md`. Frontend only — no backend, no deploy, no push.
+
+### Added
+- **Definitive nav** (`os/nav.ts`): 31 branches in four sections (Operación · Datos y análisis ·
+  Mobile Operations · Configuraciones); generic section rendering in the sidebar; longest-prefix active state.
+- **Global branches** (`os/branches.tsx`): **Eventos y noticias**, **Oportunidades**, **Anuncios**,
+  **Fuentes**, **Países** — real modules (metrics, filters, tables, distributions) from badged DEV fixtures
+  (`data/global-seed.ts`); measured outcomes (acceptance, conversion, impressions, CTR) are honest empty states.
+- **Mobile Operations** (`os/mobile.tsx`): Resumen móvil, Publicaciones, Notificaciones push, Usuarios móviles,
+  Versiones (Android/iOS/PWA), Analítica móvil, Configuración móvil — fixtures in `data/mobile-seed.ts`;
+  users/analytics are honest empty states (no fabricated user/telemetry numbers).
+- New icons (`os/icons.tsx`); write actions gated by the platform permission matrix (mock, no live mutation).
+
+### Notes
+- Kept "Estudio" alongside the new "Anuncios" branch (composition/code vs. type supervision).
+- Tests: admin 86 green (nav counts, spec branches, per-route render, live surface status). Full suite green.
+
 ## Phase 10 — Master Spec: opportunity OS + Promotion Builder — 2026-07-13
 
 Executes the 4-part **Eventra Product Master Specification**: reposition the Business app from a calendar into
