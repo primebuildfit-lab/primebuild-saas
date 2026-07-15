@@ -1,0 +1,37 @@
+[package]
+name = "eventra-internal-os"
+version = "0.1.0"
+description = "Eventra Internal OS — private Windows desktop shell for apps/admin"
+authors = ["Eventra"]
+edition = "2021"
+rust-version = "1.77.2"
+
+# The library is what Tauri runs; main.rs is a thin launcher. Keeps the crate
+# mobile-ready and testable, matching Tauri 2 conventions.
+[lib]
+name = "eventra_internal_os_lib"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+tauri = { version = "2", features = [] }
+tauri-plugin-opener = "2"
+tauri-plugin-window-state = "2"
+tauri-plugin-log = "2"
+log = "0.4"
+serde = { version = "1", features = ["derive"] }
+serde_json = "1"
+url = "2"
+
+[features]
+# Enabled by `tauri build`; disables the dev asset server and embeds the bundle.
+custom-protocol = ["tauri/custom-protocol"]
+
+[profile.release]
+panic = "abort"
+codegen-units = 1
+lto = true
+opt-level = "s"
+strip = true

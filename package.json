@@ -39,7 +39,9 @@
     "test:packages": "npm run test --workspace @eventra/types --workspace @eventra/config --workspace @eventra/calendar --workspace @eventra/entitlements --workspace @eventra/identity",
     "build:business": "npm run build --workspace @eventra/business",
     "build:consumer": "npm run build --workspace @eventra/consumer",
-    "build:admin": "npm run build --workspace @eventra/admin"
+    "build:admin": "npm run build --workspace @eventra/admin",
+    "desktop:admin:dev": "npm run desktop:dev --workspace @eventra/admin",
+    "desktop:admin:build": "npm run desktop:build --workspace @eventra/admin"
   },
   "devDependencies": {
     "prettier": "^3.6.2",
