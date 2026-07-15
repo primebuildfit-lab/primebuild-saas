@@ -147,8 +147,29 @@ describe("Internal OS — metrics section (separated + D/M/A + honest empties)",
     expect(screen.getByText("Ingresos totales")).toBeInTheDocument();
     cleanup();
     renderAt("/metrics/roi");
-    expect(screen.getByText("Retorno (ROI)")).toBeInTheDocument();
+    expect(screen.getAllByText("Retorno sobre inversión (ROI)").length).toBeGreaterThan(0); // from the equation registry
+    expect(screen.getByText("ROAS")).toBeInTheDocument();
     expect(screen.getAllByText("No calculable todavía").length).toBeGreaterThan(0);
+  });
+});
+
+describe("Internal OS — metrics by equation (selectable in the marked places)", () => {
+  it("Comparaciones: the metric selector is fed by equation-defined metrics", () => {
+    renderAt("/metrics/compare");
+    expect(screen.getByText("Métrica a comparar")).toBeInTheDocument();
+    expect(screen.getAllByText("Retorno sobre inversión (ROI)").length).toBeGreaterThan(0); // default registry metric
+    expect(screen.getAllByText("No calculable").length).toBeGreaterThan(0);                 // honest — no data source
+  });
+
+  it("each metrics page offers an equation-metric picker", () => {
+    renderAt("/metrics/mobile");
+    expect(screen.getByText("Métrica por ecuación")).toBeInTheDocument();
+  });
+
+  it("ROI renders the equation family (ROAS, costo por visita) from the registry", () => {
+    renderAt("/metrics/roi");
+    expect(screen.getByText("Costo por visita")).toBeInTheDocument();
+    expect(screen.getByText("ROAS")).toBeInTheDocument();
   });
 });
 

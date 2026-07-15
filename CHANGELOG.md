@@ -3,6 +3,35 @@
 All notable milestones. Dates are absolute. This file summarizes; `docs/DECISIONS.md` is authoritative for
 decisions and `docs/BUILD_STATUS.md` for per-module status.
 
+## Phase 13 — Internal OS: metrics-by-equation in the code panel — 2026-07-15
+
+Lets operators define metrics as EQUATIONS in the Estudio code panel, and choose them
+as options in the marked places (Comparaciones, each metrics page, Inversión y retorno).
+Frontend only — no backend, no deploy/push/merge.
+
+### Added
+- **Equation engine + shared registry** (`os/metric-formulas.ts`): a SAFE recursive-descent
+  arithmetic parser (no `eval`/`Function`) for `+ − × ÷ ( )` and unary signs; variable
+  extraction; `evaluateFormula` (empty values → honest `null`/"no calculable", div-by-zero →
+  null); `validateExpression`; unit formatting; and a `useSyncExternalStore`-backed registry
+  seeded with the documented equations (ROI, ROAS, costo por visita/registro/prueba/cliente/
+  conversión, conversión visita→prueba, visitas por $10, ingreso neto).
+- **Equation editor** in Estudio → new "Métricas" area (`os/studio.tsx`): create/edit/delete
+  metrics by equation with live validation, detected variables and an honest "no calculable"
+  preview; built-ins are protected.
+- **Formula UI** (`os/formula-ui.tsx`): `FormulaPanel` (equation + variables + honest result)
+  and `FormulaPicker` (dropdown fed by the shared registry — reflects Estudio edits live).
+
+### Changed — the marked places now consume equation-defined metrics
+- **Comparaciones**: the metric selector is the `FormulaPicker`.
+- **Métricas Mobile/Business/Resumen**: each gains a "Métrica por ecuación" picker.
+- **Inversión y retorno**: renders the ROI family (ROI, ROAS, costo por X) from the registry.
+
+### Notes
+- No fabricated numbers anywhere — every equation stays "no calculable" until a data source is
+  connected. Tests: admin **100 green** (parser precedence/missing-vars/div0/validation, registry
+  upsert/remove/builtin-protection, pickers present in the marked places). Typecheck + build clean.
+
 ## Phase 12 — Internal OS: platform-control correction + real calendar + metrics — 2026-07-15
 
 Corrects the Internal OS so it is a **platform control centre**, not a copy of Eventra

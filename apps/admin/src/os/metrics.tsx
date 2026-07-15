@@ -7,8 +7,10 @@
  * All PB metrics are permanently "No disponible · Integración PB futura".
  */
 import { useState } from "react";
-import { PageHeader, DevBadge, Toolbar, FilterDropdown } from "./ui";
+import { PageHeader, DevBadge, Toolbar, FilterDropdown, Card, CardHead } from "./ui";
 import { DmaBar, MetricGrid, type Dma, type MetricDef } from "./platform";
+import { FormulaPicker, FormulaPanel } from "./formula-ui";
+import { useMetricFormulas } from "./metric-formulas";
 
 const NO_ANALYTICS = "Analítica de producto (pendiente de conectar)";
 const NO_BILLING = "Billing real (pendiente de conectar)";
@@ -29,8 +31,8 @@ function Filters({ specs }: { specs: { label: string; options: string[] }[] }) {
   );
 }
 
-function MetricsPage({ title, description, defs, filters }: {
-  title: string; description: string; defs: MetricDef[]; filters?: { label: string; options: string[] }[];
+function MetricsPage({ title, description, defs, filters, picker = true }: {
+  title: string; description: string; defs: MetricDef[]; filters?: { label: string; options: string[] }[]; picker?: boolean;
 }) {
   const [dma, setDma] = useState<Dma>("M");
   const [compare, setCompare] = useState(false);
@@ -40,6 +42,12 @@ function MetricsPage({ title, description, defs, filters }: {
       <DmaBar value={dma} onChange={setDma} compare={compare} onCompare={setCompare} />
       {filters ? <Filters specs={filters} /> : null}
       <MetricGrid defs={defs} dma={dma} />
+      {picker ? (
+        <Card style={{ marginTop: 16 }}>
+          <CardHead title="Métrica por ecuación" sub="Elige una métrica definida en Estudio → Código → Métricas" />
+          <div className="eos-card-pad"><FormulaPicker /></div>
+        </Card>
+      ) : null}
     </div>
   );
 }
@@ -102,27 +110,45 @@ export function MetricsOverviewPage() {
 
 /* ================================================================ Comparaciones */
 export function ComparePage() {
-  const defs: MetricDef[] = [
-    { name: "Comparación seleccionada", description: "Elige métrica, dimensión, periodo, segmento, app y visualización para comparar (Mobile vs Business, mes vs mes, plan vs plan, país vs país, inversión vs ingreso, visitas vs conversiones, anuncios vs membresías).", dims: ["Métrica", "Dimensión", "Periodo", "Segmento", "App", "Visualización"], source: "Múltiples (según selección) — pendiente", state: "pending", empty: "Sin datos" },
-  ];
-  return <MetricsPage title="Comparaciones" description="Comparador transversal: Mobile vs Business, día/mes/año, plan vs plan, país vs país, canal vs canal, inversión vs ingreso, visitas vs conversiones, anuncios vs membresías. No es una tabla estática — se activa al conectar las fuentes."
-    defs={defs} filters={[{ label: "Métrica", options: ["Visitas", "Ingresos", "Conversiones", "Membresías"] }, { label: "Dimensión", options: ["App", "Plan", "País", "Canal"] }, { label: "Periodo", options: ["Día", "Mes", "Año"] }, { label: "Visualización", options: ["Barras", "Líneas", "% contribución"] }]} />;
+  const [dma, setDma] = useState<Dma>("M");
+  const [compare, setCompare] = useState(false);
+  return (
+    <div>
+      <PageHeader title="Comparaciones" description="Comparador transversal: Mobile vs Business, día/mes/año, plan vs plan, país vs país, canal vs canal, inversión vs ingreso, visitas vs conversiones, anuncios vs membresías. La métrica se elige por ecuación; se activa al conectar las fuentes." actions={<DevBadge />} />
+      <DmaBar value={dma} onChange={setDma} compare={compare} onCompare={setCompare} />
+      <Filters specs={[{ label: "Dimensión", options: ["App", "Plan", "País", "Canal"] }, { label: "Segmento", options: ["Mobile", "Business"] }, { label: "Visualización", options: ["Barras", "Líneas", "% contribución"] }]} />
+      <Card>
+        <CardHead title="Métrica a comparar" sub="Elige la métrica (definida por ecuación en Estudio → Código → Métricas)" />
+        <div className="eos-card-pad"><FormulaPicker label="Métrica" /></div>
+      </Card>
+    </div>
+  );
 }
 
 /* ================================================================ Inversión y retorno */
+const ROI_FAMILY = ["roi", "roas", "costo_visita", "costo_registro", "costo_trial", "costo_cliente", "costo_conversion"];
 export function RoiPage() {
-  const defs: MetricDef[] = [
+  const [dma, setDma] = useState<Dma>("M");
+  const [compare, setCompare] = useState(false);
+  const formulas = useMetricFormulas();
+  const roi = ROI_FAMILY.map((id) => formulas.find((f) => f.id === id)).filter((f): f is NonNullable<typeof f> => !!f);
+  const extra: MetricDef[] = [
     { name: "Inversión total", dims: ["D/M/A", "Canal", "App"], source: "Registro de inversión (pendiente)", state: "pending", empty: "Sin datos" },
     { name: "Ingreso atribuible", dims: ["App", "Campaña"], source: NO_ATTR, state: "pending", empty: "No calculable todavía" },
-    { name: "Retorno (ROI)", formula: "((ingreso_atribuible - inversión) / inversión) × 100", dims: ["Total", "Mobile", "Business"], source: NO_ATTR, state: "pending", empty: "No calculable todavía" },
-    { name: "ROAS", formula: "ingreso_atribuible / inversión_publicitaria", source: NO_ATTR, state: "pending", empty: "No calculable todavía" },
-    { name: "Costo por visita", formula: "inversión / visitas_atribuibles", source: NO_ATTR, state: "pending", empty: "No calculable todavía" },
-    { name: "Costo por registro", formula: "inversión / registros_atribuibles", source: NO_ATTR, state: "pending", empty: "No calculable todavía" },
-    { name: "Costo por trial", formula: "inversión / trials_atribuibles", source: NO_ATTR, state: "pending", empty: "No calculable todavía" },
-    { name: "Costo por cliente pagado", formula: "inversión / clientes_pagados_atribuibles", source: NO_ATTR, state: "pending", empty: "No calculable todavía" },
-    { name: "Costo por conversión", formula: "inversión / conversiones_atribuibles", source: NO_ATTR, state: "pending", empty: "No calculable todavía" },
-    { name: "Recuperación / comparación Mobile-Business", description: "Payback y contribución por app.", dims: ["Mobile", "Business"], source: NO_ATTR, state: "pending", empty: "No calculable todavía" },
   ];
-  return <MetricsPage title="Inversión y retorno" description="Inversión, ingreso atribuible, ROI, ROAS y costos unitarios. Solo se calcula con fuentes de inversión y atribución conectadas; hasta entonces, estado honesto 'No calculable todavía'."
-    defs={defs} filters={[{ label: "App", options: ["Mobile", "Business"] }, { label: "Canal", options: ["Storefront", "Email", "Social", "Web"] }, { label: "Periodo", options: ["Día", "Mes", "Año"] }]} />;
+  return (
+    <div>
+      <PageHeader title="Inversión y retorno" description="Inversión, ingreso atribuible, ROI, ROAS y costos unitarios — calculados desde las ECUACIONES definidas en Estudio. Solo se calcula con fuentes de inversión y atribución conectadas; hasta entonces, honesto 'No calculable'." actions={<DevBadge />} />
+      <DmaBar value={dma} onChange={setDma} compare={compare} onCompare={setCompare} />
+      <Filters specs={[{ label: "App", options: ["Mobile", "Business"] }, { label: "Canal", options: ["Storefront", "Email", "Social", "Web"] }, { label: "Periodo", options: ["Día", "Mes", "Año"] }]} />
+      <MetricGrid defs={extra} dma={dma} />
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))", gap: 16, marginTop: 16 }}>
+        {roi.map((f) => <FormulaPanel key={f.id} formula={f} />)}
+      </div>
+      <Card style={{ marginTop: 16 }}>
+        <CardHead title="Otra métrica por ecuación" sub="Elige cualquier métrica definida en Estudio" />
+        <div className="eos-card-pad"><FormulaPicker /></div>
+      </Card>
+    </div>
+  );
 }

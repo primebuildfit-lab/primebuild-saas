@@ -17,8 +17,12 @@ import {
   Card, CardHead, PageHeader, MetricCard, DataTable, Toolbar, FilterDropdown, Select,
   StatusBadge, Pill, EmptyState, Btn, DevBadge, type Column,
 } from "./ui";
-import { IconMegaphone, IconCode, IconCheck, IconAlert } from "./icons";
+import { IconMegaphone, IconCode, IconCheck, IconAlert, IconBarChart } from "./icons";
 import { MOCK_PLATFORM_ROLE } from "./pages";
+import {
+  useMetricFormulas, upsertMetricFormula, removeMetricFormula, validateExpression,
+  evaluateFormula, formatMetric, UNIT_LABEL, type MetricFormula, type MetricUnit,
+} from "./metric-formulas";
 import {
   devAnnouncements, devCodeBlocks, AUDIENCE_LABEL, TONE_LABEL, LANG_LABEL, SURFACE_LABEL,
   PLACEMENT_LABEL, PLACEMENTS_FOR,
@@ -75,11 +79,12 @@ function Toggle({ checked, onChange, label }: { checked: boolean; onChange: (v: 
 }
 
 /* ------------------------------------------------------------- segmented tabs */
-type TabId = "announcements" | "code";
+type TabId = "announcements" | "code" | "metrics";
 function SegTabs({ tab, onTab }: { tab: TabId; onTab: (t: TabId) => void }) {
   const tabs: { id: TabId; label: string; icon: ReactNode }[] = [
     { id: "announcements", label: "Anuncios", icon: <IconMegaphone size={15} /> },
     { id: "code", label: "Código", icon: <IconCode size={15} /> },
+    { id: "metrics", label: "Métricas", icon: <IconBarChart size={15} /> },
   ];
   return (
     <div role="tablist" aria-label="Áreas del estudio" style={{ display: "inline-flex", gap: 4, padding: 4, background: "var(--surface)", border: "1px solid var(--border)", borderRadius: 11, marginBottom: 18 }}>
@@ -309,21 +314,113 @@ const preStyle: CSSProperties = {
   fontFamily: "ui-monospace, SFMono-Regular, Menlo, Consolas, monospace", overflowX: "auto",
 };
 
+/* ============================================================ Métricas (ecuaciones) */
+const UNITS: MetricUnit[] = ["number", "money", "percent", "ratio"];
+const rmid = () => `m-${Math.random().toString(36).slice(2, 8)}`;
+
+function MetricsCode({ canManage }: { canManage: boolean }) {
+  const formulas = useMetricFormulas();
+  const [selId, setSelId] = useState(formulas[0]?.id ?? "");
+  const selected = formulas.find((f) => f.id === selId) ?? formulas[0] ?? null;
+
+  const check = selected ? validateExpression(selected.expression) : { ok: false, variables: [] as string[] };
+  const preview = selected ? evaluateFormula(selected.expression, {}) : null; // sin datos → no calculable
+
+  function patch(p: Partial<MetricFormula>) { if (selected) upsertMetricFormula({ ...selected, ...p }); }
+  function add() {
+    const f: MetricFormula = { id: rmid(), name: "Métrica sin título", expression: "a / b", unit: "number" };
+    upsertMetricFormula(f); setSelId(f.id);
+  }
+
+  return (
+    <div>
+      <div style={{ display: "flex", gap: 10, alignItems: "flex-start", background: "var(--info-soft)", border: "1px solid var(--border)", borderRadius: 11, padding: "12px 14px", marginBottom: 16 }}>
+        <span style={{ color: "var(--info)", flex: "none", marginTop: 1 }}><IconBarChart size={18} /></span>
+        <div style={{ fontSize: 12.5, color: "var(--text-secondary)", lineHeight: 1.5 }}>
+          Define métricas por <b style={{ color: "var(--text-primary)" }}>ecuación</b> (ej. <code style={{ color: "var(--brand-strong)" }}>(ingreso - inversion) / inversion * 100</code>). Se validan aquí y quedan <b style={{ color: "var(--text-primary)" }}>seleccionables</b> en Comparaciones, en cada página de métricas y en Inversión y retorno. Sin fuente de datos conectada el resultado es honestamente «no calculable» — nunca un número inventado.
+        </div>
+      </div>
+
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(220px, 300px) 1fr", gap: 16, alignItems: "start" }} className="eos-studio-grid">
+        {/* Formula list */}
+        <Card>
+          <CardHead title="Métricas" action={<Btn onClick={add}>Nueva</Btn>} />
+          <div style={{ padding: 6 }}>
+            {formulas.map((f) => {
+              const active = f.id === selId;
+              return (
+                <button key={f.id} type="button" onClick={() => setSelId(f.id)}
+                  style={{ display: "flex", alignItems: "center", gap: 8, width: "100%", textAlign: "left", padding: "9px 10px", borderRadius: 8, border: 0, cursor: "pointer", marginBottom: 2, background: active ? "var(--surface-hover)" : "transparent", color: "var(--text-primary)" }}>
+                  <span style={{ color: "var(--brand-primary)", flex: "none" }}><IconBarChart size={15} /></span>
+                  <span style={{ flex: 1, minWidth: 0 }}>
+                    <span style={{ display: "block", fontSize: 13, fontWeight: 600, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{f.name}</span>
+                    <span style={{ fontSize: 11, color: "var(--text-muted)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", display: "block" }}>{f.expression}</span>
+                  </span>
+                  {f.builtin ? <Pill tone="neutral">base</Pill> : null}
+                </button>
+              );
+            })}
+          </div>
+        </Card>
+
+        {/* Editor */}
+        {selected ? (
+          <div style={{ display: "grid", gap: 16 }}>
+            <Card>
+              <CardHead title="Editor de ecuación" action={<DevBadge />} />
+              <div className="eos-card-pad" style={{ display: "grid", gap: 14 }}>
+                <Field label="Nombre"><TextInput value={selected.name} onChange={(v) => patch({ name: v })} placeholder="Nombre de la métrica" /></Field>
+                <Field label="Ecuación" hint="Operadores + − × ÷ y paréntesis. Cada nombre es una variable (se conecta a datos reales más adelante).">
+                  <TextArea value={selected.expression} onChange={(v) => patch({ expression: v })} rows={2} mono placeholder="(ingreso_atribuible - inversion) / inversion * 100" />
+                </Field>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(150px, 1fr))", gap: 14 }}>
+                  <Field label="Unidad"><Select value={selected.unit} onChange={(v) => patch({ unit: v as MetricUnit })} options={UNITS.map((u) => ({ value: u, label: UNIT_LABEL[u] }))} /></Field>
+                </div>
+                {/* Live validation */}
+                <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 12.5 }}>
+                  {check.ok
+                    ? <span style={{ color: "var(--success)", display: "inline-flex", alignItems: "center", gap: 6 }}><IconCheck size={15} /> Ecuación válida</span>
+                    : <span style={{ color: "var(--danger)", display: "inline-flex", alignItems: "center", gap: 6 }}><IconAlert size={15} /> {check.error}</span>}
+                </div>
+                <div style={{ display: "flex", flexWrap: "wrap", gap: 6, alignItems: "center" }}>
+                  <span style={{ fontSize: 12, color: "var(--text-muted)" }}>Variables:</span>
+                  {check.variables.length === 0 ? <span style={{ fontSize: 12, color: "var(--text-muted)" }}>—</span> : check.variables.map((v) => <Pill key={v} tone="neutral">{v}</Pill>)}
+                </div>
+                <div style={{ display: "flex", alignItems: "center", gap: 16, flexWrap: "wrap" }}>
+                  <span style={{ fontSize: 12.5, color: "var(--text-secondary)" }}>Vista previa: <b style={{ color: "var(--text-primary)" }}>{preview && preview.value !== null ? formatMetric(preview.value, selected.unit) : "No calculable (sin datos)"}</b></span>
+                  <span style={{ flex: 1 }} />
+                  {!selected.builtin ? <Btn tone="ghost" onClick={() => { removeMetricFormula(selected.id); setSelId(formulas.find((f) => f.id !== selected.id)?.id ?? ""); }}>Eliminar</Btn> : null}
+                  <Btn tone="primary" disabled={!canManage || !check.ok} title={canManage ? undefined : "Requiere permiso platform:settings:manage"}><IconCheck size={15} /> Guardar</Btn>
+                </div>
+              </div>
+            </Card>
+          </div>
+        ) : (
+          <Card style={{ padding: 8 }}><EmptyState title="Sin métricas" hint="Crea una métrica por ecuación con «Nueva»." /></Card>
+        )}
+      </div>
+    </div>
+  );
+}
+
 /* ============================================================== StudioPage */
 export function StudioPage() {
   const [tab, setTab] = useState<TabId>("announcements");
   const canPublishAnnouncements = platformCan(MOCK_PLATFORM_ROLE, PP.settingsManage);
   const canManageCode = platformCan(MOCK_PLATFORM_ROLE, PP.ownerManage);
+  const canManageMetrics = platformCan(MOCK_PLATFORM_ROLE, PP.settingsManage);
 
   return (
     <div>
       <PageHeader
         title="Estudio"
-        description="Anuncios y personalización de la app (JavaScript + Liquid). Fundación — nada se publica en vivo todavía."
+        description="Anuncios, personalización de la app (JavaScript + Liquid) y métricas por ecuación. Fundación — nada se publica en vivo todavía."
         actions={<DevBadge />}
       />
       <SegTabs tab={tab} onTab={setTab} />
-      {tab === "announcements" ? <Announcements canPublish={canPublishAnnouncements} /> : <CodeStudio canManage={canManageCode} />}
+      {tab === "announcements" ? <Announcements canPublish={canPublishAnnouncements} />
+        : tab === "code" ? <CodeStudio canManage={canManageCode} />
+        : <MetricsCode canManage={canManageMetrics} />}
     </div>
   );
 }
