@@ -9,11 +9,15 @@
 //   * reveals the window once content has painted (no white flash).
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
+mod updater;
+
 use tauri::Manager;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     tauri::Builder::default()
+        // Automatic updates (checks a signed release manifest in the background).
+        .plugin(tauri_plugin_updater::Builder::new().build())
         // Local, secret-free diagnostics in the app data/log directory.
         .plugin(
             tauri_plugin_log::Builder::new()
@@ -32,6 +36,12 @@ pub fn run() {
         .setup(|app| {
             let version = app.package_info().version.to_string();
             log::info!("Eventra Internal OS starting — v{version}");
+
+            // Non-blocking automatic update check. If a newer signed release is
+            // published it is downloaded, verified and installed, then the app
+            // relaunches. Never gates startup; no-ops until the release channel
+            // is configured.
+            updater::spawn_startup_check(app.handle().clone());
 
             // Safety net: never leave a permanently hidden window if the page
             // load event is somehow not observed (e.g. a bundling error).

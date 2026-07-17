@@ -1,0 +1,86 @@
+# Eventra Internal OS (desktop) — build, sign and publish an auto-updatable release.
+#
+# Trigger: push a tag like `eventra-desktop-v0.1.1` (or run manually). The job
+# builds the apps/admin SPA + the Tauri NSIS installer, signs the updater
+# artifacts with the private key held ONLY in repo secrets, and publishes a
+# GitHub Release with the installer, its `.sig`, and `latest.json` — the manifest
+# the installed app polls. No secret ever touches the repo, config, or frontend.
+#
+# Required repository secrets (Settings → Secrets and variables → Actions):
+#   TAURI_SIGNING_PRIVATE_KEY           full contents of ~/.eventra/updater.key
+#   TAURI_SIGNING_PRIVATE_KEY_PASSWORD  the key's password (EMPTY string for this
+#                                       key — add the secret with no value)
+#
+# The public key in apps/admin/src-tauri/tauri.conf.json (plugins.updater.pubkey)
+# MUST match this private key, or installed apps reject every update.
+#
+# NOTE: this is a shared monorepo repo. Cut ONLY desktop releases here, or use a
+# dedicated repo — the app polls `releases/latest`, so an unrelated "latest"
+# release would shadow the updater manifest.
+
+name: release-eventra-desktop
+
+on:
+  push:
+    tags:
+      - "eventra-desktop-v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag/version to release (e.g. eventra-desktop-v0.1.1)"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: apps/admin/src-tauri
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build, sign and publish desktop release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          # Baked into the binary so the installed app polls THIS repo's releases
+          # (follows a repo rename automatically).
+          EVENTRA_UPDATE_OWNER: ${{ github.repository_owner }}
+          EVENTRA_UPDATE_REPO: ${{ github.event.repository.name }}
+        with:
+          projectPath: apps/admin
+          # Overlay that turns ON signed updater artifacts (kept out of the base
+          # config so local builds stay keyless).
+          args: --config src-tauri/tauri.conf.release.json
+          tagName: ${{ github.ref_type == 'tag' && github.ref_name || inputs.tag }}
+          releaseName: "Eventra Internal OS __VERSION__"
+          releaseBody: |
+            Eventra Internal OS desktop __VERSION__.
+
+            Instalación nueva: descarga y ejecuta el instalador `.exe`.
+            Actualización: las instalaciones existentes se actualizan solas al
+            abrir la app (se descarga, verifica la firma, instala y reinicia).
+          releaseDraft: false
+          prerelease: false
+          includeUpdaterJson: true
