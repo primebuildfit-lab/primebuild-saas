@@ -99,13 +99,15 @@ The signing keypair is generated at `C:\Users\carlo\.eventra-keys\eventra-mobile
 `tauri.conf.release.json`. The GitHub Actions pipeline
 `.github/workflows/release-eventra-mobile.yml` builds + signs + publishes.
 
-**You only need to add two repository secrets once** (GitHub → Settings → Secrets
+**You only need to add ONE repository secret once** (GitHub → Settings → Secrets
 and variables → Actions):
 
 | Secret | Value |
 |--------|-------|
 | `TAURI_SIGNING_PRIVATE_KEY` | the full contents of `C:\Users\carlo\.eventra-keys\eventra-mobile.key` |
-| `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | empty (add the secret with no value) |
+
+The key has **no password**, so do NOT create a password secret — GitHub rejects
+empty secret values, and the workflow already passes an empty literal.
 
 ### Shipping a new version (every time, forever)
 

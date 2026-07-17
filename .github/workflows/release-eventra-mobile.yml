@@ -17,11 +17,11 @@
 # `--latest=false` so it never shadows another app's `releases/latest` in this
 # shared monorepo repo — that's why Mobile uses a fixed tag instead of /latest/.
 #
-# Required repository secrets (Settings → Secrets and variables → Actions):
-#   TAURI_SIGNING_PRIVATE_KEY           full contents of the file
-#                                       C:\Users\carlo\.eventra-keys\eventra-mobile.key
-#   TAURI_SIGNING_PRIVATE_KEY_PASSWORD  the key's password (EMPTY for this key —
-#                                       add the secret with an empty value)
+# Required repository secret (Settings → Secrets and variables → Actions) — just ONE:
+#   TAURI_SIGNING_PRIVATE_KEY   full contents of the file
+#                               C:\Users\carlo\.eventra-keys\eventra-mobile.key
+# The key has no password, so do NOT create a password secret (GitHub rejects
+# empty secret values; the workflow passes an empty literal instead).
 #
 # The public key in apps/consumer/src-tauri/tauri.conf.release.json
 # (plugins.updater.pubkey) MUST match this private key, or installed apps reject
@@ -67,7 +67,9 @@ jobs:
         working-directory: apps/consumer
         env:
           TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          # The key has no password. GitHub secrets can't be empty, so we DON'T
+          # create a password secret — an empty literal is exactly what's needed.
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
         # The release overlay turns ON signed updater artifacts + the real public
         # key (kept out of the base config so local builds stay keyless).
         run: npx tauri build --config src-tauri/tauri.conf.release.json
