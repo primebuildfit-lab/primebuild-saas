@@ -8,7 +8,12 @@
     "dev": "vite",
     "build": "vite build",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "desktop:dev": "tauri dev",
+    "desktop:build": "tauri build",
+    "desktop:icon": "tauri icon",
+    "mobile:android:init": "tauri android init",
+    "mobile:android:build": "tauri android build"
   },
   "dependencies": {
     "@eventra/calendar": "*",
@@ -16,11 +21,13 @@
     "@eventra/entitlements": "*",
     "@eventra/types": "*",
     "@eventra/ui": "*",
+    "@tauri-apps/plugin-opener": "^2.5.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
     "react-router": "^7.12.0"
   },
   "devDependencies": {
+    "@tauri-apps/cli": "^2.11.4",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/react": "^18.3.25",
