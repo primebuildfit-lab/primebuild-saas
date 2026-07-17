@@ -1,0 +1,117 @@
+# Eventra Mobile — build, sign and publish an auto-updatable release.
+#
+# GOAL: once a user installs Eventra Mobile, every later change you ship reaches
+# them automatically. You never build/sign/upload by hand again — you just mark a
+# version and this pipeline does the rest; installed apps update themselves on the
+# next launch (download → verify signature → install → relaunch).
+#
+# HOW TO SHIP A NEW VERSION (after the one-time secret setup below):
+#   1. bump "version" in apps/consumer/src-tauri/tauri.conf.json (and Cargo.toml)
+#   2. commit, then:  git tag eventra-mobile-v0.2.0 && git push origin eventra-mobile-v0.2.0
+#      (or use the "Run workflow" button — workflow_dispatch — in the Actions tab)
+#
+# This job builds the apps/consumer SPA + the Tauri NSIS installer, signs the
+# updater artifact with the private key held ONLY in repo secrets, and refreshes a
+# DEDICATED rolling release tagged `eventra-mobile` that holds the installer and
+# `latest-mobile.json` (the manifest the installed app polls). It is published with
+# `--latest=false` so it never shadows another app's `releases/latest` in this
+# shared monorepo repo — that's why Mobile uses a fixed tag instead of /latest/.
+#
+# Required repository secrets (Settings → Secrets and variables → Actions):
+#   TAURI_SIGNING_PRIVATE_KEY           full contents of the file
+#                                       C:\Users\carlo\.eventra-keys\eventra-mobile.key
+#   TAURI_SIGNING_PRIVATE_KEY_PASSWORD  the key's password (EMPTY for this key —
+#                                       add the secret with an empty value)
+#
+# The public key in apps/consumer/src-tauri/tauri.conf.release.json
+# (plugins.updater.pubkey) MUST match this private key, or installed apps reject
+# every update.
+
+name: release-eventra-mobile
+
+on:
+  push:
+    tags:
+      - "eventra-mobile-v*"
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: apps/consumer/src-tauri
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build & sign Eventra Mobile
+        working-directory: apps/consumer
+        env:
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+        # The release overlay turns ON signed updater artifacts + the real public
+        # key (kept out of the base config so local builds stay keyless).
+        run: npx tauri build --config src-tauri/tauri.conf.release.json
+
+      - name: Compose manifest and publish rolling release
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          BUNDLE="apps/consumer/src-tauri/target/release/bundle/nsis"
+          SRC_EXE="$(ls "$BUNDLE"/*-setup.exe | head -n1)"
+          SIG="$(cat "$BUNDLE"/*-setup.exe.sig)"
+          VER="$(node -p "require('./apps/consumer/src-tauri/tauri.conf.json').version")"
+          PUB_DATE="$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+
+          # Upload under a space-free, predictable name so the manifest URL is exact.
+          STAGE="release-staging"
+          mkdir -p "$STAGE"
+          ASSET="Eventra-Mobile_${VER}_x64-setup.exe"
+          cp "$SRC_EXE" "$STAGE/$ASSET"
+
+          cat > "$STAGE/latest-mobile.json" <<JSON
+          {
+            "version": "${VER}",
+            "notes": "Eventra Mobile ${VER}. Existing installs update automatically on next launch.",
+            "pub_date": "${PUB_DATE}",
+            "platforms": {
+              "windows-x86_64": {
+                "signature": "${SIG}",
+                "url": "https://github.com/${GITHUB_REPOSITORY}/releases/download/eventra-mobile/${ASSET}"
+              }
+            }
+          }
+          JSON
+
+          # Refresh the dedicated rolling release (delete + recreate so stale
+          # installers don't accumulate). --latest=false keeps it from shadowing
+          # the repo's "latest" (used by the desktop app's updater).
+          gh release delete eventra-mobile --yes --cleanup-tag 2>/dev/null || true
+          gh release create eventra-mobile \
+            --title "Eventra Mobile (auto-update channel)" \
+            --notes "Rolling channel that Eventra Mobile installs poll for updates. Current: ${VER}." \
+            --latest=false \
+            "$STAGE/$ASSET" "$STAGE/latest-mobile.json"
+
+          echo "Published Eventra Mobile ${VER} to the eventra-mobile channel."

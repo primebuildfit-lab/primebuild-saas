@@ -72,68 +72,63 @@ apps/consumer/src-tauri/target/release/bundle/
 > The first build compiles all Rust dependencies — expect several minutes.
 > Later builds are incremental.
 
-## 6. Automatic updates (the "Auto-update" requirement)
+## 6. Automatic updates — how "ship once, updates forever" works
 
-The updater is **already wired** end-to-end and driven entirely from Rust
-(`src-tauri/src/updater.rs` + the `#[cfg(desktop)]` gate in `lib.rs`), so the
-web content never gets the updater/process permission surface. On launch a
-single non-blocking check runs; if a newer **signed** release exists it is
-downloaded, its minisign signature verified natively, installed, and the app
-relaunches. A tampered/unsigned package is rejected — the working install is
-never left broken. Until the release channel below is configured it reports
-"not configured" and no-ops (never errors, never blocks startup).
+The updater is **wired and driven entirely from Rust** (`src-tauri/src/updater.rs`
++ the `#[cfg(desktop)]` gate in `lib.rs`), so the web content never gets the
+updater/process permission surface. On launch a single non-blocking check runs;
+if a newer **signed** release exists it is downloaded, its minisign signature
+verified natively, installed, and the app relaunches. A tampered/unsigned package
+is rejected — the working install is never left broken.
 
-### Going live — one-time setup
+**Config split (so local dev stays keyless):**
+- Base `tauri.conf.json` ships a **placeholder** pubkey → local builds don't sign
+  and the updater no-ops. `npm run desktop:mobile:build` works with no key.
+- Release overlay `tauri.conf.release.json` adds the **real** pubkey +
+  `createUpdaterArtifacts` → only CI builds are signed and updatable.
 
-1. **Generate a signing key pair** (keep the private key secret; CI-only):
+**Dedicated channel, not `/latest/`:** the installed app polls a **fixed** tag —
+`…/releases/download/eventra-mobile/latest-mobile.json` — so it is never shadowed
+by the desktop app's `releases/latest` in this shared monorepo repo.
+`EVENTRA_UPDATE_ENDPOINT` overrides at runtime for local end-to-end tests.
+
+### One-time setup (already done in code; only the secrets remain)
+
+The signing keypair is generated at `C:\Users\carlo\.eventra-keys\eventra-mobile.key`
+(private, outside the repo) and its public key is baked into
+`tauri.conf.release.json`. The GitHub Actions pipeline
+`.github/workflows/release-eventra-mobile.yml` builds + signs + publishes.
+
+**You only need to add two repository secrets once** (GitHub → Settings → Secrets
+and variables → Actions):
+
+| Secret | Value |
+|--------|-------|
+| `TAURI_SIGNING_PRIVATE_KEY` | the full contents of `C:\Users\carlo\.eventra-keys\eventra-mobile.key` |
+| `TAURI_SIGNING_PRIVATE_KEY_PASSWORD` | empty (add the secret with no value) |
+
+### Shipping a new version (every time, forever)
+
+1. Bump `"version"` in `apps/consumer/src-tauri/tauri.conf.json` **and**
+   `Cargo.toml`.
+2. Commit, then tag & push:
 
    ```powershell
-   npx @tauri-apps/cli signer generate -w eventra-mobile.key
-   # prints a PUBLIC key and writes the PRIVATE key to eventra-mobile.key
+   git tag eventra-mobile-v0.2.0
+   git push origin eventra-mobile-v0.2.0
    ```
 
-2. **Publish the public key** in `apps/consumer/src-tauri/tauri.conf.json`:
+   (Or press **Run workflow** on `release-eventra-mobile` in the Actions tab.)
 
-   ```jsonc
-   "plugins": { "updater": { "pubkey": "<PUBLIC KEY FROM STEP 1>", ... } }
-   ```
-
-3. **Point the endpoint at your release host.** The default is a GitHub Releases
-   manifest named `latest-mobile.json` (distinct from the Internal OS
-   `latest.json` so the two apps update independently from the same repo).
-   Bake the repo at build time via `EVENTRA_UPDATE_OWNER` / `EVENTRA_UPDATE_REPO`
-   (or edit the `endpoints` array). `EVENTRA_UPDATE_ENDPOINT` overrides at
-   runtime for local end-to-end tests.
-
-4. **Sign artifacts at build time** by exporting the private key so the Tauri
-   CLI signs the bundle and emits `.sig` files:
-
-   ```powershell
-   $env:TAURI_SIGNING_PRIVATE_KEY = Get-Content eventra-mobile.key -Raw
-   $env:TAURI_SIGNING_PRIVATE_KEY_PASSWORD = "<password or empty>"
-   npm run desktop:mobile:build
-   ```
-
-5. **Publish a release** containing the installer, its `.sig`, and a
-   `latest-mobile.json` manifest, e.g.:
-
-   ```json
-   {
-     "version": "0.2.0",
-     "notes": "…",
-     "pub_date": "2026-07-17T00:00:00Z",
-     "platforms": {
-       "windows-x86_64": {
-         "signature": "<contents of the .sig file>",
-         "url": "https://github.com/<owner>/<repo>/releases/download/v0.2.0/Eventra.Mobile_0.2.0_x64-setup.exe"
-       }
-     }
-   }
-   ```
-
-Bump `version` in both `tauri.conf.json` and `Cargo.toml` for each release; the
-installed app only applies a build whose manifest `version` is higher **and**
+CI builds, signs, and refreshes the `eventra-mobile` release. **Every installed
+app updates itself on its next launch** — you never build/sign/upload by hand.
+The installed app only applies a build whose manifest `version` is higher **and**
 whose signature verifies against the embedded public key.
+
+> The very first update requires at least one installed build carrying the **real**
+> pubkey — i.e. built by CI (or a local overlay build). The base-config installer
+> you may have side-loaded for testing has the placeholder key and won't auto-update;
+> install a CI build once, and it self-updates from then on.
 
 ## 7. Native mobile (Android / iOS) — later
 
@@ -151,8 +146,10 @@ and run `tauri android init` first (generates `src-tauri/gen/android`).
 
 | File | Purpose |
 |------|---------|
-| `apps/consumer/src-tauri/tauri.conf.json` | product name, identifier, phone window, bundle, updater endpoint + pubkey |
+| `apps/consumer/src-tauri/tauri.conf.json` | product name, identifier, phone window, bundle, updater endpoint (fixed tag) + **placeholder** pubkey (keyless local builds) |
+| `apps/consumer/src-tauri/tauri.conf.release.json` | CI overlay: real pubkey + `createUpdaterArtifacts` (signed, updatable builds) |
 | `apps/consumer/src-tauri/Cargo.toml` | Rust deps; updater gated to desktop targets |
 | `apps/consumer/src-tauri/capabilities/default.json` | minimal IPC permissions |
 | `apps/consumer/src-tauri/src/lib.rs` | runtime: plugins, window reveal, desktop update check |
 | `apps/consumer/src-tauri/src/updater.rs` | desktop auto-update flow (check→verify→install→relaunch) |
+| `.github/workflows/release-eventra-mobile.yml` | CI: build + sign + publish the `eventra-mobile` auto-update channel |

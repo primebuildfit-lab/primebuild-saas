@@ -32,7 +32,6 @@
   },
   "bundle": {
     "active": true,
-    "createUpdaterArtifacts": true,
     "targets": ["nsis", "msi"],
     "publisher": "Eventra",
     "homepage": "https://eventra.app",
@@ -54,9 +53,9 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEVDMDIyNEJBRTY1NUM2NTAKUldSUXhsWG11aVFDN09mYlZVRjk2YTJPNVNjeUtsVjFnT1Y3dm8zUVhqQ1lkQzNsMUtTSTBIUGwK",
+      "pubkey": "REPLACE_WITH_PRODUCTION_PUBKEY",
       "endpoints": [
-        "https://github.com/primebuildfit-lab/primebuild-saas/releases/latest/download/latest-mobile.json"
+        "https://github.com/primebuildfit-lab/primebuild-saas/releases/download/eventra-mobile/latest-mobile.json"
       ],
       "windows": {
         "installMode": "passive"

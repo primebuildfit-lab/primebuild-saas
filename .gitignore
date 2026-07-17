@@ -38,3 +38,6 @@ pnpm-lock.yaml
 
 # Private local Claude Code permissions (never commit)
 .claude/settings.local.json
+
+# Local release-staging output (installers/manifests to upload)
+dist-release/

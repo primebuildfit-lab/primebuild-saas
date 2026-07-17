@@ -21,39 +21,17 @@
 use tauri::AppHandle;
 use tauri_plugin_updater::UpdaterExt;
 
-/// GitHub owner/repo the installed app polls for releases. Baked at build time
-/// from `EVENTRA_UPDATE_OWNER` / `EVENTRA_UPDATE_REPO` when present (set by CI),
-/// otherwise the documented placeholder so the app degrades honestly until the
-/// release channel exists. A runtime `EVENTRA_UPDATE_ENDPOINT` override wins,
-/// used for controlled local end-to-end tests.
-fn update_owner() -> String {
-    option_env!("EVENTRA_UPDATE_OWNER")
-        .unwrap_or("primebuildfit-lab")
-        .to_string()
-}
-
-fn update_repo() -> String {
-    option_env!("EVENTRA_UPDATE_REPO")
-        .unwrap_or("primebuild-saas")
-        .to_string()
-}
-
-/// Resolve the manifest endpoint, or `None` when still on the placeholder (no
-/// remote yet) so the caller treats the updater as "not configured".
-fn resolve_endpoint() -> Option<String> {
-    if let Ok(e) = std::env::var("EVENTRA_UPDATE_ENDPOINT") {
-        let e = e.trim().to_string();
-        if !e.is_empty() {
-            return Some(e);
-        }
+/// The manifest endpoint the installed app polls. By default this comes from
+/// `plugins.updater.endpoints` in the bundled config — a **fixed** release tag
+/// (`.../releases/download/eventra-mobile/latest-mobile.json`) so it is never
+/// shadowed by another app's `releases/latest` in this shared monorepo repo.
+/// A runtime `EVENTRA_UPDATE_ENDPOINT` override wins, used for controlled local
+/// end-to-end tests; when unset we let the plugin use the config endpoint.
+fn endpoint_override() -> Option<String> {
+    match std::env::var("EVENTRA_UPDATE_ENDPOINT") {
+        Ok(e) if !e.trim().is_empty() => Some(e.trim().to_string()),
+        _ => None,
     }
-    let (owner, repo) = (update_owner(), update_repo());
-    if owner.starts_with("REPLACE_") || repo.starts_with("REPLACE_") {
-        return None;
-    }
-    Some(format!(
-        "https://github.com/{owner}/{repo}/releases/latest/download/latest-mobile.json"
-    ))
 }
 
 /// Fire a non-blocking update check right after launch. Never gates startup: on
@@ -75,24 +53,16 @@ pub fn spawn_startup_check(app: AppHandle) {
 /// an update was actually applied (in which case the app is restarting and this
 /// call does not return past `restart`).
 async fn run_update_flow(app: &AppHandle) -> Result<bool, String> {
-    let endpoint = match resolve_endpoint() {
-        Some(e) => e,
-        None => {
-            log::info!("updater: release endpoint not configured yet — skipping");
-            return Ok(false);
-        }
-    };
-
-    // Build the updater with the resolved endpoint (the public key comes from
-    // tauri.conf.json). A placeholder/invalid key surfaces here as an error,
-    // which we log and swallow rather than crash.
-    let url = endpoint.parse().map_err(|e| format!("bad endpoint: {e}"))?;
-    let updater = app
-        .updater_builder()
-        .endpoints(vec![url])
-        .map_err(|e| e.to_string())?
-        .build()
-        .map_err(|e| e.to_string())?;
+    // Build the updater. The public key and (by default) the endpoint come from
+    // the bundled config; only override the endpoint when the env var is set for
+    // a local test. A placeholder/invalid key surfaces here as an error, which we
+    // log and swallow rather than crash — so keyless local builds simply no-op.
+    let mut builder = app.updater_builder();
+    if let Some(endpoint) = endpoint_override() {
+        let url = endpoint.parse().map_err(|e| format!("bad endpoint: {e}"))?;
+        builder = builder.endpoints(vec![url]).map_err(|e| e.to_string())?;
+    }
+    let updater = builder.build().map_err(|e| e.to_string())?;
 
     let update = match updater.check().await {
         Ok(Some(u)) => u,
