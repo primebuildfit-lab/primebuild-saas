@@ -36,8 +36,9 @@ together (all three must match).
 `eventra-desktop-vX.Y.Z` (exclusive — the workflow triggers only on this prefix).
 
 ## Publish a release
-1. One-time: add repo secret `TAURI_SIGNING_PRIVATE_KEY` = full contents of
-   `C:\Users\carlo\.eventra\updater.key` (no password secret needed).
+1. One-time: add repo secret `EVENTRA_DESKTOP_SIGNING_KEY` = full contents of
+   `C:\Users\carlo\.eventra\updater.key` (no password secret needed). Distinct
+   from Eventra Mobile's `TAURI_SIGNING_PRIVATE_KEY` — same repo, different keys.
 2. `git tag eventra-desktop-v0.1.1 && git push origin eventra-desktop-v0.1.1`
 3. The `release-eventra-desktop` workflow builds the SPA + NSIS installer, signs
    the updater artifacts (via the CI overlay `tauri.conf.release.json`), and

@@ -6,10 +6,13 @@
 # GitHub Release with the installer, its `.sig`, and `latest.json` — the manifest
 # the installed app polls. No secret ever touches the repo, config, or frontend.
 #
-# Required repository secrets (Settings → Secrets and variables → Actions):
-#   TAURI_SIGNING_PRIVATE_KEY           full contents of ~/.eventra/updater.key
-#   TAURI_SIGNING_PRIVATE_KEY_PASSWORD  the key's password (EMPTY string for this
-#                                       key — add the secret with no value)
+# Required repository secret (Settings → Secrets and variables → Actions):
+#   EVENTRA_DESKTOP_SIGNING_KEY  full contents of ~/.eventra/updater.key
+# The password secret is NOT needed (this key has no password).
+#
+# IMPORTANT: this repo ALSO hosts Eventra Mobile, whose workflow uses the secret
+# TAURI_SIGNING_PRIVATE_KEY with a DIFFERENT key. Desktop therefore has its OWN
+# uniquely-named secret so the two products never share a signing key.
 #
 # The public key in apps/admin/src-tauri/tauri.conf.json (plugins.updater.pubkey)
 # MUST match this private key, or installed apps reject every update.
@@ -62,8 +65,10 @@ jobs:
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY }}
-          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.TAURI_SIGNING_PRIVATE_KEY_PASSWORD }}
+          # Env var name is fixed (the signer reads it); it is fed from the
+          # desktop-only secret so it never collides with Eventra Mobile.
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.EVENTRA_DESKTOP_SIGNING_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ""
           # Baked into the binary so the installed app polls THIS repo's releases
           # (follows a repo rename automatically).
           EVENTRA_UPDATE_OWNER: ${{ github.repository_owner }}
