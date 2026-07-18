@@ -47,7 +47,11 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Node 22, no 20. El repo fija `engine-strict=true` en .npmrc, así que
+          # `npm ci` valida los `engines` de TODA la dependencia: `@supabase/*`
+          # exige `node >=22.0.0`, por lo que con Node 20 el install abortaba con
+          # EBADENGINE en ~1 s (causa del fallo del release v0.1.0).
+          node-version: 22
           cache: npm
 
       - name: Setup Rust

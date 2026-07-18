@@ -49,7 +49,9 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # Ver nota en release-eventra-desktop.yml: con `engine-strict=true`,
+          # `@supabase/*` (>=22) hace fallar `npm ci` bajo Node 20.
+          node-version: 22
           cache: npm
 
       - name: Setup Rust
