@@ -1,0 +1,7 @@
+# Rust / Tauri build artifacts
+/target
+# Tauri-generated schemas & bindings (regenerated on build)
+/gen/schemas
+
+# Updater signing keys — NEVER commit
+/.tauri

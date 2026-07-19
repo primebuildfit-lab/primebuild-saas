@@ -1,0 +1,45 @@
+{
+  "name": "@eventra/business-admin",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Eventra Business Admin — internal monitoring/supervision console for the commercial Eventra Business Client. Vite SPA, packaged as the Tauri desktop app. Never acts as a client company; monitors, reviews, diagnoses, audits, and intervenes with permissions.",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "desktop:dev": "tauri dev",
+    "desktop:build": "tauri build",
+    "desktop:icon": "tauri icon",
+    "check:version": "node scripts/check-version-sync.mjs"
+  },
+  "dependencies": {
+    "@eventra/config": "*",
+    "@eventra/identity": "*",
+    "@eventra/types": "*",
+    "@eventra/ui": "*",
+    "@supabase/supabase-js": "^2.110.7",
+    "@tauri-apps/plugin-opener": "^2.5.4",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "react-router": "^7.12.0",
+    "@tauri-apps/api": "^2.11.1"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.11.4",
+    "@testing-library/jest-dom": "^6.9.1",
+    "@testing-library/react": "^16.3.2",
+    "@types/react": "^18.3.25",
+    "@types/react-dom": "^18.3.7",
+    "@vitejs/plugin-react": "^4.7.0",
+    "jsdom": "^25.0.1",
+    "typescript": "^5.9.3",
+    "vite": "^7.3.1",
+    "vitest": "^2.1.9"
+  },
+  "eventra": {
+    "surface": "business-admin",
+    "note": "Internal admin/monitoring console for the Eventra Business Client. Tauri-packaged. Consumes @eventra/* shared packages; imports no other app."
+  }
+}

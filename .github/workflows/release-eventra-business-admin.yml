@@ -1,0 +1,144 @@
+# Eventra Business Admin (desktop) — build, sign and publish an auto-updatable release.
+#
+# Trigger: push a tag like `business-admin-v0.1.1` (or run manually). The job
+# builds the apps/business-admin SPA + the Tauri NSIS installer, signs the updater
+# artifacts with the private key held ONLY in repo secrets, and publishes:
+#
+#   1. a versioned GitHub Release (`business-admin-v<version>`) holding the
+#      installer, its `.sig` and the generated manifest;
+#   2. the ROLLING release `business-admin-latest`, whose single asset
+#      `latest-business-admin.json` is the manifest installed apps poll.
+#
+# Why the rolling tag
+# -------------------
+# This is a shared monorepo: Eventra Internal OS and Eventra Mobile publish
+# releases here too. `releases/latest/download/...` resolves to whichever product
+# released most recently, so a Business Admin manifest published that way would be
+# shadowed the moment another product cut a release — the app would silently stop
+# finding updates. A fixed tag is immune to that. The endpoint in
+# `apps/business-admin/src-tauri/tauri.conf.json` must match this tag exactly.
+#
+# Required repository secret (Settings → Secrets and variables → Actions):
+#   EVENTRA_BUSINESS_ADMIN_SIGNING_KEY
+#     full contents of apps/business-admin/src-tauri/.tauri/business-admin-updater.key
+#   EVENTRA_BUSINESS_ADMIN_SIGNING_KEY_PASSWORD  (only if the key has a password)
+#
+# The Business Admin has its OWN signing key and its OWN secret name: it never
+# shares a key with the Internal OS (EVENTRA_DESKTOP_SIGNING_KEY) or Mobile
+# (TAURI_SIGNING_PRIVATE_KEY). The public key in tauri.conf.json
+# (plugins.updater.pubkey) MUST match this private key, or every installed app
+# rejects every update.
+#
+# Release checklist: bump the version in the SAME three places before tagging —
+# apps/business-admin/package.json, src-tauri/Cargo.toml, src-tauri/tauri.conf.json.
+
+name: release-eventra-business-admin
+
+on:
+  push:
+    tags:
+      - "business-admin-v*"
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Tag to release (e.g. business-admin-v0.1.1)"
+        required: true
+
+permissions:
+  contents: write
+
+env:
+  # Rolling tag whose manifest installed apps poll. Must match the `endpoints`
+  # entry in apps/business-admin/src-tauri/tauri.conf.json.
+  ROLLING_TAG: business-admin-latest
+  MANIFEST_NAME: latest-business-admin.json
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          # Node 22, not 20: the repo sets `engine-strict=true`, and `@supabase/*`
+          # requires node >=22, so `npm ci` aborts with EBADENGINE on Node 20.
+          node-version: 22
+          cache: npm
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Cache cargo
+        uses: swatinem/rust-cache@v2
+        with:
+          workspaces: apps/business-admin/src-tauri
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify version consistency
+        shell: bash
+        run: node apps/business-admin/scripts/check-version-sync.mjs
+
+      - name: Build, sign and publish the versioned release
+        id: tauri
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Env var name is fixed (the signer reads it); it is fed from the
+          # Business-Admin-only secret so no key is ever shared between products.
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.EVENTRA_BUSINESS_ADMIN_SIGNING_KEY }}
+          TAURI_SIGNING_PRIVATE_KEY_PASSWORD: ${{ secrets.EVENTRA_BUSINESS_ADMIN_SIGNING_KEY_PASSWORD }}
+        with:
+          projectPath: apps/business-admin
+          tagName: ${{ github.ref_type == 'tag' && github.ref_name || inputs.tag }}
+          releaseName: "Eventra Business Admin __VERSION__"
+          releaseBody: |
+            Eventra Business Admin __VERSION__.
+
+            Instalación nueva: descarga y ejecuta el instalador `.exe`.
+            Actualización: las instalaciones existentes detectan esta versión al
+            abrirse; el operador la instala desde Configuración → Actualizaciones
+            (se descarga, se verifica la firma y se reinicia en la nueva versión).
+          releaseDraft: false
+          prerelease: false
+          includeUpdaterJson: true
+
+      - name: Publish the rolling updater manifest
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION_TAG: ${{ github.ref_type == 'tag' && github.ref_name || inputs.tag }}
+        run: |
+          set -euo pipefail
+
+          # tauri-action always names the generated manifest `latest.json`; the
+          # Business Admin polls its own name so the two can never be confused.
+          gh release download "$VERSION_TAG" --pattern "latest.json" --dir manifest
+          mv "manifest/latest.json" "manifest/$MANIFEST_NAME"
+
+          # Fail loudly rather than publish a manifest with no signature: an
+          # unsigned manifest would make every installed app reject the update.
+          node -e "
+            const m = require('./manifest/$MANIFEST_NAME');
+            const platforms = Object.values(m.platforms ?? {});
+            if (!m.version) throw new Error('manifest has no version');
+            if (platforms.length === 0) throw new Error('manifest has no platforms');
+            for (const p of platforms) {
+              if (!p.signature) throw new Error('manifest entry has no signature');
+              if (!p.url) throw new Error('manifest entry has no url');
+            }
+            console.log('manifest OK — version ' + m.version);
+          "
+
+          # Recreate the rolling release so it always holds exactly one manifest.
+          gh release delete "$ROLLING_TAG" --yes --cleanup-tag || true
+          gh release create "$ROLLING_TAG" \
+            --title "Eventra Business Admin — canal de actualización" \
+            --notes "Manifiesto de actualización que consultan las instalaciones de Eventra Business Admin. Apunta a la última versión publicada ($VERSION_TAG). No es una descarga para usuarios: para instalar la aplicación usa la release con versión." \
+            --latest=false \
+            "manifest/$MANIFEST_NAME"

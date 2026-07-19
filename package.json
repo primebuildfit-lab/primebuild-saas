@@ -46,7 +46,9 @@
     "desktop:business:dev": "npm run desktop:dev --workspace @eventra/business",
     "desktop:business:build": "npm run desktop:build --workspace @eventra/business",
     "desktop:mobile:dev": "npm run desktop:dev --workspace @eventra/consumer",
-    "desktop:mobile:build": "npm run desktop:build --workspace @eventra/consumer"
+    "desktop:mobile:build": "npm run desktop:build --workspace @eventra/consumer",
+    "desktop:business-admin:dev": "npm run desktop:dev --workspace @eventra/business-admin",
+    "desktop:business-admin:build": "npm run desktop:build --workspace @eventra/business-admin"
   },
   "devDependencies": {
     "prettier": "^3.6.2",
