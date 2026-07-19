@@ -1,6 +1,6 @@
 [package]
 name = "eventra-mobile"
-version = "0.1.0"
+version = "0.2.0"
 description = "Eventra Mobile — phone-form-factor shell for apps/consumer"
 authors = ["Eventra"]
 edition = "2021"
@@ -28,15 +28,27 @@ log = "0.4"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 url = "2"
+# Registers the app's URI scheme (eventra-mobile://) so it is launchable by the Internal
+# OS / Business Admin, and receives inbound deep links. Mobile does NOT launch other apps.
+tauri-plugin-deep-link = "2"
 
 # The updater plugin only supports desktop platforms; keep it off mobile builds
 # so `tauri android`/`tauri ios` compile cleanly (store-managed updates there).
+# single-instance is likewise desktop-only (focuses the running window on relaunch).
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
 tauri-plugin-updater = "2"
+tauri-plugin-single-instance = { version = "2", features = ["deep-link"] }
 
 [features]
 # Enabled by `tauri build`; disables the dev asset server and embeds the bundle.
 custom-protocol = ["tauri/custom-protocol"]
+
+# `cargo test` on a Tauri crate links the whole dependency graph; with full
+# debuginfo rustc exhausts memory while encoding metadata on this machine
+# (STATUS_STACK_BUFFER_OVERRUN during `encode_metadata`). Tests don't need
+# debug symbols, so turn them off to keep `cargo test` reliable.
+[profile.test]
+debug = 0
 
 [profile.release]
 panic = "abort"

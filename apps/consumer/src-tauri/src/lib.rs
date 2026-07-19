@@ -14,17 +14,79 @@
 #[cfg(desktop)]
 mod updater;
 
-use tauri::Manager;
+use tauri::{Emitter, Manager};
+
+/// The Eventra URI schemes this app accepts inbound. Mobile is a LAUNCH TARGET only: it
+/// accepts its own `eventra-mobile://` deep links and NEVER opens the internal-tool
+/// schemes (Internal OS / Business Admin) — those are administrative surfaces.
+const MOBILE_SCHEME: &str = "eventra-mobile";
+
+/// Validate a deep-link route: empty, or slash-separated lowercase-alphanumeric+dash
+/// segments. Rejects traversal, absolute paths, schemes, queries and whitespace.
+fn route_valid(route: &str) -> bool {
+    if route.is_empty() {
+        return true;
+    }
+    if route.len() > 128 || route.contains("..") {
+        return false;
+    }
+    route.split('/').all(|seg| {
+        !seg.is_empty()
+            && !seg.starts_with('-')
+            && !seg.ends_with('-')
+            && seg
+                .chars()
+                .all(|c| c.is_ascii_lowercase() || c.is_ascii_digit() || c == '-')
+    })
+}
+
+/// Validate an inbound `eventra-mobile://<route>` deep link and, if valid, focus the
+/// window and emit `eventra://open-route` for the frontend. Any other scheme, or an
+/// invalid route, is logged and ignored — never executed.
+fn forward_deep_links(app: &tauri::AppHandle, urls: &[String]) {
+    if let Some(main) = app.get_webview_window("main") {
+        let _ = main.show();
+        let _ = main.set_focus();
+    }
+    for raw in urls {
+        let Some((scheme, rest)) = raw.split_once("://") else { continue };
+        let route = rest.trim_end_matches('/');
+        if scheme == MOBILE_SCHEME && route_valid(route) {
+            log::info!("deep link accepted: {scheme}://{route}");
+            let _ = app.emit("eventra://open-route", route.to_string());
+        } else {
+            log::warn!("deep link rejected: {raw}");
+        }
+    }
+}
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
     let mut builder = tauri::Builder::default();
 
-    // Automatic updates (checks a signed release manifest in the background).
-    // Desktop only — the plugin does not support mobile targets.
+    // single-instance MUST be the FIRST plugin (desktop only): a relaunch / deep link
+    // focuses the running window and forwards the URL instead of spawning a duplicate.
     #[cfg(desktop)]
     {
-        builder = builder.plugin(tauri_plugin_updater::Builder::new().build());
+        builder = builder.plugin(tauri_plugin_single_instance::init(|app, argv, _cwd| {
+            forward_deep_links(app, &argv);
+        }));
+    }
+
+    // Automatic updates (checks a signed release manifest in the background).
+    // Desktop only — the plugin does not support mobile targets. The webview gets
+    // only these three thin commands; it never touches the updater plugin's own
+    // IPC surface, so it cannot download or install anything on its own.
+    #[cfg(desktop)]
+    {
+        builder = builder
+            .plugin(tauri_plugin_updater::Builder::new().build())
+            .manage(updater::UpdaterState::default())
+            .invoke_handler(tauri::generate_handler![
+                updater::updater_state,
+                updater::updater_check,
+                updater::updater_install,
+            ]);
     }
 
     builder
@@ -43,14 +105,31 @@ pub fn run() {
         .plugin(tauri_plugin_window_state::Builder::default().build())
         // Opens external URLs in the user's default browser.
         .plugin(tauri_plugin_opener::init())
+        // Registers/receives the eventra-mobile:// URI scheme (launch target only).
+        .plugin(tauri_plugin_deep_link::init())
         .setup(|app| {
             let version = app.package_info().version.to_string();
             log::info!("Eventra Mobile starting — v{version}");
 
-            // Non-blocking automatic update check (desktop only). If a newer
-            // signed release is published it is downloaded, verified and
-            // installed, then the app relaunches. Never gates startup; no-ops
-            // until the release channel is configured.
+            // Register this app's URI scheme for the current user and forward validated
+            // inbound deep links to the frontend (desktop; mobile uses OS app-link config).
+            #[cfg(desktop)]
+            {
+                use tauri_plugin_deep_link::DeepLinkExt;
+                if let Err(e) = app.deep_link().register_all() {
+                    log::warn!("deep-link scheme registration skipped: {e}");
+                }
+                let handle = app.handle().clone();
+                app.deep_link().on_open_url(move |event| {
+                    let urls: Vec<String> = event.urls().iter().map(|u| u.to_string()).collect();
+                    forward_deep_links(&handle, &urls);
+                });
+            }
+
+            // Non-blocking automatic update check (desktop only). It only
+            // REPORTS — the result is pushed to the UI, and applying an update
+            // is always the user's explicit action (see updater.rs). Never
+            // gates startup; no-ops until the release channel is configured.
             #[cfg(desktop)]
             updater::spawn_startup_check(app.handle().clone());
 
