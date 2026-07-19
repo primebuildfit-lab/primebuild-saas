@@ -1,6 +1,8 @@
 /**
  * @eventra/config — the single, shareable source of truth for platform commercial
- * definitions (products, plans, add-ons, entitlements, limits, trials, environments).
+ * definitions (products, plans, add-ons, entitlements, limits, trials, environments)
+ * and the country & locale catalog (markets, languages, currencies, timezones — see
+ * ./countries; consumed by Internal OS, Business and Mobile, never duplicated).
  *
  * SAFE TO SHARE IN CODE. Contains NO secrets, API keys, or provider credentials.
  * Prices/limits live here once and are consumed by @eventra/entitlements + apps —
@@ -126,3 +128,66 @@ export function consumerProductPrice(id: ConsumerProductId): number {
 export function adFreePrice(): number {
   return CONSUMER_ADDONS["addon.ad_free"].priceMonthly;
 }
+
+// ─────────────────────────── Company reputation & ranking ───────────────────────────
+// Single source of truth for the approved reputation numbers + level bands (ORDER §27).
+export {
+  REPUTATION_CONFIG,
+  REPUTATION_LEVELS,
+  clampScore,
+  resolveReputationLevel,
+  reputationFactor,
+} from "./reputation";
+export type {
+  ReputationConfig,
+  CancellationPenaltyConfig,
+  ReputationLevelId,
+  ReputationLevelDef,
+} from "./reputation";
+
+// ─────────────────────────── Country & locale catalog ───────────────────────────
+// Single source of truth for markets, languages, currencies, timezones (ORDER §4–§6).
+export {
+  COUNTRIES,
+  getCountry,
+  countriesByStatus,
+  activeCountries,
+  primaryLocale,
+  localesOf,
+  defaultCountry,
+  businessMarkets,
+} from "./countries";
+export type {
+  CountryDef,
+  CountryLocale,
+  CountryStatus,
+  CountryCoverage,
+  CountryMarket,
+} from "./countries";
+
+// ─────────────────────────── Cross-product app links ───────────────────────────
+// Single source of truth for navigation/launch between the four Eventra apps
+// (Internal OS, Business Admin, Mobile = Tauri; Business Client = web). Pure
+// validators + allowlists — no hardcoded URLs scattered across components (ORDER §7/§10).
+export {
+  EVENTRA_APP_LINKS,
+  EVENTRA_TAURI_APPS,
+  ALLOWED_APP_IDENTIFIERS,
+  ALLOWED_APP_SCHEMES,
+  ALLOWED_WEB_HOSTS,
+  ALLOWED_WEB_HOST_SUFFIXES,
+  isAllowedAppIdentifier,
+  isAllowedAppScheme,
+  tauriAppByIdentifier,
+  isValidDeepLinkRoute,
+  buildDeepLink,
+  deepLinkFor,
+  validateWebTarget,
+  resolveBusinessClientUrl,
+} from "./appLinks";
+export type {
+  EventraAppKey,
+  EventraTauriApp,
+  EventraWebApp,
+  EventraAppLink,
+} from "./appLinks";

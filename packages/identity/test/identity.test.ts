@@ -17,6 +17,22 @@ import {
   platformPermissionsForRole,
   PLATFORM_ROLES,
   PLATFORM_PERMISSIONS as PP,
+  PLATFORM_PERMISSION_CATALOG,
+  ALL_CATALOG_PERMISSIONS,
+  isCatalogPermission,
+  isSensitivePermission,
+  disallowedGrants,
+  canGrantAll,
+  resolveTemplatePermissions,
+  ROLE_TEMPLATES,
+  PLATFORM_OWNER,
+  businessAdminCan,
+  businessAdminPermissionsForRole,
+  BUSINESS_ADMIN_PERMISSIONS as BA,
+  BUSINESS_ADMIN_VIEWS,
+  BUSINESS_ADMIN_SENSITIVE,
+  isSensitiveBusinessAdminPermission,
+  ALL_BUSINESS_ADMIN_PERMISSIONS,
   type OrgRole,
   type PlatformRole,
 } from "../src/index";
@@ -185,5 +201,96 @@ describe("platform (Internal OS) role → permission matrix", () => {
     // owner (tenant) is unrelated to platform_owner
     expect(platformCan("owner" as unknown as PlatformRole, PP.ownerManage)).toBe(false);
     expect(platformPermissionsForRole("owner" as unknown as PlatformRole).size).toBe(0);
+  });
+});
+
+describe("granular internal-OS permission catalog (orden §5-§8/§14)", () => {
+  it("exposes a broad, module-organized catalog (IA absent — no real impl)", () => {
+    expect(PLATFORM_PERMISSION_CATALOG.length).toBeGreaterThan(15);
+    expect(PLATFORM_PERMISSION_CATALOG.map((m) => m.id)).not.toContain("ai");
+    expect(isCatalogPermission("companies.change_status")).toBe(true);
+    expect(isCatalogPermission("not.a.real.perm")).toBe(false);
+    // no duplicate keys across modules
+    const keys = ALL_CATALOG_PERMISSIONS;
+    expect(new Set(keys).size).toBe(keys.length);
+  });
+
+  it("templates only preselect; owner template = whole catalog", () => {
+    expect(resolveTemplatePermissions("read_only").every((k) => k.includes(".view"))).toBe(true);
+    expect(resolveTemplatePermissions("platform_owner")).toHaveLength(ALL_CATALOG_PERMISSIONS.length);
+    expect(ROLE_TEMPLATES.some((t) => t.id === "operations")).toBe(true);
+  });
+
+  it("anti-escalation: only owner grants sensitive perms; nobody grants beyond scope", () => {
+    expect(isSensitivePermission("integrations.manage_secrets")).toBe(true);
+    // non-owner cannot grant a sensitive permission even if they hold it
+    expect(disallowedGrants(["integrations.manage_secrets"], ["integrations.manage_secrets"], false))
+      .toEqual(["integrations.manage_secrets"]);
+    // owner can
+    expect(disallowedGrants(["integrations.manage_secrets"], ["integrations.manage_secrets"], true)).toEqual([]);
+    // cannot grant a non-sensitive perm you don't hold
+    expect(disallowedGrants(["companies.view"], [], false)).toEqual(["companies.view"]);
+    expect(canGrantAll(["companies.view"], ["companies.view"], false)).toBe(true);
+  });
+
+  it("the platform owner is defined once (Brian) — resolve, don't hard-code", () => {
+    expect(PLATFORM_OWNER.displayName).toBe("Brian Almeida");
+    expect(PLATFORM_OWNER.roleLabel).toBe("Platform Owner");
+    expect(PLATFORM_OWNER.email).toMatch(/@/);
+  });
+});
+
+describe("business-admin permissions (monitoring console)", () => {
+  it("read_only + analyst get every view but no intervention", () => {
+    for (const role of ["read_only", "analyst"] as PlatformRole[]) {
+      for (const v of BUSINESS_ADMIN_VIEWS) expect(businessAdminCan(role, v)).toBe(true);
+      // no manage/review of any kind
+      expect(businessAdminCan(role, BA.companiesManage)).toBe(false);
+      expect(businessAdminCan(role, BA.ordersManage)).toBe(false);
+      expect(businessAdminCan(role, BA.marketingReview)).toBe(false);
+      expect(businessAdminCan(role, BA.subscriptionsManage)).toBe(false);
+    }
+  });
+
+  it("support can triage alerts and review marketing, but never touch lifecycle/money/orders", () => {
+    expect(businessAdminCan("support", BA.alertsManage)).toBe(true);
+    expect(businessAdminCan("support", BA.marketingReview)).toBe(true);
+    expect(businessAdminCan("support", BA.companiesManage)).toBe(false);
+    expect(businessAdminCan("support", BA.subscriptionsManage)).toBe(false);
+    expect(businessAdminCan("support", BA.ordersManage)).toBe(false);
+    expect(businessAdminCan("support", BA.storesManage)).toBe(false);
+  });
+
+  it("operations can perform operational interventions but NOT sensitive ones", () => {
+    expect(businessAdminCan("operations", BA.storesManage)).toBe(true);
+    expect(businessAdminCan("operations", BA.ordersManage)).toBe(true);
+    expect(businessAdminCan("operations", BA.integrationsManage)).toBe(true);
+    expect(businessAdminCan("operations", BA.alertsManage)).toBe(true);
+    expect(businessAdminCan("operations", BA.marketingReview)).toBe(true);
+    // sensitive → denied
+    expect(businessAdminCan("operations", BA.companiesManage)).toBe(false);
+    expect(businessAdminCan("operations", BA.subscriptionsManage)).toBe(false);
+  });
+
+  it("platform_admin and platform_owner hold the full surface (incl. sensitive)", () => {
+    for (const role of ["platform_admin", "platform_owner"] as PlatformRole[]) {
+      for (const p of ALL_BUSINESS_ADMIN_PERMISSIONS) expect(businessAdminCan(role, p)).toBe(true);
+    }
+  });
+
+  it("sensitive set = companies.manage + subscriptions.manage, owner/admin only", () => {
+    expect([...BUSINESS_ADMIN_SENSITIVE].sort()).toEqual(
+      [BA.companiesManage, BA.subscriptionsManage].sort(),
+    );
+    expect(isSensitiveBusinessAdminPermission(BA.companiesManage)).toBe(true);
+    expect(isSensitiveBusinessAdminPermission(BA.ordersManage)).toBe(false);
+    for (const role of ["read_only", "analyst", "support", "operations"] as PlatformRole[]) {
+      for (const s of BUSINESS_ADMIN_SENSITIVE) expect(businessAdminCan(role, s)).toBe(false);
+    }
+  });
+
+  it("deny-by-default: unknown permission is never granted", () => {
+    expect(businessAdminCan("platform_owner", "business.nonexistent")).toBe(false);
+    expect(businessAdminPermissionsForRole("read_only").has("business.unknown")).toBe(false);
   });
 });
