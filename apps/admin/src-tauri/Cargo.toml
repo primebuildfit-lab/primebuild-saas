@@ -1,6 +1,6 @@
 [package]
 name = "eventra-internal-os"
-version = "0.1.2"
+version = "0.1.3"
 description = "Eventra Internal OS — private Windows desktop shell for apps/admin"
 authors = ["Eventra"]
 edition = "2021"
