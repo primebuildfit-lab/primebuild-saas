@@ -247,19 +247,138 @@ marcador y se detuvo el servidor local.
 
 ---
 
-## 7. Qué falta para que funcione en producción
+## 7. Cómo publicar una versión nueva (ya operativo)
 
-El código está completo; queda un paso que **requiere acceso de Brian** y no se ejecutó:
+El canal está activo. Para publicar:
 
-1. Crear el secreto `EVENTRA_BUSINESS_ADMIN_SIGNING_KEY` en GitHub con el contenido de
-   `apps/business-admin/src-tauri/.tauri/business-admin-updater.key` (sin contraseña,
-   así que `..._PASSWORD` puede quedar vacío). **La clave privada no debe salir de ahí.**
-2. Hacer commit de `apps/business-admin/` (hoy sin seguir por git) y del workflow.
-3. Publicar la primera release: `git tag business-admin-v0.1.0 && git push origin business-admin-v0.1.0`.
+1. Subir la versión en las **tres** fuentes (`package.json`, `src-tauri/Cargo.toml`,
+   `src-tauri/tauri.conf.json`). `npm run check:version` lo valida.
+2. Commit y `git tag business-admin-vX.Y.Z && git push origin business-admin-vX.Y.Z`.
+3. El workflow construye, firma, publica la release versionada y **recrea el tag
+   rodante** `business-admin-latest` con el manifiesto.
+4. Las instalaciones existentes detectan la versión al abrirse y el operador la
+   instala desde Configuración → Actualizaciones.
 
-Hasta que exista la release rodante `business-admin-latest`, la app muestra
-honestamente *"Aún no hay un manifiesto de versiones publicado para esta aplicación"* en
-lugar de fingir estar al día.
+**No usar `gh run rerun`** para reintentar un release fallido: reutiliza el token del
+run original y falla al crear la release. Hay que re-empujar el tag.
+
+El secreto `EVENTRA_BUSINESS_ADMIN_SIGNING_KEY` ya está configurado. Si alguna vez hay
+que reponerlo, debe cargarse **el contenido** del archivo, nunca su ruta:
+
+```
+gh secret set EVENTRA_BUSINESS_ADMIN_SIGNING_KEY < apps/business-admin/src-tauri/.tauri/business-admin-updater.key
+```
+
+---
+
+## 7.bis Release real publicado y verificado (2026-07-19) — ✅ COMPLETADO
+
+**El canal está vivo y la actualización automática funciona contra producción.**
+
+| Publicado | Tag | Contenido |
+|---|---|---|
+| Eventra Business Admin 0.1.0 | `business-admin-v0.1.0` | NSIS + MSI + ambos `.sig` + `latest.json` |
+| Eventra Business Admin 0.1.1 | `business-admin-v0.1.1` | ídem |
+| Canal de actualización | `business-admin-latest` | `latest-business-admin.json` (rodante) |
+
+### Prueba real sobre el canal de GitHub
+
+App instalada en 0.1.0, sin servidor local ni artefactos de prueba — manifiesto y
+paquete descargados de GitHub:
+
+```
+12:59:34  Eventra Business Admin starting — v0.1.0
+12:59:35  updater: nueva versión disponible: 0.1.1
+12:59:36  updater: [verifying]  Verificando la firma…
+12:59:36  updater: [installing] Instalando la versión 0.1.1…
+12:59:41  Eventra Business Admin starting — v0.1.1     ← relanzada por NSIS /UPDATE
+12:59:41  updater: al día (v0.1.1)
+```
+
+Datos locales preservados (marcador en `%APPDATA%` intacto). La versión nueva
+consultó el canal real y reportó correctamente estar al día.
+
+### Un fallo que sólo apareció al publicar
+
+El manifiesto de 0.1.0 resolvía `windows-x86_64` —la clave que usa el updater por
+defecto— al **MSI**, porque es lo que `tauri-action` prefiere. La app se distribuye
+por **NSIS** con `installMode: currentUser`: una actualización vía MSI habría
+instalado por otra ruta y pedido elevación. Corregido con
+`updaterJsonPreferNsis: true`; desde 0.1.1 la clave resuelve al `setup.exe`, que es
+la vía verificada end-to-end.
+
+Esto no se podía detectar en local: el manifiesto lo genera CI, no `tauri build`.
+
+### Los cuatro bloqueos que hubo que resolver
+
+| # | Fallo | Causa | Solución |
+|---|---|---|---|
+| 1 | `Missing script: "tauri"` | `tauri-action` ejecuta `npm run tauri build`; la app sólo tenía `desktop:build` | Script `tauri` añadido |
+| 2 | `"PLATFORM_OWNER" is not exported` | La app dependía de 710 líneas sin commitear en `packages/identity` y `packages/config` | Commiteadas aparte (typecheck 14 workspaces + 69 tests verdes) |
+| 3 | `failed to decode base64 secret key: Invalid symbol 58, offset 1` | El secreto contenía la **ruta** del archivo, no su contenido (símbolo 58 = `:`, de `D:\...`) | Resubido con `gh secret set < archivo` |
+| 4 | `Resource not accessible by integration` | Se relanzaba con `gh run rerun`, que reutiliza el token del run original | Re-push del tag → run nuevo |
+
+Sobre el #4: se cambió `default_workflow_permissions` de `read` a `write` creyendo
+que era la causa. **No lo era** — `release-eventra-mobile` publicó su release a las
+12:01 con el ajuste aún en `read`, porque los workflows declaran sus propios
+`permissions`. Ese cambio de ajuste es innecesario y puede revertirse.
+
+### El tag rodante demostró su valor el mismo día
+
+Mientras se trabajaba, `Eventra Internal OS 0.1.0` se publicó y quedó marcada como
+`Latest` en el repositorio. Con el endpoint original
+(`releases/latest/download/...`) el manifiesto de Business Admin habría quedado
+tapado en ese instante. Con el tag fijo `business-admin-latest` es inmune —
+exactamente el problema P6 de la auditoría, materializado en producción.
+
+---
+
+## 7.ter Historial: el bloqueo previo (resuelto)
+
+Se creó el secreto `EVENTRA_BUSINESS_ADMIN_SIGNING_KEY` y se empujó el tag
+`business-admin-v0.1.0`. **Dos ejecuciones del workflow, ambas fallidas**, ninguna
+por culpa de la clave (llegó al runner con valor: `TAURI_SIGNING_PRIVATE_KEY: ***`).
+
+| Run | Fallo | Estado |
+|---|---|---|
+| [29667153591](https://github.com/primebuildfit-lab/primebuild-saas/actions/runs/29667153591) | `npm error Missing script: "tauri"` — tauri-action ejecuta `npm run tauri build` y la app sólo definía `desktop:build` | **CORREGIDO** (script `tauri` añadido) |
+| [29667280874](https://github.com/primebuildfit-lab/primebuild-saas/actions/runs/29667280874) | `"PLATFORM_OWNER" is not exported by packages/identity/src/index.ts` | **BLOQUEANTE, sin resolver** |
+
+### El bloqueo de fondo
+
+`apps/business-admin` importa de los paquetes compartidos cuatro símbolos que
+**no existen en el estado commiteado** del repositorio:
+
+| Símbolo | Paquete | En HEAD |
+|---|---|---|
+| `PLATFORM_OWNER` | `@eventra/identity` | ✗ falta |
+| `BUSINESS_ADMIN_PERMISSIONS` | `@eventra/identity` | ✗ falta |
+| `businessAdminCan` | `@eventra/identity` | ✗ falta |
+| `PlatformRole` | `@eventra/identity` | ✓ existe |
+
+Viven en **710 líneas sin commitear** (`packages/identity/src/index.ts` +539,
+`packages/config/src/index.ts` +67, `packages/identity/test/identity.test.ts` +107),
+trabajo de sesiones anteriores. En local todo compila porque el árbol sucio las tiene;
+CI clona el estado commiteado y no las encuentra.
+
+Las mismas dependencias afectan a `@eventra/config` (`EVENTRA_APP_LINKS`,
+`deepLinkFor`, `resolveBusinessClientUrl`, `EventraTauriApp`), usadas por el
+launcher entre apps.
+
+**Estado del árbol pendiente (verificado 2026-07-19):** typecheck de los **14
+workspaces** en verde y **69 tests** de `identity` + `config` pasando. Las únicas
+líneas eliminadas son comentarios; el resto es puramente aditivo. Es decir, ese
+trabajo pendiente está sano — sólo hay que decidir si se commitea.
+
+**Decisión pendiente del propietario.** Commitear esos paquetes excede el alcance
+declarado de esta tarea ("no modificar ninguna otra aplicación"): los consumen
+`admin`, `business-client` y `consumer`. Hasta que se resuelva, el release **no
+puede completarse**; el updater está listo pero sin canal publicado.
+
+**Estado del remoto ahora mismo:** la rama tiene el trabajo del updater y el fix
+del script `tauri`. El tag `business-admin-v0.1.0` **existe pero apunta a un commit
+que no compila en CI** — conviene borrarlo (`git push origin :refs/tags/business-admin-v0.1.0`)
+o dejarlo para re-tagear cuando se desbloquee. No se creó ninguna release.
 
 ---
 
@@ -297,7 +416,19 @@ lo reconoce en un comentario, pero **Internal OS sigue usando
 deja de encontrar el manifiesto. Business Admin ya está resuelto con el tag rodante; el
 mismo patrón serviría para los demás.
 
-### E3 — El formateo no está aplicado
+### E3 — `apps/admin` tampoco puede publicar: le falta el script `tauri`
+
+`release-eventra-desktop.yml` usa `tauri-action`, que invoca `npm run tauri build`.
+`apps/admin/package.json` define `desktop:build` pero **no `tauri`**, exactamente la
+misma carencia que bloqueó el primer intento de Business Admin. Su workflow fallaría
+con `Missing script: "tauri"` antes siquiera de compilar.
+
+Esto explica que el repositorio tenga **0 releases** pese a llevar ese workflow
+desde hace días: nunca llegó a publicar nada, así que el updater del Internal OS
+no ha funcionado nunca en producción. La corrección es una línea (`"tauri": "tauri"`)
+en su `package.json`, pero queda fuera del alcance de esta tarea.
+
+### E4 — El formateo no está aplicado
 
 `npm run format` (prettier --check) falla en archivos preexistentes de esta app. El script
 `check` del raíz no incluye `format`, así que nunca se detecta. Es una limpieza global,
