@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Minimal desktop capabilities for the Eventra Internal OS shell. The web frontend makes no Tauri IPC calls; window persistence, logging and external-link opening are handled entirely in Rust, so no plugin IPC is exposed to web content.",
+  "description": "Minimal desktop capabilities for the Eventra Internal OS shell. External-link opening uses the opener plugin restricted to standard web schemes (default-urls). Cross-app launching goes through the app's own `eventra_launch`/`eventra_app_installed` commands, which enforce a scheme+route allowlist in Rust — no plugin permission widens the opener scope to custom schemes, and no shell/exec permission is granted. Deep-link registration and inbound-URL handling run entirely in Rust; the web layer exposes no deep-link IPC.",
   "windows": ["main"],
-  "permissions": ["core:default"]
+  "permissions": ["core:default", "opener:allow-open-url", "opener:allow-default-urls"]
 }
