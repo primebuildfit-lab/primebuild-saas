@@ -10,7 +10,7 @@
     "services/*"
   ],
   "engines": {
-    "node": ">=20.19 <22 || >=22.12"
+    "node": ">=22.12"
   },
   "scripts": {
     "lint": "npm run lint --workspaces --if-present",
