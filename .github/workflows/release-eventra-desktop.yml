@@ -39,6 +39,12 @@ permissions:
 jobs:
   build:
     runs-on: windows-latest
+    env:
+      # Release rodante con el manifiesto que consultan las instalaciones. Existe
+      # porque este repo aloja varias apps: si el updater apuntara a
+      # `releases/latest`, la siguiente release de CUALQUIER otra app (Business
+      # Admin, Mobile) pasaría a ser "latest" y el Internal OS recibiría un 404.
+      ROLLING_TAG: eventra-desktop-latest
     steps:
       - uses: actions/checkout@v4
         with:
@@ -99,3 +105,38 @@ jobs:
           releaseDraft: false
           prerelease: false
           includeUpdaterJson: true
+
+      - name: Publish the rolling updater manifest
+        shell: bash
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION_TAG: ${{ github.ref_type == 'tag' && github.ref_name || inputs.tag }}
+        run: |
+          set -euo pipefail
+
+          gh release download "$VERSION_TAG" --pattern "latest.json" --dir manifest
+
+          # Antes de publicarlo, comprobar que el manifiesto va firmado. Publicar uno
+          # sin firma haría que cada app instalada rechazase la actualización, y el
+          # fallo no se vería hasta que un usuario intentara actualizar.
+          node -e "
+            const m = require('./manifest/latest.json');
+            const platforms = Object.values(m.platforms ?? {});
+            if (!m.version) throw new Error('el manifiesto no tiene version');
+            if (platforms.length === 0) throw new Error('el manifiesto no tiene plataformas');
+            for (const p of platforms) {
+              if (!p.signature) throw new Error('una entrada del manifiesto no tiene firma');
+              if (!p.url) throw new Error('una entrada del manifiesto no tiene url');
+            }
+            console.log('manifiesto OK — version ' + m.version);
+          "
+
+          # Se recrea para que el canal contenga siempre exactamente un manifiesto.
+          # `--latest=false` es imprescindible: sin eso este release rodante pasaría a
+          # ser el "latest" del repo y desplazaría a las releases con versión.
+          gh release delete "$ROLLING_TAG" --yes --cleanup-tag || true
+          gh release create "$ROLLING_TAG" \
+            --title "Eventra Internal OS — canal de actualización" \
+            --notes "Manifiesto que consultan las instalaciones de Eventra Internal OS. Apunta a la última versión publicada ($VERSION_TAG). No es una descarga para usuarios: para instalar la aplicación usa la release con versión." \
+            --latest=false \
+            "manifest/latest.json"
