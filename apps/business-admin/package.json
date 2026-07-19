@@ -12,6 +12,8 @@
     "desktop:dev": "tauri dev",
     "desktop:build": "tauri build",
     "desktop:icon": "tauri icon",
+    "_comment:tauri": "tauri-action invoca `npm run tauri build`; sin este script el release falla con 'Missing script: tauri' antes incluso de firmar.",
+    "tauri": "tauri",
     "check:version": "node scripts/check-version-sync.mjs"
   },
   "dependencies": {
