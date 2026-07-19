@@ -48,8 +48,22 @@ fn resolve_endpoint() -> Option<String> {
     if owner.starts_with("REPLACE_") || repo.starts_with("REPLACE_") {
         return None;
     }
+    // Canal rodante propio, NO `releases/latest`.
+    //
+    // `releases/latest` apunta a la release más reciente del REPOSITORIO, no de esta
+    // app, y este monorepo publica también Business Admin y Mobile. Comprobado en
+    // vivo: con `releases/latest` esta app descargaba el manifiesto de
+    // `business-admin-v0.1.0` y, al leer allí "version 0.1.0", concluía que ya estaba
+    // al día y no se actualizaba nunca. Peor aún: si ese manifiesto ajeno hubiera
+    // anunciado una versión superior, esta app habría instalado el paquete de OTRA
+    // aplicación.
+    //
+    // `eventra-desktop-latest` lo publica release-eventra-desktop.yml y contiene
+    // exactamente un manifiesto, el de esta app. Ojo: este valor manda sobre
+    // `plugins.updater.endpoints` de tauri.conf.json, porque el flujo llama a
+    // `.endpoints(...)` con esta URL — cambiar solo el config no surte efecto.
     Some(format!(
-        "https://github.com/{owner}/{repo}/releases/latest/download/latest.json"
+        "https://github.com/{owner}/{repo}/releases/download/eventra-desktop-latest/latest.json"
     ))
 }
 
