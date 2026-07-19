@@ -1,7 +1,7 @@
 {
   "$schema": "../gen/schemas/desktop-schema.json",
   "identifier": "default",
-  "description": "Minimal capabilities for the Eventra Mobile shell. The web frontend makes no Tauri IPC calls; window persistence, logging and external-link opening are handled entirely in Rust, so no plugin IPC is exposed to web content.",
+  "description": "Minimal capabilities for the Eventra Mobile shell. External-link opening uses the opener plugin restricted to standard web schemes (default-urls) — Mobile only opens allow-listed HTTPS pages (terms/privacy/support/web/business-client) and NEVER launches internal-tool apps. It registers/receives only its own eventra-mobile:// scheme in Rust; the web layer exposes no launcher or deep-link IPC and has no shell/exec permission.",
   "windows": ["main"],
   "permissions": ["core:default", "opener:allow-open-url", "opener:allow-default-urls"]
 }

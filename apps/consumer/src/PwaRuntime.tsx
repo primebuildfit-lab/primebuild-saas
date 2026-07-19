@@ -1,4 +1,6 @@
 import { useEffect, useState } from "react";
+import { IconButton } from "./ui";
+import { IconWifiOff, IconDownload, IconShare } from "./ui/icons";
 
 /**
  * Eventra Calendar (Consumer) — client-only PWA runtime.
@@ -31,21 +33,6 @@ function isStandalone(): boolean {
 function isIos(): boolean {
   return /iphone|ipad|ipod/i.test(window.navigator.userAgent);
 }
-
-const bar: React.CSSProperties = {
-  position: "fixed",
-  left: 0,
-  right: 0,
-  bottom: 0,
-  zIndex: 50,
-  display: "flex",
-  alignItems: "center",
-  gap: 12,
-  padding: "12px 16px",
-  paddingBottom: "calc(12px + env(safe-area-inset-bottom))",
-  fontSize: 13,
-  boxShadow: "0 -1px 2px rgba(16,24,40,.08)",
-};
 
 export function PwaRuntime() {
   const [online, setOnline] = useState(true);
@@ -123,33 +110,25 @@ export function PwaRuntime() {
   return (
     <>
       {!online ? (
-        <div style={{ ...bar, background: "#fef3c7", color: "#92400e" }} role="status">
-          <span aria-hidden>⚠️</span>
-          <span>You're offline — showing your last loaded calendar.</span>
+        <div className="em-banner em-banner-warn" role="status">
+          <span className="em-banner-icon" style={{ color: "var(--em-warn)" }}><IconWifiOff size={18} /></span>
+          <span className="em-banner-text">Estás sin conexión — mostrando lo último cargado.</span>
         </div>
       ) : installEvent ? (
-        <div style={{ ...bar, background: "var(--eventra-surface)", borderTop: "1px solid var(--eventra-border)" }}>
-          <span style={{ flex: 1 }}>Install Eventra Calendar on your phone.</span>
-          <button
-            type="button"
-            onClick={doInstall}
-            style={{ height: 34, padding: "0 14px", borderRadius: 8, border: "none", background: "var(--eventra-brand-600)", color: "#fff", fontWeight: 600, fontSize: 13, cursor: "pointer" }}
-          >
-            Install
-          </button>
+        <div className="em-banner">
+          <span className="em-banner-icon" style={{ color: "var(--em-brand-strong)" }}><IconDownload size={18} /></span>
+          <span className="em-banner-text">Instala Eventra en tu teléfono.</span>
+          <button type="button" className="em-btn em-btn-primary em-btn-sm" onClick={doInstall}>Instalar</button>
         </div>
       ) : showIosTip ? (
-        <div style={{ ...bar, background: "var(--eventra-surface)", borderTop: "1px solid var(--eventra-border)" }}>
-          <span style={{ flex: 1 }}>
-            To install: tap <b>Share</b> then <b>Add to Home Screen</b>.
+        <div className="em-banner">
+          <span className="em-banner-icon" style={{ color: "var(--em-brand-strong)" }}><IconShare size={18} /></span>
+          <span className="em-banner-text">
+            Para instalar: toca <b>Compartir</b> y luego <b>Añadir a pantalla de inicio</b>.
           </span>
-          <button
-            type="button"
-            onClick={dismissIosTip}
-            style={{ height: 34, padding: "0 12px", borderRadius: 8, border: "1px solid var(--eventra-border)", background: "transparent", color: "var(--eventra-text)", fontWeight: 600, fontSize: 13, cursor: "pointer" }}
-          >
-            Got it
-          </button>
+          <IconButton label="Entendido" plain onClick={dismissIosTip}>
+            <span style={{ fontSize: 12.5, fontWeight: 700, padding: "0 4px" }}>OK</span>
+          </IconButton>
         </div>
       ) : null}
     </>
