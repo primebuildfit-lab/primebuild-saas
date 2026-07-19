@@ -1,5 +1,4 @@
 {
-  "$comment": "CI-only overlay merged on top of tauri.conf.json via `tauri build --config`. Turns ON signed updater artifacts (installer + .sig + latest.json). Kept OUT of the base config so local `tauri build` does not require the signing key. See .github/workflows/release-eventra-desktop.yml.",
   "bundle": {
     "createUpdaterArtifacts": true
   }

@@ -81,6 +81,12 @@ jobs:
           projectPath: apps/admin
           # Overlay that turns ON signed updater artifacts (kept out of the base
           # config so local builds stay keyless).
+          #
+          # NO añadas "$comment" ni ninguna clave de documentación a ese overlay:
+          # Tauri valida el config YA FUSIONADO contra su esquema y aborta con
+          # `Additional properties are not allowed ('$comment' was unexpected)`,
+          # rompiendo todos los builds firmados. El overlay debe contener solo
+          # claves válidas de configuración; documenta aquí.
           args: --config src-tauri/tauri.conf.release.json
           tagName: ${{ github.ref_type == 'tag' && github.ref_name || inputs.tag }}
           releaseName: "Eventra Internal OS __VERSION__"
