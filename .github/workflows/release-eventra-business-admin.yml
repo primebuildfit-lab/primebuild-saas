@@ -107,6 +107,12 @@ jobs:
           releaseDraft: false
           prerelease: false
           includeUpdaterJson: true
+          # La clave `windows-x86_64` del manifiesto debe apuntar al instalador
+          # NSIS, no al MSI. La app se distribuye e instala por NSIS
+          # (`installMode: currentUser`, sin elevación); si el updater se bajara
+          # el MSI instalaría por otra ruta y pediría permisos de administrador.
+          # Sin esto, tauri-action prefiere el MSI por defecto.
+          updaterJsonPreferNsis: true
 
       - name: Publish the rolling updater manifest
         shell: bash

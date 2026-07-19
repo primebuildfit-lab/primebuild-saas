@@ -1,6 +1,6 @@
 {
   "name": "@eventra/business-admin",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "type": "module",
   "description": "Eventra Business Admin — internal monitoring/supervision console for the commercial Eventra Business Client. Vite SPA, packaged as the Tauri desktop app. Never acts as a client company; monitors, reviews, diagnoses, audits, and intervenes with permissions.",

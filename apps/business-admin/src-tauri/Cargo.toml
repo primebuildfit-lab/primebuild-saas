@@ -1,6 +1,6 @@
 [package]
 name = "eventra-business-admin"
-version = "0.1.0"
+version = "0.1.1"
 description = "Eventra Business Admin — private Windows desktop shell for apps/business-admin (internal monitoring console)"
 authors = ["Eventra"]
 edition = "2021"
