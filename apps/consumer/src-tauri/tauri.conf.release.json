@@ -5,7 +5,7 @@
   },
   "plugins": {
     "updater": {
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IEVDNUQ4MjM3RUM1NjM2NEIKUldSTE5sYnNONEpkN0VwMmJUZXJwTlFiMFVUU2tLR2NuWkU3RnMrOWg2T0R6WDJIV3JCRlFYVk8K"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDNEMjlBNDk1N0I1QzhGRkUKUldUK2oxeDdsYVFwUFpJTllIa3ZYZUxad1BXNmVlWTNHL0l2cW1LSWNiTitWT2JyOWEwVDNTRTAK"
     }
   }
 }
