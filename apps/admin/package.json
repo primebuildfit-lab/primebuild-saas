@@ -11,7 +11,9 @@
     "test": "vitest run",
     "desktop:dev": "tauri dev",
     "desktop:build": "tauri build",
-    "desktop:icon": "tauri icon"
+    "desktop:icon": "tauri icon",
+    "_comment:tauri": "tauri-action invoca `npm run tauri build`; sin este script el release falla con 'Missing script: tauri' antes incluso de firmar.",
+    "tauri": "tauri"
   },
   "dependencies": {
     "@eventra/calendar": "*",
@@ -20,9 +22,12 @@
     "@eventra/promotions": "*",
     "@eventra/types": "*",
     "@eventra/ui": "*",
+    "@supabase/supabase-js": "^2.110.7",
+    "@tauri-apps/plugin-opener": "^2.5.4",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
-    "react-router": "^7.12.0"
+    "react-router": "^7.12.0",
+    "@tauri-apps/api": "^2.11.1"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.11.4",
